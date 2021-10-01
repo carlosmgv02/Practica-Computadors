@@ -2,7 +2,7 @@
 @;=== candy1_combi.s: rutinas para detectar y sugerir combinaciones   ===
 @;=                                                               		=
 @;=== Programador tarea 1G: carlos.martinezg@estudiants.urv.cat				  ===
-@;=== Programador tarea 1H: carlos.martinezg@estudiants.urv.cat				  ===
+@;=== Programador tarea 1H: carlos.martinez1g@estudiants.urv.cat				  ===
 @;=                                                             	 	=
 
 
@@ -11,7 +11,7 @@
 
 
 
-@;-- .text. código de las rutinas ---
+@;-- .text. cï¿½digo de las rutinas ---
 .text	
 		.align 2
 		.arm
@@ -20,10 +20,10 @@
 
 @;TAREA 1G;
 @; hay_combinacion(*matriz): rutina para detectar si existe, por lo menos, una
-@;	combinación entre dos elementos (diferentes) consecutivos que provoquen
-@;	una secuencia válida, incluyendo elementos en gelatinas simples y dobles.
-@;	Parámetros:
-@;		R0 = dirección base de la matriz de juego
+@;	combinaciï¿½n entre dos elementos (diferentes) consecutivos que provoquen
+@;	una secuencia vï¿½lida, incluyendo elementos en gelatinas simples y dobles.
+@;	Parï¿½metros:
+@;		R0 = direcciï¿½n base de la matriz de juego
 @;	Resultado:
 @;		R0 = 1 si hay una secuencia, 0 en otro caso
 	.global hay_combinacion
@@ -36,22 +36,22 @@ hay_combinacion:
 
 
 @;TAREA 1H;
-@; sugiere_combinacion(*matriz, *sug): rutina para detectar una combinación
+@; sugiere_combinacion(*matriz, *sug): rutina para detectar una combinaciï¿½n
 @;	entre dos elementos (diferentes) consecutivos que provoquen una secuencia
-@;	válida, incluyendo elementos en gelatinas simples y dobles, y devolver
-@;	las coordenadas de las tres posiciones de la combinación (por referencia).
+@;	vï¿½lida, incluyendo elementos en gelatinas simples y dobles, y devolver
+@;	las coordenadas de las tres posiciones de la combinaciï¿½n (por referencia).
 @;	Restricciones:
-@;		* se supone que existe por lo menos una combinación en la matriz
+@;		* se supone que existe por lo menos una combinaciï¿½n en la matriz
 @;			 (se debe verificar antes con la rutina 'hay_combinacion')
-@;		* la combinación sugerida tiene que ser escogida aleatoriamente de
+@;		* la combinaciï¿½n sugerida tiene que ser escogida aleatoriamente de
 @;			 entre todas las posibles, es decir, no tiene que ser siempre
 @;			 la primera empezando por el principio de la matriz (o por el final)
-@;		* para obtener posiciones aleatorias, se invocará la rutina 'mod_random'
+@;		* para obtener posiciones aleatorias, se invocarï¿½ la rutina 'mod_random'
 @;			 (ver fichero "candy1_init.s")
-@;	Parámetros:
-@;		R0 = dirección base de la matriz de juego
-@;		R1 = dirección del vector de posiciones (char *), donde la rutina
-@;				guardará las coordenadas (x1,y1,x2,y2,x3,y3), consecutivamente.
+@;	Parï¿½metros:
+@;		R0 = direcciï¿½n base de la matriz de juego
+@;		R1 = direcciï¿½n del vector de posiciones (char *), donde la rutina
+@;				guardarï¿½ las coordenadas (x1,y1,x2,y2,x3,y3), consecutivamente.
 	.global sugiere_combinacion
 sugiere_combinacion:
 		push {lr}
@@ -67,21 +67,21 @@ sugiere_combinacion:
 
 
 @; generar_posiciones(vect_pos,f,c,ori,cpi): genera las posiciones de sugerencia
-@;	de combinación, a partir de la posición inicial (f,c), el código de
-@;	orientación 'ori' y el código de posición inicial 'cpi', dejando las
+@;	de combinaciï¿½n, a partir de la posiciï¿½n inicial (f,c), el cï¿½digo de
+@;	orientaciï¿½n 'ori' y el cï¿½digo de posiciï¿½n inicial 'cpi', dejando las
 @;	coordenadas en el vector 'vect_pos'.
 @;	Restricciones:
-@;		* se supone que la posición y orientación pasadas por parámetro se
-@;			corresponden con una disposición de posiciones dentro de los límites
+@;		* se supone que la posiciï¿½n y orientaciï¿½n pasadas por parï¿½metro se
+@;			corresponden con una disposiciï¿½n de posiciones dentro de los lï¿½mites
 @;			de la matriz de juego
-@;	Parámetros:
-@;		R0 = dirección del vector de posiciones 'vect_pos'
+@;	Parï¿½metros:
+@;		R0 = direcciï¿½n del vector de posiciones 'vect_pos'
 @;		R1 = fila inicial 'f'
 @;		R2 = columna inicial 'c'
-@;		R3 = código de orientación;
+@;		R3 = cï¿½digo de orientaciï¿½n;
 @;				inicio de secuencia: 0 -> Este, 1 -> Sur, 2 -> Oeste, 3 -> Norte
 @;				en medio de secuencia: 4 -> horizontal, 5 -> vertical
-@;		R4 = código de posición inicial:
+@;		R4 = cï¿½digo de posiciï¿½n inicial:
 @;				0 -> izquierda, 1 -> derecha, 2 -> arriba, 3 -> abajo
 @;	Resultado:
 @;		vector de posiciones (x1,y1,x2,y2,x3,y3), devuelto por referencia
@@ -93,34 +93,34 @@ generar_posiciones:
 
 
 
-@; detectar_orientacion(f,c,mat): devuelve el código de la primera orientación
-@;	en la que detecta una secuencia de 3 o más repeticiones del elemento de la
-@;	matriz situado en la posición (f,c).
+@; detectar_orientacion(f,c,mat): devuelve el cï¿½digo de la primera orientaciï¿½n
+@;	en la que detecta una secuencia de 3 o mï¿½s repeticiones del elemento de la
+@;	matriz situado en la posiciï¿½n (f,c).
 @;	Restricciones:
-@;		* para proporcionar aleatoriedad a la detección de orientaciones en las
-@;			que se detectan secuencias, se invocará la rutina 'mod_random'
+@;		* para proporcionar aleatoriedad a la detecciï¿½n de orientaciones en las
+@;			que se detectan secuencias, se invocarï¿½ la rutina 'mod_random'
 @;			(ver fichero "candy1_init.s")
-@;		* para detectar secuencias se invocará la rutina 'cuenta_repeticiones'
+@;		* para detectar secuencias se invocarï¿½ la rutina 'cuenta_repeticiones'
 @;			(ver fichero "candy1_move.s")
-@;		* sólo se tendrán en cuenta los 3 bits de menor peso de los códigos
-@;			almacenados en las posiciones de la matriz, de modo que se ignorarán
+@;		* sï¿½lo se tendrï¿½n en cuenta los 3 bits de menor peso de los cï¿½digos
+@;			almacenados en las posiciones de la matriz, de modo que se ignorarï¿½n
 @;			las marcas de gelatina (+8, +16)
-@;	Parámetros:
+@;	Parï¿½metros:
 @;		R1 = fila 'f'
 @;		R2 = columna 'c'
-@;		R4 = dirección base de la matriz
+@;		R4 = direcciï¿½n base de la matriz
 @;	Resultado:
-@;		R0 = código de orientación;
+@;		R0 = cï¿½digo de orientaciï¿½n;
 @;				inicio de secuencia: 0 -> Este, 1 -> Sur, 2 -> Oeste, 3 -> Norte
 @;				en medio de secuencia: 4 -> horizontal, 5 -> vertical
 @;				sin secuencia: 6 
 detectar_orientacion:
 		push {r3, r5, lr}
 		
-		mov r5, #0				@;R5 = índice bucle de orientaciones
+		mov r5, #0				@;R5 = ï¿½ndice bucle de orientaciones
 		mov r0, #4
 		bl mod_random
-		mov r3, r0				@;R3 = orientación aleatoria (0..3)
+		mov r3, r0				@;R3 = orientaciï¿½n aleatoria (0..3)
 	.Ldetori_for:
 		mov r0, r4
 		bl cuenta_repeticiones
@@ -129,23 +129,23 @@ detectar_orientacion:
 		cmp r0, #3
 		bhs .Ldetori_fin		@;hay inicio de secuencia
 		add r3, #2
-		and r3, #3				@;R3 = salta dos orientaciones (módulo 4)
+		and r3, #3				@;R3 = salta dos orientaciones (mï¿½dulo 4)
 		mov r0, r4
 		bl cuenta_repeticiones
 		add r3, #2
-		and r3, #3				@;restituye orientación (módulo 4)
+		and r3, #3				@;restituye orientaciï¿½n (mï¿½dulo 4)
 		cmp r0, #1
-		beq .Ldetori_cont		@;no hay continuación de secuencia
+		beq .Ldetori_cont		@;no hay continuaciï¿½n de secuencia
 		tst r3, #1
 		bne .Ldetori_vert
-		mov r3, #4				@;detección secuencia horizontal
+		mov r3, #4				@;detecciï¿½n secuencia horizontal
 		b .Ldetori_fin
 	.Ldetori_vert:
-		mov r3, #5				@;detección secuencia vertical
+		mov r3, #5				@;detecciï¿½n secuencia vertical
 		b .Ldetori_fin
 	.Ldetori_cont:
 		add r3, #1
-		and r3, #3				@;R3 = siguiente orientación (módulo 4)
+		and r3, #3				@;R3 = siguiente orientaciï¿½n (mï¿½dulo 4)
 		add r5, #1
 		cmp r5, #4
 		blo .Ldetori_for		@;repetir 4 veces
@@ -153,7 +153,7 @@ detectar_orientacion:
 		mov r3, #6				@;marca de no encontrada
 		
 	.Ldetori_fin:
-		mov r0, r3				@;devuelve orientación o marca de no encontrada
+		mov r0, r3				@;devuelve orientaciï¿½n o marca de no encontrada
 		
 		pop {r3, r5, pc}
 
