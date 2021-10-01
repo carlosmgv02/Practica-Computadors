@@ -2,7 +2,7 @@
 @;=== candy1_combi.s: rutinas para detectar y sugerir combinaciones   ===
 @;=                                                               		=
 @;=== Programador tarea 1G: carlos.martinezg@estudiants.urv.cat				  ===
-@;=== Programador tarea 1H: carlos.martinez1g@estudiants.urv.cat				  ===
+@;=== Programador tarea 1H: carlos.martinezg@estudiants.urv.cat				  ===
 @;=                                                             	 	=
 
 
