@@ -60,11 +60,24 @@ hay_secuencia:
 @;		R1 = dirección de la matriz de marcas
 	.global elimina_secuencias
 elimina_secuencias:
-		push {lr}
+		push {r6-r9, lr}
 		
+		mov r6, #0
+		mov r8, #0				@;R8 es desplazamiento posiciones matriz
+	.Lelisec_for0:
+		strb r6, [r1, r8]		@;poner matriz de marcas a cero
+		add r8, #1
+		cmp r8, #ROWS*COLUMNS
+		blo .Lelisec_for0
 		
-		pop {pc}
+		bl marcar_horizontales
+		bl marcar_verticales
+		
 
+@; ATENCIÓN: FALTA CÓDIGO PARA ELIMINAR SECUENCIAS MARCADAS Y GELATINAS
+
+		
+		pop {r6-r9, pc}
 
 	
 @;:::RUTINAS DE SOPORTE:::
