@@ -115,11 +115,47 @@ generar_posiciones:
 @;				en medio de secuencia: 4 -> horizontal, 5 -> vertical
 @;				sin secuencia: 6 
 detectar_orientacion:
-		push {r3,r5,lr}
+		push {r3, r5, lr}
 		
+		mov r5, #0				@;R5 = índice bucle de orientaciones
+		mov r0, #4
+		bl mod_random
+		mov r3, r0				@;R3 = orientación aleatoria (0..3)
+	.Ldetori_for:
+		mov r0, r4
+		bl cuenta_repeticiones
+		cmp r0, #1
+		beq .Ldetori_cont		@;no hay inicio de secuencia
+		cmp r0, #3
+		bhs .Ldetori_fin		@;hay inicio de secuencia
+		add r3, #2
+		and r3, #3				@;R3 = salta dos orientaciones (módulo 4)
+		mov r0, r4
+		bl cuenta_repeticiones
+		add r3, #2
+		and r3, #3				@;restituye orientación (módulo 4)
+		cmp r0, #1
+		beq .Ldetori_cont		@;no hay continuación de secuencia
+		tst r3, #1
+		bne .Ldetori_vert
+		mov r3, #4				@;detección secuencia horizontal
+		b .Ldetori_fin
+	.Ldetori_vert:
+		mov r3, #5				@;detección secuencia vertical
+		b .Ldetori_fin
+	.Ldetori_cont:
+		add r3, #1
+		and r3, #3				@;R3 = siguiente orientación (módulo 4)
+		add r5, #1
+		cmp r5, #4
+		blo .Ldetori_for		@;repetir 4 veces
 		
-		pop {r3,r5,pc}
-
+		mov r3, #6				@;marca de no encontrada
+		
+	.Ldetori_fin:
+		mov r0, r3				@;devuelve orientación o marca de no encontrada
+		
+		pop {r3, r5, pc}
 
 
 .end
