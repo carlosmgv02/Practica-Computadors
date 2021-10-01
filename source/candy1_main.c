@@ -9,7 +9,7 @@
 	Programador 1: xxx.xxx@estudiants.urv.cat
 	Programador 2: yyy.yyy@estudiants.urv.cat
 	Programador 3: zzz.zzz@estudiants.urv.cat
-	Programador 4: uuu.uuu@estudiants.urv.cat
+	Programador 4: carlos.martinezg@estudiants.urv.cat
 
 ------------------------------------------------------------------------------*/
 #include <nds.h>
