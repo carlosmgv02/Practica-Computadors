@@ -1,8 +1,8 @@
 @;=                                                         	      	=
 @;=== candy1_move: rutinas para contar repeticiones y bajar elementos ===
 @;=                                                          			=
-@;=== Programador tarea 1E: xxx.xxx@estudiants.urv.cat				  ===
-@;=== Programador tarea 1F: yyy.yyy@estudiants.urv.cat				  ===
+@;=== Programador tarea 1E: joseluis.pueyo@estudiants.urv.cat		  ===
+@;=== Programador tarea 1F: joseluis.pueyo@estudiants.urv.cat		  ===
 @;=                                                         	      	=
 
 
