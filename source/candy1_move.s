@@ -39,10 +39,29 @@
 @;		R0 = número de repeticiones detectadas (mínimo 1)
 	.global cuenta_repeticiones
 cuenta_repeticiones:
-		push {lr}
+		push {r1-r2, r4-r6, lr}
 		
+		mov r5, #COLUMNS
+		mla r6, r1, r5, r2
+		add r4, r0, r6			@;R4 apunta al elemento (f,c) de 'mat'
+		ldrb r5, [r4]
+		and r5, #7				@;R5 es el valor filtrado (sin marcas de gel.)
+		mov r0, #1				@;R0 = número de repeticiones
+		cmp r3, #0
+		beq .Lconrep_este
+		cmp r3, #1
+		beq .Lconrep_sur
+		cmp r3, #2
+		beq .Lconrep_oeste
+		cmp r3, #3
+		beq .Lconrep_norte
+		b .Lconrep_fin
 		
-		pop {pc}
+
+@; ATENCIÓN: FALTA CÓDIGO PARA CONTAR LAS REPETICIONES EN CADA ORIENTACIÓN
+
+		
+		pop {r1-r2, r4-r6, pc}
 
 
 
