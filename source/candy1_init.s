@@ -1,8 +1,8 @@
 @;=                                                          	     	=
 @;=== candy1_init.s: rutinas para inicializar la matriz de juego	  ===
 @;=                                                           	    	=
-@;=== Programador tarea 1A: xxx.xxx@estudiants.urv.cat				  ===
-@;=== Programador tarea 1B: yyy.yyy@estudiants.urv.cat				  ===
+@;=== Programador tarea 1A: Jialiang.Chen@estudiants.urv.cat				  ===
+@;=== Programador tarea 1B: Jialiang.Chen@estudiants.urv.cat				  ===
 @;=                                                       	        	=
 
 
