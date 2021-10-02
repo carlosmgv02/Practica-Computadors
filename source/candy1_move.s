@@ -39,29 +39,78 @@
 @;		R0 = número de repeticiones detectadas (mínimo 1)
 	.global cuenta_repeticiones
 cuenta_repeticiones:
-		push {r1-r2, r4-r6, lr}
+		push {r1-r2, r4-r10, lr}
 		
 		mov r5, #COLUMNS
-		mla r6, r1, r5, r2
+		mla r6, r1, r5, r2		@;R6 = f * COLUMNS + c
 		add r4, r0, r6			@;R4 apunta al elemento (f,c) de 'mat'
 		ldrb r5, [r4]
 		and r5, #7				@;R5 es el valor filtrado (sin marcas de gel.)
 		mov r0, #1				@;R0 = número de repeticiones
+		
+		ldrb r11, [r4]			@;R11 es el valor sin filtrado
+		
+		@;cmp r3, #0
+		@;beq .Lconrep_este
+		@;cmp r3, #1
+		@;beq .Lconrep_sur
+		@;cmp r3, #2
+		@;beq .Lconrep_oeste
+		@;cmp r3, #3
+		@;beq .Lconrep_norte
+		@;b .Lconrep_fin
+		
+		@;Este
 		cmp r3, #0
-		beq .Lconrep_este
+		subeq r7, #COLUMNS, r2	@; r7 = # posiciones a comprovar
+		moveq r8, #1			@; r8 = forma de moverse a la siguiente casilla a evaluar
+		
+		@;Sur
 		cmp r3, #1
-		beq .Lconrep_sur
+		subeq r7, #ROWS, r1
+		moveq r8, #COLUMNS
+		
+		@;Oeste
 		cmp r3, #2
-		beq .Lconrep_oeste
+		moveq r7, r2
+		moveq r8, #1
+		mvneq r8, [r8, 1]			@; ca2(r8) -> -r8
+		
+		@;Norte
 		cmp r3, #3
-		beq .Lconrep_norte
-		b .Lconrep_fin
+		moveq r7, r1
+		moveq r8, #COLUMNS
+		mvneq r8, [r8, 1]
+			
+		@;Bucle
+		add r9, r4, r8
+	Linicio_bucle
+		cmp r7, #0
+		blt .Lfin_bucle
 		
-
-@; ATENCIÓN: FALTA CÓDIGO PARA CONTAR LAS REPETICIONES EN CADA ORIENTACIÓN
-
+		add r9, r8
+		ldrb r10, [r9]
 		
-		pop {r1-r2, r4-r6, pc}
+		cmp r5, #0
+		beq .LigualCeroSiete
+		cmp r5, #7
+		bne .LdiferenteCeroSiete
+	LigualCeroSiete:
+		cmp r10, r11
+		addeq r0, #1
+		b .LfinIgualCeroSiete
+	LdiferenteCeroSiete:
+		and r12, r10, #7
+		cmp r5, r12
+		addeq r0, #1
+	LfinIgualSiete:
+		
+		sub r7, #1
+		
+		b .Linicio_bucle
+	Lfin_bucle:
+		
+		pop {r1-r2, r4-r12, pc}
 
 
 
