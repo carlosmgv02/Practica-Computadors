@@ -62,29 +62,33 @@ cuenta_repeticiones:
 		
 		@;Este
 		cmp r3, #0
-		subeq r7, #COLUMNS, r2	@; r7 = # posiciones a comprovar
-		moveq r8, #1			@; r8 = forma de moverse a la siguiente casilla a evaluar
+		moveq r7, #COLUMNS
+		subeq r7, r2			@; r7 = # posiciones a comprovar
+		moveq r8, #1			@; r8 = posiciones a moverse hasta la siguiente casilla a evaluar
 		
 		@;Sur
 		cmp r3, #1
-		subeq r7, #ROWS, r1
+		moveq r7, #ROWS
+		subeq r7, r1
 		moveq r8, #COLUMNS
 		
 		@;Oeste
 		cmp r3, #2
 		moveq r7, r2
 		moveq r8, #1
-		mvneq r8, [r8, 1]			@; ca2(r8) -> -r8
+		mvneq r8, r8			@; ca2(r8) -> -r8
+		addeq r8, #1			
 		
 		@;Norte
 		cmp r3, #3
 		moveq r7, r1
 		moveq r8, #COLUMNS
-		mvneq r8, [r8, 1]
+		mvneq r8, r8
+		addeq r8, #1
 			
 		@;Bucle
 		add r9, r4, r8
-	Linicio_bucle
+	.Linicio_bucle:
 		cmp r7, #0
 		blt .Lfin_bucle
 		
@@ -95,20 +99,20 @@ cuenta_repeticiones:
 		beq .LigualCeroSiete
 		cmp r5, #7
 		bne .LdiferenteCeroSiete
-	LigualCeroSiete:
+	.LigualCeroSiete:
 		cmp r10, r11
 		addeq r0, #1
 		b .LfinIgualCeroSiete
-	LdiferenteCeroSiete:
+	.LdiferenteCeroSiete:
 		and r12, r10, #7
 		cmp r5, r12
 		addeq r0, #1
-	LfinIgualSiete:
+	.LfinIgualCeroSiete:
 		
 		sub r7, #1
 		
 		b .Linicio_bucle
-	Lfin_bucle:
+	.Lfin_bucle:
 		
 		pop {r1-r2, r4-r12, pc}
 
