@@ -40,10 +40,84 @@
 @;		R0 = 1 si hay una secuencia, 0 en otro caso
 	.global hay_secuencia
 hay_secuencia:
-		push {lr}
-		
-		
-		pop {pc}
+		push {r0-r11,lr}
+		mov r1, #ROWS                  @; r1=filas-->9
+		mov r2, #COLUMNS               @; r2=columnas-->9
+		mov r3, #0                     @; r3 = i
+		mov r4, #0                     @; r4 = j
+		sub r8, r1, #2				   @; r8 = filas-2-->7
+		sub r9, r2, #2                 @; r9 = columnas-2-->7
+.Lfor1:
+		cmp r3, r1
+		bhs .Lfifor1
+.Lfor2:
+		cmp r4, r2
+		bhs .Lfifor2
+		mul r6, r1, r2
+		add r7, r6, r4
+		ldrb r5,[r0,r7]
+.Lif1:
+		tst r5, #0x07
+		beq .Lfiif1
+		tst r5, #0x00
+		beq .Lfiif1
+.Lif2:
+		cmp r3, r8
+		bhs .Lelse2
+		cmp r4, r9
+		bhs .Lelse2
+.Lif3:
+		mov r10, r3
+		mov r11, r0
+		mov r3, #1
+		bl cuenta_repeticiones
+		cmp r0, #3
+		blo .Lelse3
+		b .Lreturn1
+.Lelse3:
+		mov r0, r11
+		mov r3, #0
+		bl cuenta_repeticiones
+		cmp r0, #3
+		blo .Lfiif2
+		b .Lreturn1
+.Lelse2:
+		cmp r3, r8
+		blo .Lelse22
+.Lif4:
+		mov r10, r3
+		mov r11, r0
+		mov r3, #0
+		bl cuenta_repeticiones
+		cmp r0, #3
+		blo .Lfiif2
+		b .Lreturn1
+.Lelse22:
+		cmp r4, r9
+		blo .Lfiif1
+		mov r10, r3
+		mov r11, r0
+		mov r3, #1
+		bl cuenta_repeticiones
+		cmp r0, #3
+		blo .Lfiif2
+		b .Lreturn1
+.Lfiif2:	
+		mov r3, r10
+		mov r0, r11
+.Lfiif1:
+		add r4, #1
+		b .Lfor2
+.Lfifor2:
+		add r3, #1
+		b .Lfor1
+.Lfifor1:
+		mov r0, #0
+		b .Lreturn0
+.Lreturn1:
+		mov r0, #1
+.Lreturn0:
+		pop {r0-r11,pc}
 
 
 
