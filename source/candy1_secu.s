@@ -59,7 +59,8 @@ hay_secuencia:
 .Lif1:
 		tst r5, #0x07
 		beq .Lfiif1
-		tst r5, #0x00
+		mvn r5, r5
+		tst r5, #0x07  
 		beq .Lfiif1
 .Lif2:
 		cmp r3, r8
