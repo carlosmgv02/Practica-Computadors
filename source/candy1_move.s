@@ -45,10 +45,9 @@ cuenta_repeticiones:
 		mla r6, r1, r5, r2		@;R6 = f * COLUMNS + c
 		add r4, r0, r6			@;R4 apunta al elemento (f,c) de 'mat'
 		ldrb r5, [r4]
+		ldrb r11, [r4]			@;R6 es el valor sin filtrar
 		and r5, #7				@;R5 es el valor filtrado (sin marcas de gel.)
 		mov r0, #1				@;R0 = número de repeticiones
-		
-		ldrb r11, [r4]			@;R11 es el valor sin filtrado
 		
 		@;cmp r3, #0
 		@;beq .Lconrep_este
@@ -88,29 +87,28 @@ cuenta_repeticiones:
 			
 		@;Bucle
 		add r9, r4, r8
-	.Linicio_bucle:
+	.Linicio_bucle:		@; for(r7; r7 > 0; r7--)
 		cmp r7, #0
 		blt .Lfin_bucle
-		
 		add r9, r8
 		ldrb r10, [r9]
-		
+		@; si(seguentNum == 0 o seguentNum == 7) //Para tener en cuenta el 4o y 5o bit o usar el valor filtrado
 		cmp r5, #0
 		beq .LigualCeroSiete
 		cmp r5, #7
 		bne .LdiferenteCeroSiete
 	.LigualCeroSiete:
-		cmp r10, r11
+		cmp r10, r11	@; valor sin filtrar == valorInicial?
 		addeq r0, #1
+		bne .Lfin_bucle	@; En caso de que no lo sea salgo del bucle
 		b .LfinIgualCeroSiete
 	.LdiferenteCeroSiete:
 		and r12, r10, #7
-		cmp r5, r12
+		cmp r5, r12		@; valor filtrado == valorInicial?
 		addeq r0, #1
+		bne .Lfin_bucle @; En caso de que no lo sea salgo del bucle
 	.LfinIgualCeroSiete:
-		
 		sub r7, #1
-		
 		b .Linicio_bucle
 	.Lfin_bucle:
 		
