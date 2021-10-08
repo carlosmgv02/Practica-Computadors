@@ -8,7 +8,7 @@
 	Analista-programador: santiago.romani@urv.cat
 	Programador 1: jialiang.chen@estudiants.urv.cat
 	Programador 2: ismael.ruiz@estudiants.urv.cat
-	Programador 3: zzz.zzz@estudiants.urv.cat
+	Programador 3: joseluis.pueyo@estudiants.urv.cat
 	Programador 4: uuu.uuu@estudiants.urv.cat
 
 ------------------------------------------------------------------------------*/
@@ -46,7 +46,6 @@ void actualizar_contadores(int code)
 
 
 /* ---------------------------------------------------------------- */
-
 /* candy1_main.c : función principal main() para test de tarea 1A y 1C	*/
 /*					(requiere tener implementada la tarea 1E)		*/
 /* ---------------------------------------------------------------- */
