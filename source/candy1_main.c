@@ -9,7 +9,7 @@
 	Programador 1: jialiang.chen@estudiants.urv.cat
 	Programador 2: ismael.ruiz@estudiants.urv.cat
 	Programador 3: joseluis.pueyo@estudiants.urv.cat
-	Programador 4: uuu.uuu@estudiants.urv.cat
+	Programador 4: carlos.martinezg@estudiants.urv.cat
 
 ------------------------------------------------------------------------------*/
 #include <nds.h>
