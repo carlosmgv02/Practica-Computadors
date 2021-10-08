@@ -7,7 +7,7 @@
 	
 	Analista-programador: santiago.romani@urv.cat
 	Programador 1: jialiang.chen@estudiants.urv.cat
-	Programador 2: yyy.yyy@estudiants.urv.cat
+	Programador 2: ismael.ruiz@estudiants.urv.cat
 	Programador 3: zzz.zzz@estudiants.urv.cat
 	Programador 4: uuu.uuu@estudiants.urv.cat
 
@@ -46,14 +46,15 @@ void actualizar_contadores(int code)
 
 
 /* ---------------------------------------------------------------- */
-/* candy1_main.c : función principal main() para test de tarea 1A 	*/
+
+/* candy1_main.c : función principal main() para test de tarea 1A y 1C	*/
 /*					(requiere tener implementada la tarea 1E)		*/
 /* ---------------------------------------------------------------- */
 int main(void)
 {
 	seed32 = time(NULL);		// fijar semilla de números aleatorios
 	consoleDemoInit();			// inicialización de pantalla de texto
-	printf("candyNDS (prueba tarea 1A)\n");
+	printf("candyNDS (prueba tarea 1A i 1C)\n");
 	printf("\x1b[38m\x1b[1;0H  nivel:");
 	actualizar_contadores(1);
 
@@ -61,14 +62,18 @@ int main(void)
 	{
 		inicializa_matriz(matrix, level);
 		escribe_matriz_debug(matrix);
+		if (hay_secuencia(matrix))			// si hay secuencias
+			printf("\x1b[39m\x1b[3;0H hay secuencia: SI");
+		else
+			printf("\x1b[39m\x1b[3;0H hay secuencia: NO");
 		retardo(5);
-		printf("\x1b[39m\x1b[3;8H (pulse A o B)");
+		printf("\x1b[38m\x1b[3;19H (pulse A/B)");
 		do
 		{	swiWaitForVBlank();
 			scanKeys();					// esperar pulsación tecla 'A' o 'B'
 		} while (!(keysHeld() & (KEY_A | KEY_B)));
-		printf("\x1b[3;8H              ");
-		
+		printf("\x1b[3;0H                               ");
+		retardo(5);
 		if (keysHeld() & KEY_A)			// si pulsa 'A',
 		{								// pasa a siguiente nivel
 			level = (level + 1) % MAXLEVEL;
@@ -77,4 +82,3 @@ int main(void)
 	} while (1);
 	return(0);
 }
-
