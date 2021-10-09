@@ -36,99 +36,98 @@
 @;			(ver fichero "candy1_move.s")
 @;	Parámetros:
 @;		R0 = dirección base de la matriz de juego
+@;		R1 = i
+@;		R2 = j
+@;		R3 = ROWS
+@;		R4 = COLUMNS
+@;		R5 = Valor de la matriz en la posicion i j
+@;		R6 = i * COLUMNS + j
+@;		R7 = R0 + R6
+@;		R8 = ROWS - 2	
+@;		R9 = COLUMNS - 2
+@;		R10 = Guardar ROWS
+@;		R11 = Guardar dirección base de la matriz de juego	
 @;	Resultado:
 @;		R0 = 1 si hay una secuencia, 0 en otro caso
 	.global hay_secuencia
 hay_secuencia:
 		push {r1-r11,lr}
-		mov r1, #ROWS                  @; r1=filas-->9
-		mov r2, #COLUMNS               @; r2=columnas-->9
-		mov r3, #0                     @; r3 = i
-		mov r4, #0                     @; r4 = j
-		sub r8, r1, #2				   @; r8 = filas-2-->7
-		sub r9, r2, #2                 @; r9 = columnas-2-->7
+		mov r1, #0                     	@; r1 = i
+		mov r2, #0                     	@; r2 = j
+		mov r3, #ROWS                  	@; r3 = Filas
+		mov r4, #COLUMNS               	@; r4 = Columnas
+		sub r8, r3, #2				   	@; r8 = filas-2-->7
+		sub r9, r4, #2                 	@; r9 = columnas-2-->7
 .Lfor1:
-		cmp r3, r1
+		cmp r1, r3						@; i < filas
 		bhs .Lfifor1
 .Lfor2:
-		cmp r4, r2
+		cmp r2, r4						@; j < columnas
 		bhs .Lfifor2
-		mla r6, r3, r2, r4
-		add r7, r0, r4
-		ldrb r5,[r7]
+		mla r6, r1, r4, r2				@; R6 = i * NC + j
+		add r7, r0, r6
+		ldrb r5,[r7]					@; R5 = matriz[i][j]
 .Lif1:
-		tst r5, #0x07
+		tst r5, #0x07					@; Comprobar que el valor no sea un espacio vacio
 		beq .Lfiif1
 		mvn r5, r5
-		tst r5, #0x07  
+		tst r5, #0x07  					@; Comprobar que no sea un bloque solido o un hueco
 		beq .Lfiif1
 .Lif2:
-		cmp r3, r8
+		cmp r1, r8						@; i < filas-2
 		bhs .Lelse2
-		cmp r4, r9
+		cmp r2, r9						@; j < columnas-2
 		bhs .Lelse2
 .Lif3:
-		mov r10, r1
-		mov r11, r2
-		mov r1, r3
-		mov r2, r4
-		mov r12, r0
-		mov r3, #1
-		bl cuenta_repeticiones
-		cmp r0, #3
+		mov r10, r3						@; Guardar filas en R10
+		mov r11, r0						@; Guardar dirección base de la matriz de juego en R11
+		mov r3, #1						@; Añadir dirección(sur) en R3
+		bl cuenta_repeticiones			@; Llamar funcion cuenta repeticiones
+		cmp r0, #3						@; nº de repiticiones >= 3
 		blo .Lelse3
 		b .Lreturn1
 .Lelse3:
-		mov r0, r11
-		mov r3, #0
-		bl cuenta_repeticiones
-		cmp r0, #3
+		mov r0, r11    					@; Devolver dirección base de la matrix de juego en R0
+		mov r3, #0						@; Añadir dirección(este) en R3
+		bl cuenta_repeticiones			@; Llamar funcion cuenta repeticiones
+		cmp r0, #3						@; nº de repiticiones >= 3
 		blo .Lfiif2
 		b .Lreturn1
 .Lelse2:
-		cmp r3, r8
+		cmp r1, r8						@; i >= filas-2
 		blo .Lelse22
 .Lif4:
-		mov r10, r1
-		mov r11, r2
-		mov r1, r3
-		mov r2, r4
-		mov r12, r0
-		mov r3, #0
-		bl cuenta_repeticiones
-		cmp r0, #3
+		mov r10, r3						@; Guardar filas en R10
+		mov r11, r0						@; Guardar dirección base de la matriz de juego en R11
+		mov r3, #0						@; Añadir dirección(sur) en R3
+		bl cuenta_repeticiones			@; Llamar funcion cuenta repeticiones
+		cmp r0, #3						@; nº de reèticiones >= 3
 		blo .Lfiif2
 		b .Lreturn1
 .Lelse22:
-		cmp r4, r9
+		cmp r2, r9						@; j >= colimnas-2
 		blo .Lfiif1
-		mov r10, r1
-		mov r11, r2
-		mov r1, r3
-		mov r2, r4
-		mov r12, r0
-		mov r3, #1
-		bl cuenta_repeticiones
-		cmp r0, #3
+		mov r10, r3						@; Guardar filas en R10
+		mov r11, r0						@; Guardar dirección base de la matriz de juego en R11
+		mov r3, #1						@; Añadir dirección(sur) en R3
+		bl cuenta_repeticiones			@; Llamar funcion cuenta repeticiones
+		cmp r0, #3						@; nº de repeticiones >= 3
 		blo .Lfiif2
 		b .Lreturn1
 .Lfiif2:	
-		mov r3, r1
-		mov r4, r2
-		mov r0, r12
-		mov r3, r10
-		mov r2, r11
+		mov r0, r11						@; Devolver dirección base de la matrix de juego en R0 
+		mov r3, r10						@; Devolver filas en R3
 .Lfiif1:
-		add r4, #1
-		b .Lfor2
+		add r2, #1						@; j++
+		b .Lfor2						@; Saltar al segundo bucle
 .Lfifor2:
-		add r3, #1
-		b .Lfor1
+		add r1, #1						@; i++
+		b .Lfor1						@; Saltar al primer bucle
 .Lfifor1:
-		mov r0, #0
+		mov r0, #0						@; Hay secuencias = 0 (false)
 		b .Lreturn0
 .Lreturn1:
-		mov r0, #1
+		mov r0, #1						@; Hay secuencias = 1 (true)
 .Lreturn0:
 		pop {r1-r11,pc}
 
