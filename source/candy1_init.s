@@ -41,13 +41,78 @@
 @;			'cuenta_repeticiones' (ver fichero "candy1_move.s")
 @;	Parámetros:
 @;		R0 = dirección base de la matriz de juego
-@;		R1 = número de mapa de configuración
+@;		Uso de registros:
+@;		r1 = x 
+@;		r2 = y 
+@;		r4 = posicion inicual mapa de configuración
+@;		r5 = número de mapa de configuración
+@;		r6 = ROWS * COLUMNS
+@;		r7 = COLUMNS
+@;		r8 = (x*COLUMNS)+y
+@;		r9 = nose
+@;		r10 = valor de la posición actual (mapa)
+@;		r11 = posición inicial de la matriz
+
 	.global inicializa_matriz
 inicializa_matriz:
-		push {lr}		@;guardar registros utilizados
+		push {r1-r12, lr}		@;guardar registros utilizados
+		mov r5, r1
+		mov r7, #COLUMNS
+		ldr r4, =mapas
+		mov r6, #ROWS*COLUMNS
+		mla r4, r6, r5, r4
+		mov r1, #0
+		mov r2, #0
+	.Lfor1:
+		cmp r1, ROWS
+		bhs .LendFor1
+	.Lfor2:
+		cmp r2, COLUMNS
+		bhs .LendFor2
+@;  LIf1
+		mla r8, r1, r7, r2
+		add r9, r4, r8
+		ldrb r10, [r9]
+		tst r10, #0x07
+		beq .Lelse
+		add r9, r0, r8
+		strb r10, [r9]
+		b .LendIf
+	.Lelse:
+		
+	.LendIf:
 		
 		
-		pop {pc}			@;recuperar registros y volver
+		
+				
+		
+		
+	
+	.LendFor2:
+	.LendFor1:
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		pop {r1-r12, pc}			@;recuperar registros y volver
 
 
 
