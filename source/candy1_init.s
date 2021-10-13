@@ -42,43 +42,55 @@
 @;	Parámetros:
 @;		R0 = dirección base de la matriz de juego
 @;		Uso de registros:
-@;		r1 = x 
-@;		r2 = y 
-@;		r4 = posicion inicual mapa de configuración
+@;		r1 = i 
+@;		r2 = j 
+@;		r4 = posicion inicial mapa de configuración
 @;		r5 = número de mapa de configuración
 @;		r6 = ROWS * COLUMNS
 @;		r7 = COLUMNS
-@;		r8 = (x*COLUMNS)+y
+@;		r8 = (i*COLUMNS)+j
 @;		r9 = nose
 @;		r10 = valor de la posición actual (mapa)
-@;		r11 = posición inicial de la matriz
+@;		r11 = r0 temporal para llamar mod_random()
+@;		r12 = 
 
 	.global inicializa_matriz
 inicializa_matriz:
 		push {r1-r12, lr}		@;guardar registros utilizados
-		mov r5, r1
-		mov r7, #COLUMNS
-		ldr r4, =mapas
-		mov r6, #ROWS*COLUMNS
-		mla r4, r6, r5, r4
-		mov r1, #0
-		mov r2, #0
+		mov r5, r1				@;mover el número de mapa a r5
+		mov r7, #COLUMNS		@;mover valor de COLUMNS a r7
+		ldr r4, =mapas			@;cargar la dirección inicial de mapa a r4, r4=@mapa
+		mov r6, #ROWS*COLUMNS	@;memoria que ocupa 1 mapa
+		mla r4, r6, r5, r4		@;@([memoria que ocupa 1 mapa](r6) * n_mapa(r5) + dirección inicial de mapa (r4)) = @mapa_n[0][0]
+		mov r1, #0				@;r1 = i
+		mov r2, #0				@;r2 = j
 	.Lfor1:
-		cmp r1, ROWS
-		bhs .LendFor1
+		cmp r1, ROWS			@;compara si y ha salido del rango del mapa
+		bhs .LendFor1			@; salta si i > filas
 	.Lfor2:
-		cmp r2, COLUMNS
-		bhs .LendFor2
-@;  LIf1
-		mla r8, r1, r7, r2
-		add r9, r4, r8
-		ldrb r10, [r9]
-		tst r10, #0x07
-		beq .Lelse
-		add r9, r0, r8
-		strb r10, [r9]
+		cmp r2, COLUMNS			@;compara si x ha salido del rango del mapa
+		bhs .LendFor2			@;salta si j > columnas
+@;  LIf
+		mla r8, r1, r7, r2		@;@(i*columnas)+j = @la pocision actual (indiferente del mapa)
+		add r9, r4, r8			@;@posicion de la fila "i" y columna actual "j" = @Posicion actual (mapa)
+		ldrb r10, [r9]			@;r10= valor de @Posicion actual / Valor en esa posicion
+		tst r10, #0x07			@;compara el valor de la posicion actual con la mascara, y modifica el flag de ceros
+		beq .Lelse				@;si el flag de 0 está activo
+		add r9, r0, r8			@;se añade la posicion de la actual al la direccion base = @matriz[i][j]
+		strb r10, [r9]			@;carga el contenido de la posicion actual de la matriz a la direccion @matriz[i][j]
+		b .LendIf				
+	.Lelse:						@; si el flag de 0 NO está activo
+		mov r11,r0				@;backup de la dirección base de la matriz
+		mov r0, #6				@;mod_random(), n = 6
+		bl mod_random			@;llamar a mod_random con r0=6, retorna un valor de 0 a 5
+		add r0, #1				@;ahora r0 pertenece a {1, 2, 3, 4, 5, 6}
+		add r10, r0				@;matriz[i][j] + n
+		strb r10, [r9]			@;carga el valor mapa[i][j] + n a la memoria de matriz[i][j]
+	.Lwhile
+		
+		
+	.Lendwhile
 		b .LendIf
-	.Lelse:
 		
 	.LendIf:
 		
