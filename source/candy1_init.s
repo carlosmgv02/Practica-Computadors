@@ -44,6 +44,7 @@
 @;		Uso de registros:
 @;		r1 = i 
 @;		r2 = j 
+@; 		r3 = orientación
 @;		r4 = posicion inicial mapa de configuración
 @;		r5 = número de mapa de configuración
 @;		r6 = ROWS * COLUMNS
@@ -86,44 +87,29 @@ inicializa_matriz:
 		add r0, #1				@;ahora r0 pertenece a {1, 2, 3, 4, 5, 6}
 		add r10, r0				@;matriz[i][j] + n
 		strb r10, [r9]			@;carga el valor mapa[i][j] + n a la memoria de matriz[i][j]
-	.Lwhile
-		
-		
-	.Lendwhile
-		b .LendIf
-		
-	.LendIf:
-		
-		
-		
-				
-		
-		
+@;while
+		mov r0, r11				@;pasar la matriz por r0
+		mov r3, #3				@;pasar la orientación oeste por parámetro
+		bl cuenta_repeticiones
+		cmp r0, #3
+		bhs .Lwhile
+		mov r0, r11				@;pasar la matriz por r0
+		mov r3, #2				@;pasar la orientación norte por parámetro 
+		bl cuenta_repeticiones
+		cmp r0, #3
+		blo .Lendwhile
+	.Lwhile:
+		mov r0, #6				@;mod_random(), n = 6
+		bl mod_random			@;llamar a mod_random con r0=6, retorna un valor de 0 a 5
+		add r0, #1				@;ahora r0 pertenece a {1, 2, 3, 4, 5, 6}
+		add r10, r0				@;matriz[i][j] + n
+		strb r10, [r9]			@;carga el valor mapa[i][j] + n a la memoria de matriz[i][j]
 	
+	.Lendwhile:
+	.LendIf:
 	.LendFor2:
 	.LendFor1:
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+	
 		pop {r1-r12, pc}			@;recuperar registros y volver
 
 
