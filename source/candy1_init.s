@@ -41,17 +41,19 @@
 @;			'cuenta_repeticiones' (ver fichero "candy1_move.s")
 @;	Parámetros:
 @;		R0 = dirección base de la matriz de juego
+@;		R1 = numero de mapa
 @;		Uso de registros:
+@; 		r0 = dirección base de la matriz de juego
 @;		r1 = i 
 @;		r2 = j 
 @; 		r3 = orientación
 @;		r4 = (i*COLUMNS)+j
 @;		r5 = @mapa[0][0]
 @;		r6 = #COLUMNS
-@;		r7 = 
-@;		r8 = 
-@;		r9 = 
-@;		r10 = 
+@;		r7 = temporal
+@;		r8 = temporal
+@;		r9 = temporal
+@;		r10 = temporal
 @;		r11 = mapa[i][j]
 @;		r12 = backup de r0
 
@@ -80,31 +82,31 @@ inicializa_matriz:
 	tst r11, #0x07				@;comparar si té els tres últims bits a 0
 	beq .Lelse					@;salta si son tots 0's
 	strb r11, [r0, r4]			@;si no son tots 0's, es guarda el valor
-	b .Lendif
+	b .Lendif					
 .Lelse:
-	mov r12, r0
-	mov r0, #6
-	bl mod_random
-	add r0, #1
-	orr r0, r11
-	strb r0, [r12, r4]
+	mov r12, r0					@;recuperar la matriu
+	mov r0, #6					@;posar el paràmetre n
+	bl mod_random				@;trucar a la funció
+	add r0, #1					@;obternir un resultat d'entre 1 i 6
+	orr r0, r11					@;afegir les gelatines
+	strb r0, [r12, r4]			@;guardar el valor en la matriu
 @;comprovacions
-	mov r0, r12
-	mov r3, #2
-	bl cuenta_repeticiones
-	cmp r0, #3	
-	bhs .Lelse
-	mov r0, r12
-	mov r3, #3
-	bl cuenta_repeticiones
-	cmp r0, #3
-	bhs .Lelse
+	mov r0, r12					@;recuperar la matriu
+	mov r3, #2					@;pasar el paràmetre d'orientació
+	bl cuenta_repeticiones		
+	cmp r0, #3					@;mirar si té una seqüencia de 3 o més
+	bhs .Lelse					@;Si és igual o major, es retorna a calcular el valor
+	mov r0, r12					@;recuperar la matriu
+	mov r3, #3					@;pasar el paràmetre d'orientació
+	bl cuenta_repeticiones		@;Si és igual o major, es retorna a calcular el valor
+	cmp r0, #3					@;mirar si té una seqüencia de 3 o més
+	bhs .Lelse		
 .Lendif:
-	mov r0, r12
-	add r2, #1
+	mov r0, r12					@;recuperar la matriu
+	add r2, #1					@;j++
 	b .Lfor2
-.Lendfor2:
-	add r1, #1
+.Lendfor2:		
+	add r1, #1					@;i++
 	b .Lfor1
 .Lendfor1:
 	
