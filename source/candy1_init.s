@@ -67,10 +67,10 @@ inicializa_matriz:
 		mov r2, #0				@;r2 = j
 	.Lfor1:
 		cmp r1, #ROWS			@;compara si y ha salido del rango del mapa
-		bhs .LendFor1			@; salta si i > filas
+		bhi .LendFor1			@; salta si i > filas
 	.Lfor2:
-		cmp r2, #COLUMNS			@;compara si x ha salido del rango del mapa
-		bhs .LendFor2			@;salta si j > columnas
+		cmp r2, #COLUMNS		@;compara si x ha salido del rango del mapa
+		bhi .LendFor2			@;salta si j > columnas
 @;  LIf
 		mla r8, r1, r7, r2		@;@(i*columnas)+j = @la pocision actual (indiferente del mapa)
 		add r9, r4, r8			@;@posicion de la fila "i" y columna actual "j" = @Posicion actual (mapa)
@@ -85,32 +85,41 @@ inicializa_matriz:
 		mov r0, #6				@;mod_random(), n = 6
 		bl mod_random			@;llamar a mod_random con r0=6, retorna un valor de 0 a 5
 		add r0, #1				@;ahora r0 pertenece a {1, 2, 3, 4, 5, 6}
+		add r9, r8, r11			@;se añade la posicion de la actual al la direccion base = @matriz[i][j]
+		ldrb r10, [r9]
 		add r10, r0				@;matriz[i][j] + n
 		strb r10, [r9]			@;carga el valor mapa[i][j] + n a la memoria de matriz[i][j]
 @;while
-		mov r0, r11				@;pasar la matriz por r0
+		mov r0, r11				@;pasar la direccion de la matriz por r0
 		mov r3, #3				@;pasar la orientación oeste por parámetro
-		bl cuenta_repeticiones
-		cmp r0, #3
-		bhs .Lwhile
+		bl cuenta_repeticiones	@;Llamar a la función cuenta_repeticiones
+		cmp r0, #3				@;Comparar si el resultado és mayor o igual a 3
+		bhs .Lwhile				@;saltar si se cumple r0>=#3
 		mov r0, r11				@;pasar la matriz por r0
 		mov r3, #2				@;pasar la orientación norte por parámetro 
-		bl cuenta_repeticiones
-		cmp r0, #3
+		bl cuenta_repeticiones	@;Llamar a la función cuenta_repeticiones
+		cmp r0, #3				@;Comparar si el resultado és mayor o igual a 3
 		blo .Lendwhile
 	.Lwhile:
 		mov r0, #6				@;mod_random(), n = 6
 		bl mod_random			@;llamar a mod_random con r0=6, retorna un valor de 0 a 5
 		add r0, #1				@;ahora r0 pertenece a {1, 2, 3, 4, 5, 6}
+		ldrb r10, [r9]
 		add r10, r0				@;matriz[i][j] + n
 		strb r10, [r9]			@;carga el valor mapa[i][j] + n a la memoria de matriz[i][j]
-	
+		cmp r0, #3
+		blo .Lendwhile
+		b .Lwhile
 	.Lendwhile:
 	.LendIf:
+	add r2, #1
+	b .LendFor2
 	.LendFor2:
+	add r1, #1
+	b .LendFor1
 	.LendFor1:
 	
-		pop {r1-r12, pc}			@;recuperar registros y volver
+	pop {r1-r12, pc}			@;recuperar registros y volver
 
 
 
