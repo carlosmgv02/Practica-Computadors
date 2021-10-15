@@ -84,7 +84,8 @@ inicializa_matriz:
 	strb r11, [r0, r4]			@;si no son tots 0's, es guarda el valor
 	b .Lendif					
 .Lelse:
-	mov r12, r0					@;recuperar la matriu
+	mov r12, r0					@;backup de r0
+.Lwhile:
 	mov r0, #6					@;posar el paràmetre n
 	bl mod_random				@;trucar a la funció
 	add r0, #1					@;obternir un resultat d'entre 1 i 6
@@ -95,12 +96,12 @@ inicializa_matriz:
 	mov r3, #2					@;pasar el paràmetre d'orientació
 	bl cuenta_repeticiones		
 	cmp r0, #3					@;mirar si té una seqüencia de 3 o més
-	bhs .Lelse					@;Si és igual o major, es retorna a calcular el valor
+	bhs .Lwhile					@;Si és igual o major, es retorna a calcular el valor
 	mov r0, r12					@;recuperar la matriu
 	mov r3, #3					@;pasar el paràmetre d'orientació
 	bl cuenta_repeticiones		@;Si és igual o major, es retorna a calcular el valor
 	cmp r0, #3					@;mirar si té una seqüencia de 3 o més
-	bhs .Lelse		
+	bhs .Lwhile		
 .Lendif:
 	mov r0, r12					@;recuperar la matriu
 	add r2, #1					@;j++
