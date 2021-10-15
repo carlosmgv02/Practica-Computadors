@@ -45,78 +45,76 @@
 @;		r1 = i 
 @;		r2 = j 
 @; 		r3 = orientación
-@;		r4 = posicion inicial mapa de configuración
-@;		r5 = número de mapa de configuración
-@;		r6 = ROWS * COLUMNS
-@;		r7 = COLUMNS
-@;		r8 = (i*COLUMNS)+j
-@;		r9 = nose
-@;		r10 = valor de la posición actual (mapa)
-@;		r11 = r0 temporal para llamar mod_random()
+@;		r4 = num mapa
+@;		r5 = @mapa[i][j]
+@;		r6 = @matriz[i][j]
+@;		r7 = mapa[i][j]
+@;		r8 = matriz[i][j]
+@;		r9 = 
+@;		r10 = 
+@;		r11 = 
 @;		r12 = 
 
 	.global inicializa_matriz
 inicializa_matriz:
-	push {r1-r12, lr}
+	push {r0-r12, lr}
 	mov r4, r1				@;mover número de mapa a otro R para usarlo
 	mov r1, #0				@;definir i=0
 	mov r2, #0				@;definir j=0
-	mov r10, #ROWS			@;cargar el número de filas
-	mov r11, #COLUMNS		@;cargar el número de columnas
 	ldr r12, =mapas			@;cargar direccion inicial de mapas
-	mul r6, r10, r11		@;FIL * COL
+	mov r6, #ROWS*COLUMNS	@;FIL * COL
 	mla r5, r6, r4, r12		@;r5=@mapa[i][j]
 	mov r6, r0				@;r6=@matriz[i][j]
 	
 	
 .Lfor1:
 	cmp r1, #ROWS			@;i<ROWS
-	bhi .Lendfor1			@;sale del bucle si es mayor
+	bhs .Lendfor1			@;sale del bucle si es mayor
 .Lfor2:
 	cmp r2, #COLUMNS		@;j<COLUMNS
-	bhi .Lendfor2
+	bhs .Lendfor2
 	
 	ldrb r7, [r5]			@;r7=mapa[i][j]
 	ldrb r8, [r6]			@;r8=matriz[i][j]
 	
-@; IF
-	tst r7, #7
+@; IF		
+	tst r7, #0x07
 	beq .Lelse
-	strb r7, [r8]			@;matriz[x][y]=mapa[x][y]
+	strb r7, [r6]			@;matriz[x][y]=mapa[x][y]
 	b .Lendif
 .Lelse:
 	mov r12, r0				@;backup de r0
 	mov r0, #6				@;n=6
 	bl mod_random			@;retorna 0-5
 	add r0, #1				@;ahora r0 está entre 1 y 6
+	orr r0, r7				@;añadir gelatina si existe
 	strb r0, [r6]			@;matriz[i][j]=n
 .Lcomprovacio:
-	mov r3, #2
+	mov r0, r12				@;recuperar dirección matriz
+	mov r3, #2				@;orientación
 	bl cuenta_repeticiones
 	cmp r0, #3
-	bhs .Lwhile
+	bhs .Lelse
+	mov r0, r12
 	mov r3, #3
 	bl cuenta_repeticiones
-	bhs .Lwhile
-	b .Lendif
-.Lwhile:
-	mov r0, #6				@;n=6
-	bl mod_random			@;retorna 0-5
-	add r0, #1				@;ahora r0 está entre 1 y 6
-	strb r0, [r6]			@;matriz[i][j]=n
-	b .Lcomprovacio
+	cmp r0, #3
+	bhs .Lelse
 .Lendif:
+	mov r0, r12
 	add r2, #1				@;j++
 	add r5, #1				@;@mapa[i][j]++
 	add r6, #1				@;@matriz[i][j]++
 	b .Lfor2
+	mov r2, #0
 .Lendfor2:
 	add r1, #1				@;i++
 	add r5, #1				@;@mapa[i][j]++
 	add r6, #1				@;@matriz[i][j]++
 	b .Lfor1
 .Lendfor1:
-	pop {r1-r12, pc}			@;recuperar registros y volver
+	pop {r0-r12, pc}			@;recuperar registros y volver
+
 
 
 
