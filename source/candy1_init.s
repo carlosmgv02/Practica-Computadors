@@ -57,68 +57,63 @@
 
 	.global inicializa_matriz
 inicializa_matriz:
-		push {r1-r12, lr}		@;guardar registros utilizados
-		mov r5, r1				@;mover el número de mapa a r5
-		mov r7, #COLUMNS		@;mover valor de COLUMNS a r7
-		ldr r4, =mapas			@;cargar la dirección inicial de mapa a r4, r4=@mapa
-		mov r6, #ROWS*COLUMNS	@;memoria que ocupa 1 mapa
-		mla r4, r6, r5, r4		@;@([memoria que ocupa 1 mapa](r6) * n_mapa(r5) + dirección inicial de mapa (r4)) = @mapa_n[0][0]
-		mov r1, #0				@;r1 = i
-		mov r2, #0				@;r2 = j
-	.Lfor1:
-		cmp r1, #ROWS			@;compara si y ha salido del rango del mapa
-		bhi .LendFor1			@; salta si i > filas
-	.Lfor2:
-		cmp r2, #COLUMNS		@;compara si x ha salido del rango del mapa
-		bhi .LendFor2			@;salta si j > columnas
-@;  LIf
-		mla r8, r1, r7, r2		@;@(i*columnas)+j = @la pocision actual (indiferente del mapa)
-		add r9, r4, r8			@;@posicion de la fila "i" y columna actual "j" = @Posicion actual (mapa)
-		ldrb r10, [r9]			@;r10= valor de @Posicion actual / Valor en esa posicion
-		tst r10, #0x07			@;compara el valor de la posicion actual con la mascara, y modifica el flag de ceros
-		beq .Lelse				@;si el flag de 0 está activo
-		add r9, r0, r8			@;se añade la posicion de la actual al la direccion base = @matriz[i][j]
-		strb r10, [r9]			@;carga el contenido de la posicion actual de la matriz a la direccion @matriz[i][j]
-		b .LendIf				
-	.Lelse:						@; si el flag de 0 NO está activo
-		mov r11,r0				@;backup de la dirección base de la matriz
-		mov r0, #6				@;mod_random(), n = 6
-		bl mod_random			@;llamar a mod_random con r0=6, retorna un valor de 0 a 5
-		add r0, #1				@;ahora r0 pertenece a {1, 2, 3, 4, 5, 6}
-		add r9, r8, r11			@;se añade la posicion de la actual al la direccion base = @matriz[i][j]
-		ldrb r10, [r9]
-		add r10, r0				@;matriz[i][j] + n
-		strb r10, [r9]			@;carga el valor mapa[i][j] + n a la memoria de matriz[i][j]
-@;while
-		mov r0, r11				@;pasar la direccion de la matriz por r0
-		mov r3, #3				@;pasar la orientación oeste por parámetro
-		bl cuenta_repeticiones	@;Llamar a la función cuenta_repeticiones
-		cmp r0, #3				@;Comparar si el resultado és mayor o igual a 3
-		bhs .Lwhile				@;saltar si se cumple r0>=#3
-		mov r0, r11				@;pasar la matriz por r0
-		mov r3, #2				@;pasar la orientación norte por parámetro 
-		bl cuenta_repeticiones	@;Llamar a la función cuenta_repeticiones
-		cmp r0, #3				@;Comparar si el resultado és mayor o igual a 3
-		blo .Lendwhile
-	.Lwhile:
-		mov r0, #6				@;mod_random(), n = 6
-		bl mod_random			@;llamar a mod_random con r0=6, retorna un valor de 0 a 5
-		add r0, #1				@;ahora r0 pertenece a {1, 2, 3, 4, 5, 6}
-		ldrb r10, [r9]
-		add r10, r0				@;matriz[i][j] + n
-		strb r10, [r9]			@;carga el valor mapa[i][j] + n a la memoria de matriz[i][j]
-		cmp r0, #3
-		blo .Lendwhile
-		b .Lwhile
-	.Lendwhile:
-	.LendIf:
-	add r2, #1
-	b .LendFor2
-	.LendFor2:
-	add r1, #1
-	b .LendFor1
-	.LendFor1:
+	push {r1-r12, lr}
+	mov r4, r1				@;mover número de mapa a otro R para usarlo
+	mov r1, #0				@;definir i=0
+	mov r2, #0				@;definir j=0
+	mov r10, #ROWS			@;cargar el número de filas
+	mov r11, #COLUMNS		@;cargar el número de columnas
+	ldr r12, =mapas
+	mul r6, r10, r11		@;FIL * COL
+	mla r5, r6, r4, r12		@;r5=@mapa[i][j]
+	add r6, r0				@;r6=@matriz[i][j]
 	
+	
+.Lfor1:
+	cmp r1, #ROWS
+	bhi .Lendfor1
+.Lfor2:
+	cmp r2, #COLUMNS
+	bhi .Lendfor2
+	
+	ldrb r7, [r5]			@;r7=mapa[i][j]
+	ldrb r8, [r6]			@;r8=matriz[i][j]
+	
+@; IF
+	tst r7, #0b00000111
+	bne .Lelse
+	strb r7, [r8]			@;matriz[x][y]=mapa[x][y]
+	b .Lendif
+.Lelse:
+	mov r12, r0				@;backup de r0
+	mov r0, #6				@;n=6
+	bl mod_random			@;retorna 0-5
+	add r0, #1				@;ahora r0 está entre 1 y 6
+	strb r0, [r6]			@;matriz[i][j]=n
+.Lcomprovacio:
+	mov r3, #2
+	bl cuenta_repeticiones
+	cmp r0, #3
+	bhs .Lwhile
+	mov r3, #3
+	bl cuenta_repeticiones
+	bhs .Lwhile
+	b .Lendif
+.Lwhile:
+	mov r0, #6				@;n=6
+	bl mod_random			@;retorna 0-5
+	add r0, #1				@;ahora r0 está entre 1 y 6
+	strb r0, [r6]			@;matriz[i][j]=n
+	b .Lcomprovacio
+.Lendif:
+	add r5, #1
+	add r6, #1
+	b .Lfor2
+.Lendfor2:
+	add r5, #1
+	add r6, #1
+	b .Lfor1
+.Lendfor1:
 	pop {r1-r12, pc}			@;recuperar registros y volver
 
 
