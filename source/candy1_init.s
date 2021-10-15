@@ -63,25 +63,25 @@ inicializa_matriz:
 	mov r2, #0				@;definir j=0
 	mov r10, #ROWS			@;cargar el número de filas
 	mov r11, #COLUMNS		@;cargar el número de columnas
-	ldr r12, =mapas
+	ldr r12, =mapas			@;cargar direccion inicial de mapas
 	mul r6, r10, r11		@;FIL * COL
 	mla r5, r6, r4, r12		@;r5=@mapa[i][j]
-	add r6, r0				@;r6=@matriz[i][j]
+	mov r6, r0				@;r6=@matriz[i][j]
 	
 	
 .Lfor1:
-	cmp r1, #ROWS
-	bhi .Lendfor1
+	cmp r1, #ROWS			@;i<ROWS
+	bhi .Lendfor1			@;sale del bucle si es mayor
 .Lfor2:
-	cmp r2, #COLUMNS
+	cmp r2, #COLUMNS		@;j<COLUMNS
 	bhi .Lendfor2
 	
 	ldrb r7, [r5]			@;r7=mapa[i][j]
 	ldrb r8, [r6]			@;r8=matriz[i][j]
 	
 @; IF
-	tst r7, #0b00000111
-	bne .Lelse
+	tst r7, #7
+	beq .Lelse
 	strb r7, [r8]			@;matriz[x][y]=mapa[x][y]
 	b .Lendif
 .Lelse:
@@ -106,12 +106,14 @@ inicializa_matriz:
 	strb r0, [r6]			@;matriz[i][j]=n
 	b .Lcomprovacio
 .Lendif:
-	add r5, #1
-	add r6, #1
+	add r2, #1				@;j++
+	add r5, #1				@;@mapa[i][j]++
+	add r6, #1				@;@matriz[i][j]++
 	b .Lfor2
 .Lendfor2:
-	add r5, #1
-	add r6, #1
+	add r1, #1				@;i++
+	add r5, #1				@;@mapa[i][j]++
+	add r6, #1				@;@matriz[i][j]++
 	b .Lfor1
 .Lendfor1:
 	pop {r1-r12, pc}			@;recuperar registros y volver
