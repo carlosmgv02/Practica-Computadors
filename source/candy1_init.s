@@ -66,10 +66,10 @@ inicializa_matriz:
 		mov r1, #0				@;r1 = i
 		mov r2, #0				@;r2 = j
 	.Lfor1:
-		cmp r1, ROWS			@;compara si y ha salido del rango del mapa
+		cmp r1, #ROWS			@;compara si y ha salido del rango del mapa
 		bhs .LendFor1			@; salta si i > filas
 	.Lfor2:
-		cmp r2, COLUMNS			@;compara si x ha salido del rango del mapa
+		cmp r2, #COLUMNS			@;compara si x ha salido del rango del mapa
 		bhs .LendFor2			@;salta si j > columnas
 @;  LIf
 		mla r8, r1, r7, r2		@;@(i*columnas)+j = @la pocision actual (indiferente del mapa)
