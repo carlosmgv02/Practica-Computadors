@@ -45,55 +45,54 @@
 @;		r1 = i 
 @;		r2 = j 
 @; 		r3 = orientación
-@;		r4 = num mapa
-@;		r5 = @mapa[i][j]
-@;		r6 = @matriz[i][j]
-@;		r7 = mapa[i][j]
-@;		r8 = matriz[i][j]
+@;		r4 = (i*COLUMNS)+j
+@;		r5 = @mapa[0][0]
+@;		r6 = #COLUMNS
+@;		r7 = 
+@;		r8 = 
 @;		r9 = 
 @;		r10 = 
-@;		r11 = 
-@;		r12 = 
+@;		r11 = mapa[i][j]
+@;		r12 = backup de r0
 
 	.global inicializa_matriz
 inicializa_matriz:
 	push {r0-r12, lr}
-	mov r4, r1				@;mover número de mapa a otro R para usarlo
-	mov r1, #0				@;definir i=0
-	mov r2, #0				@;definir j=0
-	ldr r12, =mapas			@;cargar direccion inicial de mapas
-	mov r6, #ROWS*COLUMNS	@;FIL * COL
-	mla r5, r6, r4, r12		@;r5=@mapa[i][j]
-	mov r6, r0				@;r6=@matriz[i][j]
-	
+	mov r7, r1					@;mover el número de mapa a otro registro
+	mov r1, #0					@;inicializar i
+	mov r2, #0					@;inicializar j
+	mov r8, #ROWS*COLUMNS		@;r8=ROWS*COLUMNS
+	mov r6, #COLUMNS			@;r9=COLUMNS
+	ldr r10, =mapas				@;r10=direccion base de mapas
+	mla r5, r8, r7, r10			@;r5=@mapa[0][0]
 	
 .Lfor1:
-	cmp r1, #ROWS			@;i<ROWS
-	bhs .Lendfor1			@;sale del bucle si es mayor
-.Lfor2:
-	cmp r2, #COLUMNS		@;j<COLUMNS
-	bhs .Lendfor2
+	cmp r1, #ROWS				@;comprovar que no s'ha sortit de la taula
+	bhs .Lendfor1				@;saltar si ja ha recorregut totes les files
+	mov r2, #0					@;resetejar la variable j per tornar a recórrer les columnes
+.Lfor2:				
+	cmp r2, #COLUMNS			@;comprovar que no s'ha sortit de la taula
+	bhs .Lendfor2				@;saltar si ja ha recorregut totes les columnes
 	
-	ldrb r7, [r5]			@;r7=mapa[i][j]
-	ldrb r8, [r6]			@;r8=matriz[i][j]
-	
-@; IF		
-	tst r7, #0x07
-	beq .Lelse
-	strb r7, [r6]			@;matriz[x][y]=mapa[x][y]
+	mla r4, r1, r6, r2			@;r4=(i*COLUMNS)+j
+@; IF
+	ldrb r11, [r5, r4]			@;r11=matriz[i][j]
+	tst r11, #0x07				@;comparar si té els tres últims bits a 0
+	beq .Lelse					@;salta si son tots 0's
+	strb r11, [r0, r4]			@;si no son tots 0's, es guarda el valor
 	b .Lendif
 .Lelse:
-	mov r12, r0				@;backup de r0
-	mov r0, #6				@;n=6
-	bl mod_random			@;retorna 0-5
-	add r0, #1				@;ahora r0 está entre 1 y 6
-	orr r0, r7				@;añadir gelatina si existe
-	strb r0, [r6]			@;matriz[i][j]=n
-.Lcomprovacio:
-	mov r0, r12				@;recuperar dirección matriz
-	mov r3, #2				@;orientación
+	mov r12, r0
+	mov r0, #6
+	bl mod_random
+	add r0, #1
+	orr r0, r11
+	strb r0, [r12, r4]
+@;comprovacions
+	mov r0, r12
+	mov r3, #2
 	bl cuenta_repeticiones
-	cmp r0, #3
+	cmp r0, #3	
 	bhs .Lelse
 	mov r0, r12
 	mov r3, #3
@@ -102,18 +101,15 @@ inicializa_matriz:
 	bhs .Lelse
 .Lendif:
 	mov r0, r12
-	add r2, #1				@;j++
-	add r5, #1				@;@mapa[i][j]++
-	add r6, #1				@;@matriz[i][j]++
+	add r2, #1
 	b .Lfor2
-	mov r2, #0
 .Lendfor2:
-	add r1, #1				@;i++
-	add r5, #1				@;@mapa[i][j]++
-	add r6, #1				@;@matriz[i][j]++
+	add r1, #1
 	b .Lfor1
 .Lendfor1:
+	
 	pop {r0-r12, pc}			@;recuperar registros y volver
+
 
 
 
