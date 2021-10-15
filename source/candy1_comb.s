@@ -51,12 +51,12 @@ hay_combinacion:
 		bne .Lifc
 	.Lifc:
 		mov r8,r5
-		sub r8,#1
+		sub r8,#1	@;para hacer la operación COLUMNS-1
 		cmp r2,r8		
 		beq .Lifone+	@;If con índice i+1:if1+
 	.Lifone+:
 		mov r8,r1
-		add r8,#1
+		add r8,#1	@;para acceder a matriz[i+1]
 		mla r11,r8,r5,r2
 		add r9,r0,r11
 		ldrb r10,[r9]
@@ -69,9 +69,9 @@ hay_combinacion:
 		cmp r10,r3
 		bne .Lifon+code
 	.Lifon+code:
-		mov r12,r3
-		mov r3,r10
-		mov r10,r12
+		mov r12,r3	@;aux=matriz [i][j]
+		mov r3,r10	@;matriz[i][j]=matriz[i+1][j]
+		mov r10,r12	@;matriz [i+1][j]=aux
 		
 		pop {pc}
 
