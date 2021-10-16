@@ -101,9 +101,9 @@ inicializa_matriz:
 	mov r3, #3					@;pasar el paràmetre d'orientació
 	bl cuenta_repeticiones		@;Si és igual o major, es retorna a calcular el valor
 	cmp r0, #3					@;mirar si té una seqüencia de 3 o més
+	mov r0, r12					@;recuperar la matriu
 	bhs .Lwhile		
 .Lendif:
-	mov r0, r12					@;recuperar la matriu
 	add r2, #1					@;j++
 	b .Lfor2
 .Lendfor2:		
@@ -112,7 +112,6 @@ inicializa_matriz:
 .Lendfor1:
 	
 	pop {r0-r12, pc}			@;recuperar registros y volver
-
 
 
 
