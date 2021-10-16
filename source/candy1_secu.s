@@ -61,6 +61,7 @@ hay_secuencia:
 .Lfor1:
 		cmp r1, r3						@; i < filas
 		bhs .Lfifor1
+		mov r2, #0
 .Lfor2:
 		cmp r2, r4						@; j < columnas
 		bhs .Lfifor2
@@ -75,7 +76,7 @@ hay_secuencia:
 		beq .Lfiif1
 .Lif2:
 		cmp r1, r8						@; i < filas-2
-		bhs .Lelse2
+		bhs .Lelse22
 		cmp r2, r9						@; j < columnas-2
 		bhs .Lelse2
 .Lif3:
