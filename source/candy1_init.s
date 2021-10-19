@@ -143,16 +143,16 @@ inicializa_matriz:
 @;-------------------------------------------------------
 @;	r0= dirección base de la matriz de juego
 @;	r1= i
-@;	r2= j
+@;	r2= j (a la primera part és ROWS*COLUMNS)
 @;	r3= orientación para otras funciones
 @;	r4= (i*COLUMNS)+j
 @;	r5= #COLUMNS
 @;	r6= valor actual de matriz[i][j]
 @;	r7= mat_recomb1[i][j]
 @;	r8= mat_recomb2[i][j]
-@;	r9= temporal (valor actual de mat_recomb1[i][j]
-@;	r10= temporal (valor actual de mat_recomb2[i][j]
-@;	r11= temporal ()
+@;	r9= temporal (
+@;	r10= temporal (
+@;	r11= temporal (valor per comparar / per a guardar valores)
 @;	r12= Copia de la dirección base de la matriz de juego
 @;	PARÁMETROS: R0 = dirección base de la matriz de juego
 	.global recombina_elementos
@@ -164,6 +164,57 @@ recombina_elementos:
 		mov r5, #COLUMNS		@;r5=#COLUMNS
 		ldr r7, =mat_recomb1	@;r7=@mat_recomb1[0][0]
 		ldr r8, =mat_recomb2	@;r8=@mat_recomb2[0][0]
+		mov r2, #ROWS*COLUMNS	@;temporalment r2 és ROWS * COLUMNS, després é sla j
+	
+	.Lfor:
+		cmp r1, r2				@;comprovar que no s'ha sortit de la taula
+		bhs .Lendfor			@;saltar si ja ha recorregut totes les caselles
+		ldrb r6, [r12, r4]		@;r6 = matriz[i][j]
+@;-------------------------------------------------------
+@; PRIMERA PART
+@;-------------------------------------------------------
+
+		and r11, r6, #7			@;porta and de matriz[i][j] amb #0b0000 0111
+		cmp r11, #7				@;detectar si és 111
+		bne .Lelse				@;saltar si té els últims 3 bits a 1
+		cmp r11, #0				@;detectar si és 000
+		bne .Lelse				@;saltar si té els últims 3 bits a 0
+		strb #0, [r7, r1]		@;mat_recomb1[i][j]=0
+		b .Lendif				@;saltar fins al fi de l'apartat 1
+	.Lelse:	
+		and r11, r6, #7		@;guardar valor de matriz[i][j] amb el bits de gelatines a 0
+		strb r11, [r7, r1]		@;mat_recomb1[i][j]=r11 (valor de la gel. s. sense el bit de la gelatina)
+	.Lendif:
+	
+@;-------------------------------------------------------
+@; SEGONA PART
+@;-------------------------------------------------------
+		
+		
+		
+		add r1, #1
+		b .Lfor
+	.Lendfor:
+	
+@;-------------------------------------------------------
+@; SEGONA PART
+@;-------------------------------------------------------
+	@;IF2
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+@;-------------------------------------------------------
+@; TERCERA PART
+@;-------------------------------------------------------
 	.Lfor1:
 		cmp r1, #ROWS			@;comprovar que no s'ha sortit de la taula
 		bhs .Lendfor1			@;saltar si ja ha recorregut totes les files
@@ -173,38 +224,6 @@ recombina_elementos:
 		bhs .Lendfor2			@;saltar si ja ha recorregut totes les columnes
 		mla r4, r1, r5, r2		@;r4 = (i*COLUMNS)+j
 		ldrb r6, [r12, r4]		@;r6 = matriz[i][j]
-		ldrb r9, [r7, r4]		@;r9 = mat_recomb1[i][j]
-	@; IF1
-		orr r6, #0				@;porta or de matriz[i][j] amb #0
-		cmp r6, #7				@;detectar si és 111
-		bne .Lelse				@;saltar si té els últims 3 bits a 1
-		cmp r6, #0				@;detectar si és 000
-		bne .Lelse				@;saltar si té els últims 3 bits a 0
-	.Lelse1:
-	
-	
-	
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 		
 		
 		
