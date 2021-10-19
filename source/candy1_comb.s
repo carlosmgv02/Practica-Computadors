@@ -16,8 +16,6 @@
 		.align 2
 		.arm
 
-
-
 @;TAREA 1G;
 @; hay_combinacion(*matriz): rutina para detectar si existe, por lo menos, una
 @;	combinaci�n entre dos elementos (diferentes) consecutivos que provoquen
@@ -76,10 +74,7 @@ hay_combinacion:
 		
 		
 		
-		
-		
-		
-		
+		@;Parte que no sirve a revisar y elimminar después
 		
 		mla r4,r1,r5,r2	@;cálculo dirección
 		add r7,r0,r4 	@;añado la dirección de memoria a la direccion base
