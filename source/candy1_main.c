@@ -20,6 +20,7 @@
 
 /* variables globales */
 char matrix[ROWS][COLUMNS];		// matriz global de juego
+char marcas[ROWS][COLUMNS];
 int seed32;						// semilla de números aleatorios
 int level = 0;					// nivel del juego (nivel inicial = 0)
 int points;						// contador global de puntos
@@ -37,7 +38,7 @@ int gelees;						// número de gelatinas restantes
 		bit 3:	gelatinas  */
 void actualizar_contadores(int code)
 {
-	if (code & 1) printf("\x1b[38m\x1b[1;8H %d", level);
+	if (code & 1) printf("\x1b[38m\x1b[1;10H %d", level);
 	if (code & 2) printf("\x1b[39m\x1b[2;8H %d  ", points);
 	if (code & 4) printf("\x1b[38m\x1b[1;28H %d ", movements);
 	if (code & 8) printf("\x1b[37m\x1b[2;28H %d ", gelees);
@@ -46,7 +47,7 @@ void actualizar_contadores(int code)
 
 
 /* ---------------------------------------------------------------- */
-/* candy1_main.c : función principal main() para test de tarea 1C 	*/
+/* candy1_main.c : función principal main() para test de tarea 1D 	*/
 /*					(requiere tener implementada la tarea 1E)		*/
 /* ---------------------------------------------------------------- */
 int main(void)
@@ -60,10 +61,18 @@ int main(void)
 	{
 		copia_mapa(matrix, level);		// sustituye a inicializa_matriz()
 		escribe_matriz_debug(matrix);
-		if (hay_secuencia(matrix))			// si hay secuencias
+		if (hay_secuencia(matrix)){			// si hay secuencias
 			printf("\x1b[39m\x1b[3;0H hay secuencia: SI");
-		else
+			elimina_secuencias(matrix,marcas);
+			retardo(15);
+			printf("\x1b[39m\x1b[3;0H Matriz  de  Juego");
+			escribe_matriz_debug(matrix);
+			retardo(20);
+			printf("\x1b[39m\x1b[3;0H Matriz de  Marcas");
+			escribe_matriz_debug(marcas);
+		}else{
 			printf("\x1b[39m\x1b[3;0H hay secuencia: NO");
+		}
 		retardo(5);
 		printf("\x1b[38m\x1b[3;19H (pulse A/B)");
 		do
