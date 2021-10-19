@@ -63,15 +63,19 @@ hay_combinacion:
 		cmp r10,#0
 		bne .Lifon+code
 		cmp r10,#8
-		bne .Lifon+code
+		bne .Lifon+code	
 		cmp r10,#16
 		bne .Lifon+code
-		cmp r10,r3
-		bne .Lifon+code
-	.Lifon+code:
+		cmp r10,r3	@;matriz[i+1][j]!=16
+		bne .Lifon_code
+	.Lifon_code:	@;if(matriz[i+1][j]!=0||matriz[i+1][j]!=8
+					@;||matriz[i+1][j]!=16||
+                    @;matriz[i+1][j]!=matriz[i][j])
+		
 		mov r12,r3	@;aux=matriz [i][j]
 		mov r3,r10	@;matriz[i][j]=matriz[i+1][j]
 		mov r10,r12	@;matriz [i+1][j]=aux
+		
 		
 		pop {pc}
 
