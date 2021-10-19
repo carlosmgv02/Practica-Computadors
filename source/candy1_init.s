@@ -50,10 +50,10 @@
 @;		r4 = (i*COLUMNS)+j
 @;		r5 = @mapa[0][0]
 @;		r6 = #COLUMNS
-@;		r7 = temporal
-@;		r8 = temporal
-@;		r9 = temporal
-@;		r10 = temporal
+@;		r7 = temporal (usado una vez para guardar n de mapa)
+@;		r8 = temporal (ROWS * COLUMNS)
+@;		r9 = temporal (no usado)
+@;		r10 = temporal (usado una vez para conseguir @mapa[0][0])
 @;		r11 = mapa[i][j]
 @;		r12 = backup de r0
 
@@ -134,10 +134,77 @@ inicializa_matriz:
 @;			con combinaciones
 @;	Parámetros:
 @;		R0 = dirección base de la matriz de juego
+@;	7=  00 0[111] (bloque solido)
+@;	15= 00 1[111] (hueco)
+@;	8=  00 1[000] (gel. s. vacia)
+@;	16= 01 0[000] (gel. d. vacia)
+@;-------------------------------------------------------
+@; USO DE REGISTROS 
+@;-------------------------------------------------------
+@;	r0= dirección base de la matriz de juego
+@;	r1= i
+@;	r2= j
+@;	r3= orientación para otras funciones
+@;	r4= (i*COLUMNS)+j
+@;	r5= #COLUMNS
+@;	r6= valor actual de matriz[i][j]
+@;	r7= 
+@;	r8= 
+@;	r9= 
+@;	r10= 
+@;	r11= 
+@;	r12= Copia de la dirección base de la matriz de juego
+@;	PARÁMETROS: R0 = dirección base de la matriz de juego
 	.global recombina_elementos
 recombina_elementos:
 		push {lr}
+		mov 12, r0				@;Backup de dirección base
+		mov r1, #0				@;Inicializar i
+		mov r2, #0				@;Inicializar j 
+		mov r5, #COLUMNS		@;r5=#COLUMNS
+	.Lfor1:
+		cmp r1, #ROWS			@;comprovar que no s'ha sortit de la taula
+		bhs .Lendfor1			@;saltar si ja ha recorregut totes les files
+		mov r2, #0				@;resetejar la variable j per tornar a recórrer les columnes
+	.Lfor2:
+		cmp r2, #COLUMNS		@;comprovar que no s'ha sortit de la taula
+		bhs .Lendfor2			@;saltar si ja ha recorregut totes les columnes
+		mla r4, r1, r5, r2		@; r4 = (i*COLUMNS)+j
+		ldrb r6, [r12, r4]
+	@; IF1
 		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		add r2, #1				@;j++
+		b .Lfor2
+	.Lendfor2:	
+		add r1, #1				@;i++
+		b .Lfor1
+	.Lendfor1:
 		
 		pop {pc}
 
