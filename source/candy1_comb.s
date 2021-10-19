@@ -26,57 +26,69 @@
 @;		R0 = direcci�n base de la matriz de juego
 @;	Resultado:
 @;		R0 = 1 si hay una secuencia, 0 en otro caso
+	@; USO DE REGISTROS
+@;		R1 = i
+@;		R2 = j
+@;		R3 = matriz[i][j]
+@;		R4 = posicion actual
+@;		R5 = COLUMNS
+@;		R6 = ROWS
+@;		R7 = matriz[i+1][j]
+@;		R8 = aux
+@;		R9 = 
+@;		R10 = 
+@;		R11 = 
+@; 		R12 = 
 	.global hay_combinacion
 hay_combinacion:
-		push {r1-r2,r4-r10,lr}
+		push {r1-r12,lr}
 		mov r5, #COLUMNS
 		mov r6, #ROWS
 		mov r1 ,#0	@;i
 		mov r2 ,#0	@;j
 	.Lfor_Row:
 		cmp r1,r6
-		blt .Lfor_Col
+		bhs .Lendfor_Rows		@; saltar al final si excede el rango
 	.Lfor_Col:
 		cmp r2,r5
-		blt .Lifz
-	.Lifz:	@;If different from 0
-		mla r4,r1,r5,r2	@;cálculo dirección
-		add r7,r0,r4 	@;añado la dirección de memoria a la direccion base
-		ldrb r3, [r7]	@;guardo el contenido de la posicion de memoria
-		cmp r3, #0	@;comparo condición de si es ==0
-		bne .Lifc
-		cmp r3,#8	@;comparo condición de si es ==8
-		bne .Lifc
-		cmp r3,#16	@;comparo condición de si es ==16
-		bne .Lifc
-	.Lifc:
-		mov r8,r5
-		sub r8,#1	@;para hacer la operación COLUMNS-1
-		cmp r2,r8		
-		beq .Lifone+	@;If con índice i+1:if1+
-	.Lifone+:
-		mov r8,r1
-		add r8,#1	@;para acceder a matriz[i+1]
-		mla r11,r8,r5,r2
-		add r9,r0,r11
-		ldrb r10,[r9]
-		cmp r10,#0
-		bne .Lifon+code
-		cmp r10,#8
-		bne .Lifon+code	
-		cmp r10,#16
-		bne .Lifon+code
-		cmp r10,r3	@;matriz[i+1][j]!=16
-		bne .Lifon_code
-	.Lifon_code:	@;if(matriz[i+1][j]!=0||matriz[i+1][j]!=8
-					@;||matriz[i+1][j]!=16||
-                    @;matriz[i+1][j]!=matriz[i][j])
-		
-		mov r12,r3	@;aux=matriz [i][j]
-		mov r3,r10	@;matriz[i][j]=matriz[i+1][j]
-		mov r10,r12	@;matriz [i+1][j]=aux
+		bhs .Lendfor_Columns	@; saltar al final si excede el rango
+@;	.Lifz:	@;If different from 0
+		mla r4,r1,r5,r2		@;cálculo dirección (i*COLUMNS)+j
+		ldrb r3, [r0, r4]	@;guardo el contenido de la posicion de memoria
+		tst r3, #7			@;tst	0111, 0[000] = 0000
+		beq	.Lendif
+@;	If2
+		cmp r2, #COLUMNS-1
+		bne .Lelse
+@; 	If3
+		add r4, #COLUMNS
+		ldrb r7, [r0, r4]	@;matriz[i+1][j]
+		tst r7, #7			@;tst	0111, 0[000] = 0000
+		beq .Lendif3
+		cmp r7, r3
+		beq .Lendif3
+		mov r8, r3			@; aux
+		strb r8, [r0, r4]
+		sub r4, #COLUMNS
+		strb r7, [r0, r4]	
 		
 		
+		
+		
+	.Lendif3
+		b .Lendif
+	.Lelse:
+		
+		
+		
+	.Lendif:
+		add	r2, #1	@; j++
+		b .Lfor_Col	@; saltar al for
+	.Lendfor_Col:	
+		mov r2, #0	@; resetear j
+		add r1, #1	@; i++
+	.Lendfor_Rows:
+		mov r0, 
 		pop {pc}
 
 
