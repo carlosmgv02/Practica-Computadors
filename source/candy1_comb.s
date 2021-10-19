@@ -42,53 +42,7 @@
 	.global hay_combinacion
 hay_combinacion:
 		push {r1-r12,lr}
-		mov r5, #COLUMNS
-		mov r6, #ROWS
-		mov r1 ,#0	@;i
-		mov r2 ,#0	@;j
-	.Lfor_Row:
-		cmp r1,r6
-		bhs .Lendfor_Rows		@; saltar al final si excede el rango
-	.Lfor_Col:
-		cmp r2,r5
-		bhs .Lendfor_Columns	@; saltar al final si excede el rango
-@;	.Lifz:	@;If different from 0
-		mla r4,r1,r5,r2		@;cálculo dirección (i*COLUMNS)+j
-		ldrb r3, [r0, r4]	@;guardo el contenido de la posicion de memoria
-		tst r3, #7			@;tst	0111, 0[000] = 0000
-		beq	.Lendif
-@;	If2
-		cmp r2, #COLUMNS-1
-		bne .Lelse
-@; 	If3
-		add r4, #COLUMNS
-		ldrb r7, [r0, r4]	@;matriz[i+1][j]
-		tst r7, #7			@;tst	0111, 0[000] = 0000
-		beq .Lendif3
-		cmp r7, r3
-		beq .Lendif3
-		mov r8, r3			@; aux
-		strb r8, [r0, r4]
-		sub r4, #COLUMNS
-		strb r7, [r0, r4]	
 		
-		
-		
-		
-	.Lendif3
-		b .Lendif
-	.Lelse:
-		
-		
-		
-	.Lendif:
-		add	r2, #1	@; j++
-		b .Lfor_Col	@; saltar al for
-	.Lendfor_Col:	
-		mov r2, #0	@; resetear j
-		add r1, #1	@; i++
-	.Lendfor_Rows:
-		mov r0, 
 		pop {pc}
 
 
