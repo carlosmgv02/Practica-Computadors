@@ -44,91 +44,191 @@ hay_combinacion:
 		mov r6, #ROWS
 		mov r1 ,#0	@;i
 		mov r2 ,#0	@;j
+		mov r4, r0
 	.Lfor_Row:
 		cmp r1,r6
 		bhs .Lendfor_Rows		@; saltar al final si excede el rango
+		mov r2 ,#0	@;j
 	.Lfor_Col:
 		cmp r2,r5
-		bhs .Lendfor_Columns	@; saltar al final si excede el rango
+		bhs .Lendfor_Col		@; saltar al final si excede el rango
 @;	.Lifz:	@;If different from 0
-		mla r4,r1,r5,r2		@;cálculo dirección (i*COLUMNS)+j
-		ldrb r3, [r0, r4]	@;guardo el contenido de la posicion de memoria
-		tst r3, #7			@;tst	0111, 0[000] = 0000
-		beq	.Lendif
+		mla r8,r1,r5,r2		@;cálculo dirección (i*COLUMNS)+j
+		ldrb r3, [r4, r8]	@;guardo el contenido de la posicion de memoria
+		tst r3, #0x07			@;tst	0111, 0[000] = 0000
+		beq	.Lendiftotal
+		mvn r7, r3
+		tst r7, #0x07
+		beq	.Lendiftotal
 @;	If2
 		cmp r2, #COLUMNS-1
 		bne .Lelse
 @; 	If3
-		add r4, #COLUMNS
-		ldrb r7, [r0, r4]	@;matriz[i+1][j]
-		tst r7, #7			@;tst	0111, 0[000] = 0000
-		beq .Lendif3
-		cmp r7, r3
-		beq .Lendif3
-		mov r8, r3			@; aux
-		strb r8, [r0, r4]
-		sub r4, #COLUMNS
-		strb r7, [r0, r4]
+		cmp r1, #ROWS-1
+		beq .Lendiftotal
+		
+		add r1, #1
+		mla r8, r1, r5, r2
+		ldrb r7, [r4, r8]	@;matriz[i+1][j]
+		tst r7, #0x07			@;tst	0111, 0[000] = 0000
+		add r1, #-1
+		beq .Lendiftotal
+		mvn r7, r7
+		tst r7, #0x07
+		beq .Lendiftotal
+		mvn r7, r7
+		cmp r7, r3    @; r3 = num arriba  r7 = num abajo
+		beq .Lendiftotal
+		
+		bl swapV
+
+		bl detectar_orientacion
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapV
+		cmp r0, #6
+		blo .Lreturn1
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapV
+		bl detectar_orientacion
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapV
+		cmp r0, #6
+		blo .Lreturn1
+		b .Lendiftotal
+	
+	.Lelse:	
+		
+		cmp r1, #ROWS-1
+		bne .Lelse2
+		
+		add r2, #1
+		mla r8, r1, r5, r2
+		ldrb r7, [r4, r8]	@;matriz[i][j+1]
+		tst r7, #0x07			@;tst	0111, 0[000] = 0000
+		add r2, #-1
+		beq .Lendiftotal
+		mvn r7, r7
+		tst r7, #0x07
+		beq .Lendiftotal
+		mvn r7, r7
+		cmp r7, r3    @; r3 = num arriba  r7 = num abajo
+		beq .Lendiftotal
+
+		bl swapH
+	
+		bl detectar_orientacion
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapH
+		cmp r0, #6
+		blo .Lreturn1
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapH
+		bl detectar_orientacion
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapH
+		cmp r0, #6
+		blo .Lreturn1
+		b .Lendiftotal
+		
+	.Lelse2:
+		
+		add r1, #1
+		mla r8, r1, r5, r2
+		ldrb r7, [r4, r8]	@;matriz[i+1][j]
+		tst r7, #0x07			@;tst	0111, 0[000] = 0000
+		add r1, #-1
+		beq .Lendiftotal
+		mvn r7, r7
+		tst r7, #0x07
+		beq .Lendiftotal
+		mvn r7, r7
+		cmp r7, r3    @; r3 = num izquierda  r7 = num derecha
+		beq .LHor
+		
+		bl swapV
+	
+		bl detectar_orientacion
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapV
+		cmp r0, #6
+		blo .Lreturn1
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapV
+		bl detectar_orientacion
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapV
+		cmp r0, #6
+		blo .Lreturn1
+		mov r3, r7
+
+.LHor:	
+		add r2, #1
+		mla r8, r1, r5, r2
+		ldrb r7, [r4, r8]	@;matriz[i][j+1]
+		tst r7, #0x07			@;tst	0111, 0[000] = 0000
+		add r2, #-1
+		beq .Lendiftotal
+		mvn r7, r7
+		tst r7, #0x07
+		beq .Lendiftotal
+		mvn r7, r7
+		cmp r7, r3    @; r3 = num izquierda  r7 = num derecha
+		beq .Lendiftotal
+
+		bl swapH
+	
+		bl detectar_orientacion
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapH
+		cmp r0, #6
+		blo .Lreturn1
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapH
+		bl detectar_orientacion
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapH
+		cmp r0, #6
+		blo .Lreturn1
 		
 		
-		
-		
-		
-		@;Parte que no sirve a revisar y elimminar después
-		
-		mla r4,r1,r5,r2	@;cálculo dirección
-		add r7,r0,r4 	@;añado la dirección de memoria a la direccion base
-		ldrb r3, [r7]	@;guardo el contenido de la posicion de memoria
-		cmp r3, #0	@;comparo condición de si es ==0
-		bne .Lifc
-		cmp r3,#8	@;comparo condición de si es ==8
-		bne .Lifc
-		cmp r3,#16	@;comparo condición de si es ==16
-		bne .Lifc
-	.Lifc:
-		mov r8,r5
-		sub r8,#1	@;para hacer la operación COLUMNS-1
-		cmp r2,r8		
-		beq .Lifone+	@;If con índice i+1:if1+
-	.Lifone+:
-		mov r8,r1
-		add r8,#1	@;para acceder a matriz[i+1]
-		mla r11,r8,r5,r2
-		add r9,r0,r11
-		ldrb r10,[r9]
-		cmp r10,#0
-		bne .Lifon+code
-		cmp r10,#8
-		bne .Lifon+code
-		cmp r10,#16
-		bne .Lifon+code
-		cmp r10,r3
-		bne .Lifon+code
-	.Lifon+code:
-		mov r12,r3	@;aux=matriz [i][j]
-		mov r3,r10	@;matriz[i][j]=matriz[i+1][j]
-		mov r10,r12	@;matriz [i+1][j]=aux
-		
-		
-	.Lendif3
-		b .Lendif
-	.Lelse:
-		
-		
-		
-		
-		
-	.Lendif:
+	.Lendiftotal:
 		add	r2, #1	@; j++
 		b .Lfor_Col	@; saltar al for
 	.Lendfor_Col:	
-		mov r2, #0	@; resetear j
 		add r1, #1	@; i++
+		b .Lfor_Row
 	.Lendfor_Rows:
-		mov r0, 
-		pop {pc}
-carlos.txt
-3 KB
+		mov r0, #0
+		b .Lreturn0
+	.Lreturn1:
+		mov r0, #1
+	.Lreturn0:
+		pop {r1-r12,pc}
+
 
 
 
@@ -254,5 +354,36 @@ detectar_orientacion:
 		
 		pop {r3, r5, pc}
 
+
+
+		@; r3 = num izquierda  r7 = num derecha
+		@; r4 = direccion de la matriz r5 = Columnas
+		@; r1 = i  r2 = j
+	swapH:
+		push {r1-r7,lr}
+			
+		mla r6, r1, r5, r2
+		strb r7,[r4,r6]
+		add r2, #1
+		mla r6, r1, r5, r2
+		strb r3,[r4,r6]
+			
+		pop {r1-r7,pc}
+	
+	
+	
+		@; r3 = num arriba  r7 = num abajo
+		@; r4 = direccion de la matriz r5 = Columnas
+		@; r1 = i  r2 = j
+	swapV:
+		push {r1-r7,lr}
+		
+			mla r6, r1, r5, r2
+			strb r7,[r4,r6]
+			add r1, #1
+			mla r6, r1, r5, r2
+			strb r3,[r4,r6]
+		
+		pop {r1-r7,pc}
 
 .end
