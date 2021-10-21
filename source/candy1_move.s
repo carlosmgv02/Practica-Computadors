@@ -112,8 +112,10 @@ cuenta_repeticiones:
 	.global baja_elementos
 baja_elementos:
 		push {lr}
-		
-		
+		mov r4, r0
+		bl baja_verticales
+		cmp r0, #0
+		ble baja_laterales
 		pop {pc}
 
 
@@ -131,8 +133,54 @@ baja_elementos:
 @;		R0 = 1 indica que se ha realizado algún movimiento. 
 baja_verticales:
 		push {lr}
-		
-		
+		mov r4, r0
+		mov r0, #0
+		mov r1, #ROWS
+		mov r2, #COLUMNS
+	.Lwhile:
+		@; while (i>1)
+		cmp r1, #1
+		blt .LfiWhile
+		.LWhile2:
+			@; while (j>1)
+			cmp r2, #0
+			blt .LfiWhile2
+			@; r5 = matriz[i][j]
+			mov r5, #COLUMNS
+			mla r6, r1, r5, r2
+			ldrb r5, [r6, r4]
+			.LIf:
+				@; if(valorFiltrado == 0)
+				tst r5, #0x7
+				beq .LfiIf
+				@; r7 = iTemp
+				mov r7, r1
+				@; r8 = valorSup = matriz[i-1][j]
+				sub r6, #COLUMNS
+				ldrb r8, [r6]
+				.LWhileHole:
+					@; while (iTemp>0)
+					cmp r7, #0
+					ble .LfiWhileHole:
+					.LIfNotHole:
+						@; if (valorSup != hueco)
+						tst r8, #0xF
+						bne .LfiNotHole
+						@; TODO Evaluar cuando el valor no es un hueco
+					.LfiNotHole:
+					sub r6, #COLUMNS
+					ldrb r8, [r6]
+					@; iTemp--
+					sub r7, #1
+					b .LWhileHole
+				.LfiWhileHole:
+				
+			.LfiIf:
+			b .Lwhile2
+		.LfiWhile2:
+		b .Lwhile
+	.LfiWhile:
+	
 		pop {pc}
 
 
