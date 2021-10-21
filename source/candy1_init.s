@@ -173,13 +173,14 @@ recombina_elementos:
 @;-------------------------------------------------------
 @; PRIMERA PART
 @;-------------------------------------------------------
-
+		
 		tst r6, #0x07			@;detectar si és 000
+		beq .Lguardarvalor		@;si té els 3 bits més baixos a 0, salta
+		mvn r11, r6				@;negar tots els bits per usar una màscara
+		tst r11, #0x07			@;detectar si és 111
 		bne .Lelse1				@;saltar si no té els últims 3 bits a 0
-		and r11, r6, #0x07		@;porta and de matriz[i][j] amb #0b0000 0111
-		cmp r11, #0x07			@;detectar si és 111
-		bne .Lelse1				@;saltar si no té els últims 3 bits a 1
-		mov r11, #0
+	.Lguardarvalor:
+		mov r11, #0						
 		strb r11, [r7, r1]		@;mat_recomb1[i][j]=0
 		b .Lendif1				@;saltar fins al fi de l'apartat 1
 	.Lelse1:	
@@ -193,14 +194,14 @@ recombina_elementos:
 		tst r6, #0x18			@;màscara per detectar si matriz[i][j] té algun dels bits de gel. a 1
 		beq .Lelse2				@;salta a else si no té els bits de gel. a 1
 		and r11, r6, #0x18		@;posar a 0 els últims 3 bits que té (codi base de gel.)
-		strb r11, [r8, r1]		@;guardar el codi base de gel a mat_recomb2
+		strb r11, [r8, r1]		@;guardar el codi base de gel a mat_recomb2[i][j]
 		b .Lendif2
 	.Lelse2:		
-		tst r6, #0x07			@;màscara per detectar si matriz[i][j] = 0
+		tst r6, #0x07			@;màscara per detectar si els bits 1, 2 i 3 son 0's
 		streqb r6, [r8, r1]		@;guardar el valor directament si té els últims 3 bits a 0
 		beq .Lendif2
-		and r11, r6, #0x07		@;detectar si matriz[i][j] té els últims 3 bits a 1
-		cmp r11, #0x07			@;comparació per saber e cas
+		mvn r11, r6				@;negar tots els bits
+		tst r11, #0x07			@;detectar si matriz[i][j] té els últims 3 bits a 1
 		moveq r11, r6			@;guardar el valor en r11 si té els 3 bits baixos a 1
 		movne r11, #0			@;guardar 0 en r11 si és un element bàsic
 		strb r11, [r8, r1]		@;guardar r11 en mat_recomb2[i][j]
@@ -216,6 +217,10 @@ recombina_elementos:
 @;	r8=  @mat_recomb2[i][j]
 @;	r9=  random_i
 @;	r10= random_j
+@;		3	recórrer la matriu
+@; L'etiqueta serveix per si al acabar el bucle, encara no es troba cap combinació
+@; per tant haurà de començar de nou des d'aquest buble
+	.Linici:
 		mov r1, #0				@;reset de l'i per recórrer la taula
 	.Lfor3:
 		cmp r1, #ROWS			@;comprovar que no s'ha sortit de la taula
@@ -227,15 +232,16 @@ recombina_elementos:
 		mla r4, r1, r5, r2		@;r4 = (i*COLUMNS)+j
 		ldrb r6, [r12, r4]		@;r6 = matriz[i][j]
 		
-	@;IF
+	@;	4	Detectar si és un espai buit
 		tst r6, #0x07			@;detectar si els 3 bits baixos és 000
 		beq .Lendif3			@;ignorar la posició si la condició es compleix
-		and r11, r6, #0x07		@;detectar si els 3 bits baixos és 111
-		cmp r11, #0x07			@;comprova el valor de r11
+		mvn r11, r6				@;negar tots els bits
+		tst r11, #0x07			@;detectar si matriz[i][j] té els últims 3 bits a 1
 		beq .Lendif3			@;ignorar la posició si la condició es compleix
 	@;ELSE
 @;	r9=  random_i
 @;	r10= random_j
+@;		5	seleccionar una posició aleatòria
 	.Lwhile1:
 		mov r0, #ROWS			@;preparar el paràmetre per la funció mod_random
 		bl mod_random		
@@ -248,33 +254,38 @@ recombina_elementos:
 		mov r0, r12				@;recuperar la matriu base
 		mla r11, r9, r5, r10	@;r11 = (rand_i*COLUMNS)+rand_j
 		
-		ldrb r10, [r7, r11]		@;carregar r11=mat_comb1[rand_i][rand_j]
-		cmp r10, #0				@;comprovar que r11 != 0
+		ldrb r10, [r7, r11]		@;carregar r10=mat_comb1[rand_i][rand_j]
+		cmp r10, #0				@;comprovar que r10 != 0
 		beq .Lwhile1			@;torna al bucle si el valor d'aquella posició és 0
 	@;FORA DEL WHILE
 @; r9 ja no s'usa com rand_i
 @; r10=mat_comb1[rand_i][rand_j]
 @; r11=(rand_i*COLUMNS)+rand_j
 
-	@;IF (cuenta_repeticiones(mat_comb2, i, j)<3)
+@;		6	Carregar el valor de comb1[rand_i][rand_j] a comb2
+@;	mat_recomb2[i][j]=resultat(r10);
+		ldrb r9, [r8, r4]		@;r9=mat_recomb2[i][j]
+		orr r10, r9				@;r10= mat_comb1[rand_i][rand_j] OR mat_recomb2[i][j] (BIT A BIT)
+		strb r10, [r8, r4]		@;guardar el valor de r10 en mat_comb2
+		
+@;		6.1	(cuenta_repeticiones(mat_comb2, i, j)<3)
 		mov r0, r8				@;paràmetre mat_recomb2
 		mov r3, #2				@;pasar el paràmetre d'orientació
 		bl cuenta_repeticiones	@;paràmetres (mat, i, j, orientació)
 		cmp r0, #3				@;mirar si té una seqüencia de 3 o més
+		strhsb r9, [r8, r4]		@;restituir el valor anterior a mat_comb2
 		bhs .Lwhile1			@;Si és igual o major, es retorna a calcular el valor
 		mov r0, r8				@;paràmetre mat_recomb2
 		mov r3, #3				@;pasar el paràmetre d'orientació
 		bl cuenta_repeticiones	@;Si és igual o major, es retorna a calcular el valor
 		cmp r0, #3				@;mirar si té una seqüencia de 3 o més
-		mov r0, r12				@;recuperar la matriu base
-		bhs .Lwhile1	
-	@;	mat_recomb2[i][j]=resultat(r10);
-		ldrb r9, [r8, r4]		@;r9=mat_recomb2[i][j]
-		orr r10, r9				@;r10= mat_comb1[rand_i][rand_j] OR mat_recomb2[i][j] (BIT A BIT)
-		strb r10, [r8, r4]		@;guardar el valor de r10 en mat_comb2
+		strhsb r9, [r8, r4]		@;restituir el valor anterior a mat_comb2
+		bhs .Lwhile1			@;Si és igual o major, es retorna a calcular el valor
+@;		7	posar un 0 a la posició d'on hem tret un valor
 		mov r11, #0					
 		strb r11, [r7, r11]		@;mat_recomb1[rand_i][rand_j]=0
-		strb r10, [r12, r4]		@;matriz[i][j]=mat_recomb2[i][j];
+		mov r0, r12				@;recuperar la matriu base
+	
 	.Lendif3:
 		add r2, #1				@;j++
 		b .Lfor4
@@ -283,6 +294,12 @@ recombina_elementos:
 		b .Lfor3
 	.Lendfor3:
 		
+@;		8	guardar comb2 en matriz, tornar a començar si no hi ha combinació.
+		bl hay_combinacion
+		tst r0, #0x01			@;màscara per observar el resultat
+		mov r0, r12				@;recuperar matriu base
+		beq .Linici
+		strb r10, [r12, r4]		@;matriz[i][j]=mat_recomb2[i][j];
 		pop {pc}
 
 
