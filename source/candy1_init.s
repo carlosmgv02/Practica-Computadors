@@ -174,47 +174,44 @@ recombina_elementos:
 @; PRIMERA PART
 @;-------------------------------------------------------
 
-		and r11, r6, #7			@;porta and de matriz[i][j] amb #0b0000 0111
-		cmp r11, #7				@;detectar si és 111
-		bne .Lelse				@;saltar si té els últims 3 bits a 1
-		cmp r11, #0				@;detectar si és 000
-		bne .Lelse				@;saltar si té els últims 3 bits a 0
+		tst r6, #0x07			@;detectar si és 000
+		bne .Lelse				@;saltar si no té els últims 3 bits a 0
+		and r11, r6, #0x07		@;porta and de matriz[i][j] amb #0b0000 0111
+		cmp r11, #0x07			@;detectar si és 111
+		bne .Lelse				@;saltar si no té els últims 3 bits a 1
 		strb #0, [r7, r1]		@;mat_recomb1[i][j]=0
 		b .Lendif				@;saltar fins al fi de l'apartat 1
 	.Lelse:	
-		and r11, r6, #7		@;guardar valor de matriz[i][j] amb el bits de gelatines a 0
+		and r11, r6, #0x07		@;guardar valor de matriz[i][j] amb el bits de gelatines a 0
 		strb r11, [r7, r1]		@;mat_recomb1[i][j]=r11 (valor de la gel. s. sense el bit de la gelatina)
 	.Lendif:
 	
 @;-------------------------------------------------------
 @; SEGONA PART
 @;-------------------------------------------------------
-		
-		
-		
+		tst r6, #0x18			@;màscara per detectar si matriz[i][j] té algun dels bits de gel. a 1
+		beq .Lelse2				@;salta a else si no té els bits de gel. a 1
+		and r11, r6, #0x18		@;posar a 0 els últims 3 bits que té (codi base de gel.)
+		strb r11, [r8, r1]		@;guardar el codi base de gel a mat_recomb2
+		b .Lendif2
+	.Lelse2:		
+		tst r6, #0x07			@;màscara per detectar si matriz[i][j] = 0
+		streqb r6, [r8, r1]		@;guardar el valor directament si té els últims 3 bits a 0
+		beq .Lenfif2
+		and r11, r6, #0x07		@;detectar si matriz[i][j] té els últims 3 bits a 1
+		cmp r11, #0x07			@;comparació per saber e cas
+		moveq r11, r6			@;guardar el valor en r11 si té els 3 bits baixos a 1
+		movne r11, #0			@;guardar 0 en r11 si és un element bàsic
+		strb r11, [r7, r1]		@;guardar r11 en mat_recomb2[i][j]
+	.Lendif2:
 		add r1, #1
 		b .Lfor
 	.Lendfor:
-	
-@;-------------------------------------------------------
-@; SEGONA PART
-@;-------------------------------------------------------
-	@;IF2
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 		
 @;-------------------------------------------------------
 @; TERCERA PART
 @;-------------------------------------------------------
+
 	.Lfor1:
 		cmp r1, #ROWS			@;comprovar que no s'ha sortit de la taula
 		bhs .Lendfor1			@;saltar si ja ha recorregut totes les files
