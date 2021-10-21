@@ -175,16 +175,17 @@ recombina_elementos:
 @;-------------------------------------------------------
 
 		tst r6, #0x07			@;detectar si és 000
-		bne .Lelse				@;saltar si no té els últims 3 bits a 0
+		bne .Lelse1				@;saltar si no té els últims 3 bits a 0
 		and r11, r6, #0x07		@;porta and de matriz[i][j] amb #0b0000 0111
 		cmp r11, #0x07			@;detectar si és 111
-		bne .Lelse				@;saltar si no té els últims 3 bits a 1
-		strb #0, [r7, r1]		@;mat_recomb1[i][j]=0
-		b .Lendif				@;saltar fins al fi de l'apartat 1
-	.Lelse:	
+		bne .Lelse1				@;saltar si no té els últims 3 bits a 1
+		mov r11, #0
+		strb r11, [r7, r1]		@;mat_recomb1[i][j]=0
+		b .Lendif1				@;saltar fins al fi de l'apartat 1
+	.Lelse1:	
 		and r11, r6, #0x07		@;guardar valor de matriz[i][j] amb el bits de gelatines a 0
 		strb r11, [r7, r1]		@;mat_recomb1[i][j]=r11 (valor de la gel. s. sense el bit de la gelatina)
-	.Lendif:
+	.Lendif1:
 	
 @;-------------------------------------------------------
 @; SEGONA PART
@@ -197,7 +198,7 @@ recombina_elementos:
 	.Lelse2:		
 		tst r6, #0x07			@;màscara per detectar si matriz[i][j] = 0
 		streqb r6, [r8, r1]		@;guardar el valor directament si té els últims 3 bits a 0
-		beq .Lenfif2
+		beq .Lendif2
 		and r11, r6, #0x07		@;detectar si matriz[i][j] té els últims 3 bits a 1
 		cmp r11, #0x07			@;comparació per saber e cas
 		moveq r11, r6			@;guardar el valor en r11 si té els 3 bits baixos a 1
@@ -216,13 +217,13 @@ recombina_elementos:
 @;	r9=  random_i
 @;	r10= random_j
 		mov r1, #0				@;reset de l'i per recórrer la taula
-	.Lfor1:
+	.Lfor3:
 		cmp r1, #ROWS			@;comprovar que no s'ha sortit de la taula
-		bhs .Lendfor1			@;saltar si ja ha recorregut totes les files
+		bhs .Lendfor3			@;saltar si ja ha recorregut totes les files
 		mov r2, #0				@;resetejar la variable j per tornar a recórrer les columnes
-	.Lfor2:
+	.Lfor4:
 		cmp r2, #COLUMNS		@;comprovar que no s'ha sortit de la taula
-		bhs .Lendfor2			@;saltar si ja ha recorregut totes les columnes
+		bhs .Lendfor4			@;saltar si ja ha recorregut totes les columnes
 		mla r4, r1, r5, r2		@;r4 = (i*COLUMNS)+j
 		ldrb r6, [r12, r4]		@;r6 = matriz[i][j]
 		
@@ -235,7 +236,7 @@ recombina_elementos:
 	@;ELSE
 @;	r9=  random_i
 @;	r10= random_j
-	.Lwhile
+	.Lwhile1:
 		mov r0, #ROWS			@;preparar el paràmetre per la funció mod_random
 		bl mod_random		
 		add r0, #1				@;ara el resultat és {1-n}
@@ -249,7 +250,7 @@ recombina_elementos:
 		
 		ldrb r10, [r7, r11]		@;carregar r11=mat_comb1[rand_i][rand_j]
 		cmp r10, #0				@;comprovar que r11 != 0
-		beq .Lwhile				@;torna al bucle si el valor d'aquella posició és 0
+		beq .Lwhile1			@;torna al bucle si el valor d'aquella posició és 0
 	@;FORA DEL WHILE
 @; r9 ja no s'usa com rand_i
 @; r10=mat_comb1[rand_i][rand_j]
@@ -260,13 +261,13 @@ recombina_elementos:
 		mov r3, #2				@;pasar el paràmetre d'orientació
 		bl cuenta_repeticiones	@;paràmetres (mat, i, j, orientació)
 		cmp r0, #3				@;mirar si té una seqüencia de 3 o més
-		bhs .Lwhile				@;Si és igual o major, es retorna a calcular el valor
+		bhs .Lwhile1			@;Si és igual o major, es retorna a calcular el valor
 		mov r0, r8				@;paràmetre mat_recomb2
 		mov r3, #3				@;pasar el paràmetre d'orientació
 		bl cuenta_repeticiones	@;Si és igual o major, es retorna a calcular el valor
 		cmp r0, #3				@;mirar si té una seqüencia de 3 o més
 		mov r0, r12				@;recuperar la matriu base
-		bhs .Lwhile	
+		bhs .Lwhile1	
 	@;	mat_recomb2[i][j]=resultat(r10);
 		ldrb r9, [r8, r4]		@;r9=mat_recomb2[i][j]
 		orr r10, r9				@;r10= mat_comb1[rand_i][rand_j] OR mat_recomb2[i][j] (BIT A BIT)
@@ -274,13 +275,13 @@ recombina_elementos:
 		mov r11, #0					
 		strb r11, [r7, r11]		@;mat_recomb1[rand_i][rand_j]=0
 		strb r10, [r12, r4]		@;matriz[i][j]=mat_recomb2[i][j];
-	.Lendif3
+	.Lendif3:
 		add r2, #1				@;j++
-		b .Lfor2
-	.Lendfor2:	
+		b .Lfor4
+	.Lendfor4:	
 		add r1, #1				@;i++
-		b .Lfor1
-	.Lendfor1:
+		b .Lfor3
+	.Lendfor3:
 		
 		pop {pc}
 
