@@ -148,23 +148,23 @@ inicializa_matriz:
 @;	r4= (i*COLUMNS)+j
 @;	r5= #COLUMNS
 @;	r6= valor actual de matriz[i][j]
-@;	r7= mat_recomb1[i][j]
-@;	r8= mat_recomb2[i][j]
-@;	r9= temporal (
-@;	r10= temporal (
+@;	r7= @mat_recomb1[0][0]
+@;	r8= @mat_recomb2[0][0]
+@;	r9= temporal (rand_i, resultats de operacions, etc)
+@;	r10= temporal (rand_j, resultats de operacions, etc)
 @;	r11= temporal (valor per comparar / per a guardar valores)
 @;	r12= Copia de la dirección base de la matriz de juego
 @;	PARÁMETROS: R0 = dirección base de la matriz de juego
 	.global recombina_elementos
 recombina_elementos:
 		push {lr}
-		mov 12, r0				@;Backup de dirección base (@matriz[0][0])
+		mov r12, r0				@;Backup de dirección base (@matriz[0][0])
 		mov r1, #0				@;Inicializar i
 		mov r2, #0				@;Inicializar j 
 		mov r5, #COLUMNS		@;r5=#COLUMNS
 		ldr r7, =mat_recomb1	@;r7=@mat_recomb1[0][0]
 		ldr r8, =mat_recomb2	@;r8=@mat_recomb2[0][0]
-		mov r2, #ROWS*COLUMNS	@;temporalment r2 és ROWS * COLUMNS, després é sla j
+		mov r2, #ROWS*COLUMNS	@;temporalment r2 és ROWS * COLUMNS, després és la j
 	
 	.Lfor:
 		cmp r1, r2				@;comprovar que no s'ha sortit de la taula
@@ -202,7 +202,7 @@ recombina_elementos:
 		cmp r11, #0x07			@;comparació per saber e cas
 		moveq r11, r6			@;guardar el valor en r11 si té els 3 bits baixos a 1
 		movne r11, #0			@;guardar 0 en r11 si és un element bàsic
-		strb r11, [r7, r1]		@;guardar r11 en mat_recomb2[i][j]
+		strb r11, [r8, r1]		@;guardar r11 en mat_recomb2[i][j]
 	.Lendif2:
 		add r1, #1
 		b .Lfor
@@ -211,7 +211,11 @@ recombina_elementos:
 @;-------------------------------------------------------
 @; TERCERA PART
 @;-------------------------------------------------------
-
+@;	r7=  @mat_recomb1[i][j]
+@;	r8=  @mat_recomb2[i][j]
+@;	r9=  random_i
+@;	r10= random_j
+		mov r1, #0				@;reset de l'i per recórrer la taula
 	.Lfor1:
 		cmp r1, #ROWS			@;comprovar que no s'ha sortit de la taula
 		bhs .Lendfor1			@;saltar si ja ha recorregut totes les files
@@ -222,8 +226,55 @@ recombina_elementos:
 		mla r4, r1, r5, r2		@;r4 = (i*COLUMNS)+j
 		ldrb r6, [r12, r4]		@;r6 = matriz[i][j]
 		
+	@;IF
+		tst r6, #0x07			@;detectar si els 3 bits baixos és 000
+		beq .Lendif3			@;ignorar la posició si la condició es compleix
+		and r11, r6, #0x07		@;detectar si els 3 bits baixos és 111
+		cmp r11, #0x07			@;comprova el valor de r11
+		beq .Lendif3			@;ignorar la posició si la condició es compleix
+	@;ELSE
+@;	r9=  random_i
+@;	r10= random_j
+	.Lwhile
+		mov r0, #ROWS			@;preparar el paràmetre per la funció mod_random
+		bl mod_random		
+		add r0, #1				@;ara el resultat és {1-n}
+		mov r9, r0				@;guardar el resultat
+		mov r0, #COLUMNS		@;preparar el paràmetre per la funció mod_random
+		bl mod_random
+		add r0, #1				@;ara el resultat és {1-n}
+		mov r10, r0				@;guardar el resultat
+		mov r0, r12				@;recuperar la matriu base
+		mla r11, r9, r5, r10	@;r11 = (rand_i*COLUMNS)+rand_j
 		
-		
+		ldrb r10, [r7, r11]		@;carregar r11=mat_comb1[rand_i][rand_j]
+		cmp r10, #0				@;comprovar que r11 != 0
+		beq .Lwhile				@;torna al bucle si el valor d'aquella posició és 0
+	@;FORA DEL WHILE
+@; r9 ja no s'usa com rand_i
+@; r10=mat_comb1[rand_i][rand_j]
+@; r11=(rand_i*COLUMNS)+rand_j
+
+	@;IF (cuenta_repeticiones(mat_comb2, i, j)<3)
+		mov r0, r8				@;paràmetre mat_recomb2
+		mov r3, #2				@;pasar el paràmetre d'orientació
+		bl cuenta_repeticiones	@;paràmetres (mat, i, j, orientació)
+		cmp r0, #3				@;mirar si té una seqüencia de 3 o més
+		bhs .Lwhile				@;Si és igual o major, es retorna a calcular el valor
+		mov r0, r8				@;paràmetre mat_recomb2
+		mov r3, #3				@;pasar el paràmetre d'orientació
+		bl cuenta_repeticiones	@;Si és igual o major, es retorna a calcular el valor
+		cmp r0, #3				@;mirar si té una seqüencia de 3 o més
+		mov r0, r12				@;recuperar la matriu base
+		bhs .Lwhile	
+	@;	mat_recomb2[i][j]=resultat(r10);
+		ldrb r9, [r8, r4]		@;r9=mat_recomb2[i][j]
+		orr r10, r9				@;r10= mat_comb1[rand_i][rand_j] OR mat_recomb2[i][j] (BIT A BIT)
+		strb r10, [r8, r4]		@;guardar el valor de r10 en mat_comb2
+		mov r11, #0					
+		strb r11, [r7, r11]		@;mat_recomb1[rand_i][rand_j]=0
+		strb r10, [r12, r4]		@;matriz[i][j]=mat_recomb2[i][j];
+	.Lendif3
 		add r2, #1				@;j++
 		b .Lfor2
 	.Lendfor2:	
