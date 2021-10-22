@@ -275,6 +275,7 @@ push {r0-r12, lr}
 	.Lendfor3:
 		
 @;	8	guardar comb2 en matriz, tornar a començar si no hi ha combinació.
+		mov r0, r8
 		bl hay_combinacion
 		cmp r0, #1				@;màscara per observar el resultat
 		mov r0, r12				@;recuperar matriu base
