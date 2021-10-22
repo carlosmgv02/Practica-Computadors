@@ -157,7 +157,8 @@ inicializa_matriz:
 @;	PARÁMETROS: R0 = dirección base de la matriz de juego
 	.global recombina_elementos
 recombina_elementos:
-		push {lr}
+push {r0-r12, lr}
+.Linici:
 		mov r12, r0				@;Backup de dirección base (@matriz[0][0])
 		mov r1, #0				@;Inicializar i
 		mov r5, #COLUMNS		@;r5=#COLUMNS
@@ -192,7 +193,6 @@ recombina_elementos:
 		add r1, #1
 		b .Lfor
 	.Lendfor:
-		
 @;-------------------------------------------------------
 @; SEGONA PART
 @;-------------------------------------------------------
@@ -200,10 +200,9 @@ recombina_elementos:
 @;	r8=  @mat_recomb2[i][j]
 @;	r9=  random_i
 @;	r10= random_j
-@;		3	recórrer la matriu
+@;	3	recórrer la matriu
 @; L'etiqueta serveix per si al acabar el bucle, encara no es troba cap combinació
 @; per tant haurà de començar de nou des d'aquest buble
-	.Linici:
 		mov r1, #0				@;reset de l'i per recórrer la taula
 	.Lfor3:
 		cmp r1, #ROWS			@;comprovar que no s'ha sortit de la taula
@@ -225,7 +224,7 @@ recombina_elementos:
 	@;ELSE
 @;	r9=  random_i
 @;	r10= random_j
-@;		5	seleccionar una posició aleatòria
+@;	5	seleccionar una posició aleatòria
 	.Lwhile1:
 		mov r0, #ROWS			@;preparar el paràmetre per la funció mod_random
 		bl mod_random		
@@ -236,11 +235,10 @@ recombina_elementos:
 		mov r0, r12				@;recuperar la matriu base
 		mov r5, #COLUMNS
 		mla r11, r9, r5, r10	@;r11 = (rand_i*COLUMNS)+rand_j  IMPORTANT!!!
-		
+@;	comprovar que la posició seleccionada no sigui 0
 		ldrb r10, [r7, r11]		@;carregar r10=mat_comb1[rand_i][rand_j]
 		cmp r10, #0				@;comprovar que r10 != 0
 		beq .Lwhile1			@;torna al bucle si el valor d'aquella posició és 0
-	@;FORA DEL WHILE
 @; r9 ja no s'usa com rand_i
 @; r10=mat_comb1[rand_i][rand_j]
 @; r11=(rand_i*COLUMNS)+rand_j
@@ -276,7 +274,7 @@ recombina_elementos:
 		b .Lfor3
 	.Lendfor3:
 		
-@;		8	guardar comb2 en matriz, tornar a començar si no hi ha combinació.
+@;	8	guardar comb2 en matriz, tornar a començar si no hi ha combinació.
 		bl hay_combinacion
 		cmp r0, #1				@;màscara per observar el resultat
 		mov r0, r12				@;recuperar matriu base
@@ -289,12 +287,11 @@ recombina_elementos:
 		cmp r1, r2				@;mirar si s'ha sortit del rang
 		bhs .Lendfor5
 		ldrb r10, [r8, r1]	@;carregar el valor de mat_recomb2[i][j]
-		@;mov r10, #3
 		strb r10, [r12, r1]		@;matriz[i][j]=mat_recomb2[i][j];
 		add r1, #1				@;i++
 		b .Lfor5
 		.Lendfor5:
-		pop {pc}
+	pop {r0-r12, pc}			@;recuperar registros y volver
 
 
 
