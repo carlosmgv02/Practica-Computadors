@@ -160,7 +160,6 @@ recombina_elementos:
 		push {lr}
 		mov r12, r0				@;Backup de dirección base (@matriz[0][0])
 		mov r1, #0				@;Inicializar i
-		mov r2, #0				@;Inicializar j 
 		mov r5, #COLUMNS		@;r5=#COLUMNS
 		ldr r7, =mat_recomb1	@;r7=@mat_recomb1[0][0]
 		ldr r8, =mat_recomb2	@;r8=@mat_recomb2[0][0]
@@ -172,45 +171,30 @@ recombina_elementos:
 @;-------------------------------------------------------
 @; PRIMERA PART
 @;-------------------------------------------------------
-		
+	@;detectar 000 or 111
 		tst r6, #0x07			@;detectar si és 000
-		beq .Lguardarvalor		@;si té els 3 bits més baixos a 0, salta
-		mvn r11, r6				@;negar tots els bits per usar una màscara
-		tst r11, #0x07			@;detectar si és 111
-		bne .Lelse1				@;saltar si no té els últims 3 bits a 0
-	.Lguardarvalor:
-		mov r11, #0						
-		strb r11, [r7, r1]		@;mat_recomb1[i][j]=0
-		b .Lendif1				@;saltar fins al fi de l'apartat 1
-	.Lelse1:	
+		mov r11, #0				@;carregar el valor 0 per ser guardat
+		streqb r11, [r7, r1]	@;guardar 0 a mat_recomb1[i][j]
+		streqb r6, [r8, r1]		@;guardar el codi en mat_recomb2[i][j] si els bits baixos de r6 és 000 (exercici 2)
+		beq .Lendif1			@;saltar si no té els últims 3 bits a 0
+		mvn r5, r6				@;negar tots els bits per usar una màscara
+		tst r5, #0x07			@;detectar si és 111
+		streqb r11, [r7, r1]	@;guardar 0 a mat_recomb1[i][j]
+		streqb r6, [r8, r1]		@;guardar el codi en mat_recomb2[i][j] si els bits baixos de r6 és 111 (exercici 2)
+		beq .Lendif1			@;saltar si no té els últims 3 bits a 0	
+	@;guarda el element bàsic sense bits de gelatina
 		and r11, r6, #0x07		@;guardar valor de matriz[i][j] amb el bits de gelatines a 0
 		strb r11, [r7, r1]		@;mat_recomb1[i][j]=r11 (valor de la gel. s. sense el bit de la gelatina)
-	.Lendif1:
-	
-@;-------------------------------------------------------
-@; SEGONA PART
-@;-------------------------------------------------------
-		tst r6, #0x18			@;màscara per detectar si matriz[i][j] té algun dels bits de gel. a 1
-		beq .Lelse2				@;salta a else si no té cap dels bits de gel. a 1
+	@;segona part
 		and r11, r6, #0x18		@;posar a 0 els últims 3 bits que té (codi base de gel.)
 		strb r11, [r8, r1]		@;guardar el codi base de gel a mat_recomb2[i][j]
-		b .Lendif2
-	.Lelse2:		
-		tst r6, #0x07			@;màscara per detectar si els bits d'1, 2 i 4 son 0's
-		streqb r6, [r8, r1]		@;guardar el valor directament si té els últims 3 bits a 0
-		beq .Lendif2
-		mvn r11, r6				@;negar tots els bits
-		tst r11, #0x07			@;detectar si matriz[i][j] té els últims 3 bits a 1
-		moveq r11, r6			@;guardar el valor en r11 si té els 3 bits baixos a 1
-		movne r11, #0			@;guardar 0 en r11 si és un element bàsic
-		strb r11, [r8, r1]		@;guardar r11 en mat_recomb2[i][j]
-	.Lendif2:
+	.Lendif1:
 		add r1, #1
 		b .Lfor
 	.Lendfor:
 		
 @;-------------------------------------------------------
-@; TERCERA PART
+@; SEGONA PART
 @;-------------------------------------------------------
 @;	r7=  @mat_recomb1[i][j]
 @;	r8=  @mat_recomb2[i][j]
@@ -251,7 +235,7 @@ recombina_elementos:
 		mov r10, r0				@;guardar el resultat
 		mov r0, r12				@;recuperar la matriu base
 		mov r5, #COLUMNS
-		mla r11, r9, r5, r10	@;r11 = (rand_i*COLUMNS)+rand_j
+		mla r11, r9, r5, r10	@;r11 = (rand_i*COLUMNS)+rand_j  IMPORTANT!!!
 		
 		ldrb r10, [r7, r11]		@;carregar r10=mat_comb1[rand_i][rand_j]
 		cmp r10, #0				@;comprovar que r10 != 0
@@ -283,7 +267,6 @@ recombina_elementos:
 @;		7	posar un 0 a la posició d'on hem tret un valor
 		mov r5, #0				@;carregar 0 a un registre temporal 
 		strb r5, [r7, r11]		@;mat_recomb1[rand_i][rand_j]=0
-	
 	.Lendif3:
 		mov r0, r12				@;recuperar la matriu base
 		add r2, #1				@;j++
@@ -295,15 +278,18 @@ recombina_elementos:
 		
 @;		8	guardar comb2 en matriz, tornar a començar si no hi ha combinació.
 		bl hay_combinacion
-		tst r0, #0x01			@;màscara per observar el resultat
+		cmp r0, #1				@;màscara per observar el resultat
 		mov r0, r12				@;recuperar matriu base
-		beq .Linici
+		bne .Linici
+		
 		mov r1, #0				@;preparar el comptador
 		mov r2, #ROWS*COLUMNS	@;número de posicions a recórrer
+		
 		.Lfor5:
 		cmp r1, r2				@;mirar si s'ha sortit del rang
 		bhs .Lendfor5
-		ldrb r10, [r8, r1]		@;carregar el valor de mat_recomb2[i][j]
+		ldrb r10, [r8, r1]	@;carregar el valor de mat_recomb2[i][j]
+		@;mov r10, #3
 		strb r10, [r12, r1]		@;matriz[i][j]=mat_recomb2[i][j];
 		add r1, #1				@;i++
 		b .Lfor5
