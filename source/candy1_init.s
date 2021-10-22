@@ -146,13 +146,13 @@ inicializa_matriz:
 @;	r2= j (a la primera part és ROWS*COLUMNS)
 @;	r3= orientación para otras funciones
 @;	r4= (i*COLUMNS)+j
-@;	r5= #COLUMNS
+@;	r5= (temporal) usat com #COLUMNS abans de carregar valors (ldrb)
 @;	r6= valor actual de matriz[i][j]
 @;	r7= @mat_recomb1[0][0]
 @;	r8= @mat_recomb2[0][0]
 @;	r9= temporal (rand_i, resultats de operacions, etc)
 @;	r10= temporal (rand_j, resultats de operacions, etc)
-@;	r11= temporal (valor per comparar / per a guardar valores)
+@;	r11= temporal (valor per comparar / per a guardar valores / (rand_i*COLUMNS)+rand_j)
 @;	r12= Copia de la dirección base de la matriz de juego
 @;	PARÁMETROS: R0 = dirección base de la matriz de juego
 	.global recombina_elementos
@@ -165,11 +165,10 @@ recombina_elementos:
 		ldr r7, =mat_recomb1	@;r7=@mat_recomb1[0][0]
 		ldr r8, =mat_recomb2	@;r8=@mat_recomb2[0][0]
 		mov r2, #ROWS*COLUMNS	@;temporalment r2 és ROWS * COLUMNS, després és la j
-	
 	.Lfor:
 		cmp r1, r2				@;comprovar que no s'ha sortit de la taula
 		bhs .Lendfor			@;saltar si ja ha recorregut totes les caselles
-		ldrb r6, [r12, r4]		@;r6 = matriz[i][j]
+		ldrb r6, [r12, r1]		@;r6 = matriz[i][j]
 @;-------------------------------------------------------
 @; PRIMERA PART
 @;-------------------------------------------------------
@@ -192,12 +191,12 @@ recombina_elementos:
 @; SEGONA PART
 @;-------------------------------------------------------
 		tst r6, #0x18			@;màscara per detectar si matriz[i][j] té algun dels bits de gel. a 1
-		beq .Lelse2				@;salta a else si no té els bits de gel. a 1
+		beq .Lelse2				@;salta a else si no té cap dels bits de gel. a 1
 		and r11, r6, #0x18		@;posar a 0 els últims 3 bits que té (codi base de gel.)
 		strb r11, [r8, r1]		@;guardar el codi base de gel a mat_recomb2[i][j]
 		b .Lendif2
 	.Lelse2:		
-		tst r6, #0x07			@;màscara per detectar si els bits 1, 2 i 3 son 0's
+		tst r6, #0x07			@;màscara per detectar si els bits d'1, 2 i 4 son 0's
 		streqb r6, [r8, r1]		@;guardar el valor directament si té els últims 3 bits a 0
 		beq .Lendif2
 		mvn r11, r6				@;negar tots els bits
@@ -229,6 +228,7 @@ recombina_elementos:
 	.Lfor4:
 		cmp r2, #COLUMNS		@;comprovar que no s'ha sortit de la taula
 		bhs .Lendfor4			@;saltar si ja ha recorregut totes les columnes
+		mov r5, #COLUMNS
 		mla r4, r1, r5, r2		@;r4 = (i*COLUMNS)+j
 		ldrb r6, [r12, r4]		@;r6 = matriz[i][j]
 		
@@ -245,13 +245,12 @@ recombina_elementos:
 	.Lwhile1:
 		mov r0, #ROWS			@;preparar el paràmetre per la funció mod_random
 		bl mod_random		
-		add r0, #1				@;ara el resultat és {1-n}
 		mov r9, r0				@;guardar el resultat
 		mov r0, #COLUMNS		@;preparar el paràmetre per la funció mod_random
 		bl mod_random
-		add r0, #1				@;ara el resultat és {1-n}
 		mov r10, r0				@;guardar el resultat
 		mov r0, r12				@;recuperar la matriu base
+		mov r5, #COLUMNS
 		mla r11, r9, r5, r10	@;r11 = (rand_i*COLUMNS)+rand_j
 		
 		ldrb r10, [r7, r11]		@;carregar r10=mat_comb1[rand_i][rand_j]
@@ -269,7 +268,7 @@ recombina_elementos:
 		strb r10, [r8, r4]		@;guardar el valor de r10 en mat_comb2
 		
 @;		6.1	(cuenta_repeticiones(mat_comb2, i, j)<3)
-		mov r0, r8				@;paràmetre mat_recomb2
+		mov r0, r8				@;paràmetre @mat_recomb2
 		mov r3, #2				@;pasar el paràmetre d'orientació
 		bl cuenta_repeticiones	@;paràmetres (mat, i, j, orientació)
 		cmp r0, #3				@;mirar si té una seqüencia de 3 o més
@@ -282,11 +281,11 @@ recombina_elementos:
 		strhsb r9, [r8, r4]		@;restituir el valor anterior a mat_comb2
 		bhs .Lwhile1			@;Si és igual o major, es retorna a calcular el valor
 @;		7	posar un 0 a la posició d'on hem tret un valor
-		mov r11, #0					
-		strb r11, [r7, r11]		@;mat_recomb1[rand_i][rand_j]=0
-		mov r0, r12				@;recuperar la matriu base
+		mov r5, #0				@;carregar 0 a un registre temporal 
+		strb r5, [r7, r11]		@;mat_recomb1[rand_i][rand_j]=0
 	
 	.Lendif3:
+		mov r0, r12				@;recuperar la matriu base
 		add r2, #1				@;j++
 		b .Lfor4
 	.Lendfor4:	
@@ -299,7 +298,16 @@ recombina_elementos:
 		tst r0, #0x01			@;màscara per observar el resultat
 		mov r0, r12				@;recuperar matriu base
 		beq .Linici
-		strb r10, [r12, r4]		@;matriz[i][j]=mat_recomb2[i][j];
+		mov r1, #0				@;preparar el comptador
+		mov r2, #ROWS*COLUMNS	@;número de posicions a recórrer
+		.Lfor5:
+		cmp r1, r2				@;mirar si s'ha sortit del rang
+		bhs .Lendfor5
+		ldrb r10, [r8, r1]		@;carregar el valor de mat_recomb2[i][j]
+		strb r10, [r12, r1]		@;matriz[i][j]=mat_recomb2[i][j];
+		add r1, #1				@;i++
+		b .Lfor5
+		.Lendfor5:
 		pop {pc}
 
 

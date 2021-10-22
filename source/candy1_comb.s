@@ -16,8 +16,6 @@
 		.align 2
 		.arm
 
-
-
 @;TAREA 1G;
 @; hay_combinacion(*matriz): rutina para detectar si existe, por lo menos, una
 @;	combinaci�n entre dos elementos (diferentes) consecutivos que provoquen
@@ -26,12 +24,211 @@
 @;		R0 = direcci�n base de la matriz de juego
 @;	Resultado:
 @;		R0 = 1 si hay una secuencia, 0 en otro caso
+@; USO DE REGISTROS
+@;		R1 = i
+@;		R2 = j
+@;		R3 = matriz[i][j]
+@;		R4 = posicion actual
+@;		R5 = COLUMNS
+@;		R6 = ROWS
+@;		R7 = matriz[i+1][j]
+@;		R8 = aux
+@;		R9 = 
+@;		R10 = 
+@;		R11 = 
+@; 		R12 = 
 	.global hay_combinacion
 hay_combinacion:
-		push {lr}
+		push {r1-r12,lr}
+		mov r5, #COLUMNS
+		mov r6, #ROWS
+		mov r1 ,#0	@;i
+		mov r2 ,#0	@;j
+		mov r4, r0
+	.Lfor_Row:
+		cmp r1,r6
+		bhs .Lendfor_Rows		@; saltar al final si excede el rango
+		mov r2 ,#0	@;j
+	.Lfor_Col:
+		cmp r2,r5
+		bhs .Lendfor_Col		@; saltar al final si excede el rango
+@;	.Lifz:	@;If different from 0
+		mla r8,r1,r5,r2		@;cálculo dirección (i*COLUMNS)+j
+		ldrb r3, [r4, r8]	@;guardo el contenido de la posicion de memoria
+		tst r3, #0x07			@;tst	0111, 0[000] = 0000
+		beq	.Lendiftotal
+		mvn r7, r3
+		tst r7, #0x07
+		beq	.Lendiftotal
+@;	If2
+		cmp r2, #COLUMNS-1
+		bne .Lelse
+@; 	If3
+		cmp r1, #ROWS-1
+		beq .Lendiftotal
+		
+		add r1, #1
+		mla r8, r1, r5, r2
+		ldrb r7, [r4, r8]	@;matriz[i+1][j]
+		tst r7, #0x07			@;tst	0111, 0[000] = 0000
+		add r1, #-1
+		beq .Lendiftotal
+		mvn r7, r7
+		tst r7, #0x07
+		beq .Lendiftotal
+		mvn r7, r7
+		cmp r7, r3    @; r3 = num arriba  r7 = num abajo
+		beq .Lendiftotal
+		
+		bl swapV
+
+		bl detectar_orientacion
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapV
+		cmp r0, #6
+		blo .Lreturn1
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapV
+		bl detectar_orientacion
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapV
+		cmp r0, #6
+		blo .Lreturn1
+		b .Lendiftotal
+	
+	.Lelse:	
+		
+		cmp r1, #ROWS-1
+		bne .Lelse2
+		
+		add r2, #1
+		mla r8, r1, r5, r2
+		ldrb r7, [r4, r8]	@;matriz[i][j+1]
+		tst r7, #0x07			@;tst	0111, 0[000] = 0000
+		add r2, #-1
+		beq .Lendiftotal
+		mvn r7, r7
+		tst r7, #0x07
+		beq .Lendiftotal
+		mvn r7, r7
+		cmp r7, r3    @; r3 = num arriba  r7 = num abajo
+		beq .Lendiftotal
+
+		bl swapH
+	
+		bl detectar_orientacion
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapH
+		cmp r0, #6
+		blo .Lreturn1
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapH
+		bl detectar_orientacion
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapH
+		cmp r0, #6
+		blo .Lreturn1
+		b .Lendiftotal
+		
+	.Lelse2:
+		
+		add r1, #1
+		mla r8, r1, r5, r2
+		ldrb r7, [r4, r8]	@;matriz[i+1][j]
+		tst r7, #0x07			@;tst	0111, 0[000] = 0000
+		add r1, #-1
+		beq .Lendiftotal
+		mvn r7, r7
+		tst r7, #0x07
+		beq .Lendiftotal
+		mvn r7, r7
+		cmp r7, r3    @; r3 = num izquierda  r7 = num derecha
+		beq .LHor
+		
+		bl swapV
+	
+		bl detectar_orientacion
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapV
+		cmp r0, #6
+		blo .Lreturn1
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapV
+		bl detectar_orientacion
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapV
+		cmp r0, #6
+		blo .Lreturn1
+		mov r3, r7
+
+.LHor:	
+		add r2, #1
+		mla r8, r1, r5, r2
+		ldrb r7, [r4, r8]	@;matriz[i][j+1]
+		tst r7, #0x07			@;tst	0111, 0[000] = 0000
+		add r2, #-1
+		beq .Lendiftotal
+		mvn r7, r7
+		tst r7, #0x07
+		beq .Lendiftotal
+		mvn r7, r7
+		cmp r7, r3    @; r3 = num izquierda  r7 = num derecha
+		beq .Lendiftotal
+
+		bl swapH
+	
+		bl detectar_orientacion
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapH
+		cmp r0, #6
+		blo .Lreturn1
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapH
+		bl detectar_orientacion
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapH
+		cmp r0, #6
+		blo .Lreturn1
 		
 		
-		pop {pc}
+	.Lendiftotal:
+		add	r2, #1	@; j++
+		b .Lfor_Col	@; saltar al for
+	.Lendfor_Col:	
+		add r1, #1	@; i++
+		b .Lfor_Row
+	.Lendfor_Rows:
+		mov r0, #0
+		b .Lreturn0
+	.Lreturn1:
+		mov r0, #1
+	.Lreturn0:
+		pop {r1-r12,pc}
+
 
 
 
@@ -157,5 +354,36 @@ detectar_orientacion:
 		
 		pop {r3, r5, pc}
 
+
+
+		@; r3 = num izquierda  r7 = num derecha
+		@; r4 = direccion de la matriz r5 = Columnas
+		@; r1 = i  r2 = j
+	swapH:
+		push {r1-r7,lr}
+			
+		mla r6, r1, r5, r2
+		strb r7,[r4,r6]
+		add r2, #1
+		mla r6, r1, r5, r2
+		strb r3,[r4,r6]
+			
+		pop {r1-r7,pc}
+	
+	
+	
+		@; r3 = num arriba  r7 = num abajo
+		@; r4 = direccion de la matriz r5 = Columnas
+		@; r1 = i  r2 = j
+	swapV:
+		push {r1-r7,lr}
+		
+			mla r6, r1, r5, r2
+			strb r7,[r4,r6]
+			add r1, #1
+			mla r6, r1, r5, r2
+			strb r3,[r4,r6]
+		
+		pop {r1-r7,pc}
 
 .end

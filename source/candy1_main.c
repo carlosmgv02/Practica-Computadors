@@ -61,7 +61,11 @@ int main(void)
 	{
 		inicializa_matriz(matrix, level);
 		escribe_matriz_debug(matrix);
+		retardo(20);
+		recombina_elementos(matrix);
+		escribe_matriz_debug(matrix);
 		retardo(5);
+	
 		printf("\x1b[39m\x1b[3;8H (pulse A o B)");
 		do
 		{	swiWaitForVBlank();
