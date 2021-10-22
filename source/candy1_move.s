@@ -133,54 +133,125 @@ baja_elementos:
 @;		R0 = 1 indica que se ha realizado algún movimiento. 
 baja_verticales:
 		push {lr}
-		mov r4, r0
-		mov r0, #0
-		mov r1, #ROWS
-		mov r2, #COLUMNS
-	.Lwhile:
+		mov r4, r0			@; r4 = *matriz
+		mov r0, #0			@; r0 = false
+		mov r1, #ROWS		@; r1 = i
+		mov r2, #COLUMNS 	@; r2 = j
+		mov r3, #COLUMNS	@; r3 = const
+		
+	@; Recorrido de la matriz sin la primera fila buscando los valores 0
+	.LBucleFilas:
 		@; while (i>1)
 		cmp r1, #1
-		blt .LfiWhile
-		.LWhile2:
-			@; while (j>1)
+		blt .LfinBucleFilas
+		
+		.LBucleColumnas:
+			@; while (j>0)
 			cmp r2, #0
-			blt .LfiWhile2
+			blt .LFinBucleColumnas
 			@; r5 = matriz[i][j]
-			mov r5, #COLUMNS
-			mla r6, r1, r5, r2
+			mla r6, r1, r3, r2
 			ldrb r5, [r6, r4]
-			.LIf:
-				@; if(valorFiltrado == 0)
+			.LSiCero:
+				@; if (valorFiltrado == 0)
 				tst r5, #0x7
-				beq .LfiIf
-				@; r7 = iTemp
-				mov r7, r1
+				bne .LFinSiCero
 				@; r8 = valorSup = matriz[i-1][j]
 				sub r6, #COLUMNS
 				ldrb r8, [r6]
-				.LWhileHole:
-					@; while (iTemp>0)
+				
+				@; r7 = iTemp
+				mov r7, r1
+				@; Pasar por los huecos superiores
+				.LBucleHueco:
+					@; while (iTemp>0 && valorSup==Hueco)
 					cmp r7, #0
-					ble .LfiWhileHole:
-					.LIfNotHole:
-						@; if (valorSup != hueco)
-						tst r8, #0xF
-						bne .LfiNotHole
-						@; TODO Evaluar cuando el valor no es un hueco
-					.LfiNotHole:
+					ble .LFinBucleHueco
+					cmp r8, #0xF
+					bne .LFinBucleHueco
+					@; Obtengo el siguiente valor superior
 					sub r6, #COLUMNS
 					ldrb r8, [r6]
 					@; iTemp--
 					sub r7, #1
-					b .LWhileHole
-				.LfiWhileHole:
+					b .LBucleHueco
+				.LFinBucleHueco:
 				
-			.LfiIf:
-			b .Lwhile2
-		.LfiWhile2:
-		b .Lwhile
-	.LfiWhile:
-	
+				@; Si hay un elemento superior válido, entonces hay una bajada vertical
+				mvn r9, r8
+				.LSiElementoValido:
+					@; if (valorSup != ElementoVacío && valorSup != BloqueSolido|Hueco)
+					tst r8, #0x7
+					beq .LFinSiElementoValido
+					tst r9, #0x7
+					beq .LFinSiElementoValido
+					@; r9 = valorSupFiltrado
+					and r9, r8, #0x7
+					@; valorSup = 0
+					and r8, #0x18
+					strb r8, [r6]
+					@; valor = valorSup
+					add r5, r9
+					mla r6, r1, r3, r2
+					strb r5, [r6]
+					@; Ya que ha habido una bajada vertical r0 = true
+					mov r0, #1
+				.LFinSiElementoValido:
+			.LFinSiCero:
+			
+			sub r2, #1
+			b .LBucleColumnas
+		.LFinBucleColumnas:
+		
+		sub r1, #1
+		b .LBucleFilas
+	.LFinBucleFilas:
+		
+		mov r1, #0
+		mov r2, #0
+	@; Busqueda de los valores 0 más altos de cada columna
+	.LBucleColumnas2:
+		@; while (j<COLUMNS)
+		cmp r2, #COLUMNS
+		bge .LFinBucleColumnas2
+		
+		.LBucleFilas2:
+			@; while (i<ROWS)
+			cmp r1, #ROWS
+			bge .LFinBucleFilas2
+			@; r5 = matriz[i][j]
+			mla r6, r1, r3, r2
+			ldrb r5, [r6, r4]
+			
+			@; if (matriz[i][j] == BloqueSolido) break;
+			cmp r5, #0x7
+			beq .LFinBucleFilas2
+			
+			.LSiCero2:
+				@; if (matriz[i][j] == 0)
+				tst r5, #0x7
+				bne .LFinSiCero2
+				@; Genero numero random entre 1 y 6
+				mov r7, r0
+				mov r0, #5
+				bl mod_random
+				add r0, #1
+				@; Asigno al valor 0 el numero aleatorio
+				add r5, r0
+				str r5, [r6]
+				mov r0, r7
+				
+				@; break
+				b .LFinBucleFilas2
+			.LFinSiCero2:
+			
+			add r1, #1
+			b .LBucleFilas2
+		.LFinBucleFilas2:
+		
+		add r2, #1
+		b .LBucleColumnas2
+	.LFinBucleColumnas2:
 		pop {pc}
 
 
