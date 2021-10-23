@@ -132,18 +132,18 @@ baja_elementos:
 @;	Resultado:
 @;		R0 = 1 indica que se ha realizado algún movimiento. 
 baja_verticales:
-		push {lr}
+		push {r1-r11,lr}
 		mov r4, r0			@; r4 = *matriz
-		mov r0, #0			@; r0 = false
-		mov r1, #ROWS		@; r1 = i
-		mov r2, #COLUMNS 	@; r2 = j
+		mov r11, #0			@; r11 = false
+		mov r1, #ROWS		@; r1 = i = ROWS
+		mov r2, #COLUMNS 	@; r2 = j = COLUMNS
 		mov r3, #COLUMNS	@; r3 = const
 		
 	@; Recorrido de la matriz sin la primera fila buscando los valores 0
 	.LBucleFilas:
 		@; while (i>1)
 		cmp r1, #1
-		blt .LfinBucleFilas
+		blt .LFinBucleFilas
 		
 		.LBucleColumnas:
 			@; while (j>0)
@@ -157,45 +157,45 @@ baja_verticales:
 				tst r5, #0x7
 				bne .LFinSiCero
 				@; r8 = valorSup = matriz[i-1][j]
-				sub r6, #COLUMNS
-				ldrb r8, [r6]
+				sub r8, r6, #COLUMNS
+				ldrb r7, [r8]
 				
-				@; r7 = iTemp
-				mov r7, r1
+				@; r10 = iTemp
+				mov r10, r1
 				@; Pasar por los huecos superiores
 				.LBucleHueco:
-					@; while (iTemp>0 && valorSup==Hueco)
-					cmp r7, #0
+					@; while (iTemp>0 && valorSup==hueco)
+					cmp r10, #0
 					ble .LFinBucleHueco
-					cmp r8, #0xF
+					cmp r7, #0xF
 					bne .LFinBucleHueco
 					@; Obtengo el siguiente valor superior
-					sub r6, #COLUMNS
-					ldrb r8, [r6]
+					sub r8, #COLUMNS
+					ldrb r7, [r8]
 					@; iTemp--
-					sub r7, #1
+					sub r10, #1
 					b .LBucleHueco
 				.LFinBucleHueco:
 				
 				@; Si hay un elemento superior válido, entonces hay una bajada vertical
-				mvn r9, r8
+				mvn r9, r7
 				.LSiElementoValido:
-					@; if (valorSup != ElementoVacío && valorSup != BloqueSolido|Hueco)
-					tst r8, #0x7
+					@; if (valorSup != elementoVacío && valorSup != bloqueSolido\hueco)
+					tst r7, #0x7
 					beq .LFinSiElementoValido
 					tst r9, #0x7
 					beq .LFinSiElementoValido
-					@; r9 = valorSupFiltrado
-					and r9, r8, #0x7
-					@; valorSup = 0
-					and r8, #0x18
-					strb r8, [r6]
-					@; valor = valorSup
-					add r5, r9
-					mla r6, r1, r3, r2
-					strb r5, [r6]
-					@; Ya que ha habido una bajada vertical r0 = true
-					mov r0, #1
+					
+					mov r10, r1
+					mov r0, r5
+					mov r1, r7
+					bl cambiar_3bits_menores
+					strb r0, [r6]
+					strb r1, [r8]
+					mov r1, r10
+					
+					@; Ya que ha habido una bajada vertical r11 = true
+					mov r11, #1
 				.LFinSiElementoValido:
 			.LFinSiCero:
 			
@@ -223,7 +223,7 @@ baja_verticales:
 			mla r6, r1, r3, r2
 			ldrb r5, [r6, r4]
 			
-			@; if (matriz[i][j] == BloqueSolido) break;
+			@; if (matriz[i][j] == bloqueSolido) break;
 			cmp r5, #0x7
 			beq .LFinBucleFilas2
 			
@@ -238,9 +238,8 @@ baja_verticales:
 				add r0, #1
 				@; Asigno al valor 0 el numero aleatorio
 				add r5, r0
-				str r5, [r6]
+				strb r5, [r6]
 				mov r0, r7
-				
 				@; break
 				b .LFinBucleFilas2
 			.LFinSiCero2:
@@ -252,7 +251,7 @@ baja_verticales:
 		add r2, #1
 		b .LBucleColumnas2
 	.LFinBucleColumnas2:
-		pop {pc}
+		pop {r1-r11,pc}
 
 
 
@@ -265,10 +264,228 @@ baja_verticales:
 @;		R0 = 1 indica que se ha realizado algún movimiento. 
 baja_laterales:
 		push {lr}
+		mov r11, #0			@; r11 = valor de retorno, por defecto es falso
+		mov r4, r0			@; r4 = *matriz
+		mov r2, #ROWS		@; r2 = i = ROWS
+		mov r3, #COLUMNS	@; r3 = j = COLUMNS
 		
+	.LBucleFilas3:
+		@; while (i>1)
+		cmp r2, #1
+		ble .LFinBucleFilas3
+		.LBucleColumnas3:
+			@; while (j>0)
+			cmp r3, #0
+			ble .LFinBucleColumnas3
+			@; r5 = matriz[i][j], r6 = *matriz[i][j]
+			mov r6, #COLUMNS
+			mla r6, r2, r6, r3
+			ldrb r5, [r6, r4]
+			.LSiCero3:
+				@; if (matriz[i][j] == 0)
+				tst r5, #0x7
+				bne .LFinSiCero3
+				
+				
+				
+				.LSiValorValido:
+					@; if (j>=COLUMNS-1 && es_valor_valido(valorIzquierdo))
+					cmp r3, #COLUMNS-1
+					blt .LSinoValorValido1
+					sub r8, r6, #COLUMNS+1	@; r8 = *valorIzquierdo = *matriz[i-1][j-1] = *matriz[i][j]-(COLUMNS+1)
+					ldrb r7, [r8]
+					mov r0, r7
+					bl es_valor_valido
+					cmp r0, #1
+					bne .LSinoValorValido1
+					
+					mov r0, r5
+					mov r1, r7
+					bl cambiar_3bits_menores
+					strb r0, [r6]
+					strb r1, [r8]
+					
+					b .LFinSiValorValido
+				.LSinoValorValido1:
+					@; else if (j<=0 && es_valor_valido(valorDerecho))
+					cmp r3, #0
+					blt .LSinoValorValido2
+					sub r8, r6, #COLUMNS-1	@; r8 = *valorDerecho = *matriz[i-1][j+1] = *matriz[i][j]-(COLUMNS-1)
+					ldrb r7, [r8]
+					mov r0, r7
+					bl es_valor_valido
+					cmp r0, #1
+					bne .LSinoValorValido2
+					
+					mov r0, r5
+					mov r1, r7
+					bl cambiar_3bits_menores
+					strb r0, [r6]
+					strb r1, [r8]
+					
+					b .LFinSiValorValido
+				.LSinoValorValido2:
+					
+					sub r8, r6, #COLUMNS+1	@; r8 = *valorIzquierdo
+					ldrb r7, [r8]
+					sub r10, r6, #COLUMNS-1	@; r10 = *valorDerecho = *matriz[i-1][j+1] = *matriz[i][j]-(COLUMNS-1)
+					ldrb r9, [r10]
+					
+					.LSiAmbosValidos:
+						@; if (es_valor_valido(valorIzquierdo) && es_valor_valido(valorDerecho))
+						mov r0, r7
+						bl es_valor_valido
+						cmp r0, #1
+						bne .LFinSiAmbosValidos
+						mov r0, r9
+						bl es_valor_valido
+						cmp r0, #1
+						bne .LFinSiAmbosValidos
+						
+						mov r0, #2
+						bl mod_random
+						@; r0 = 0 -> r7 = valorIzquierdo, r8 = *valorIzquierdo
+						@; r0 != 0 -> r7 = valorDerecho, r8 = *valorDerecho
+						cmp r0, #0
+						movne r7, r9
+						movne r8, r10
+						
+						mov r0, r5
+						mov r1, r7
+						bl cambiar_3bits_menores
+						strb r0, [r6]
+						strb r1, [r8]
+						
+						b .LFinSiAmbosValidos
+					.LSinoAmbosValidos1:
+						@; else if (esValorValido(valorIzquierdo))
+						mov r0, r7
+						bl es_valor_valido
+						cmp r0, #1
+						bne .LSinoAmbosValido2
+						
+						mov r0, r5
+						mov r1, r7
+						bl cambiar_3bits_menores
+						strb r0, [r6]
+						strb r1, [r8]
+						
+						b .LFinSiAmbosValidos
+					.LSinoAmbosValido2:
+						@; else if (esValorValido(valorDerecho))
+						mov r0, r9
+						bl es_valor_valido
+						cmp r0, #1
+						bne .LFinSiAmbosValidos
+						
+						mov r0, r5
+						mov r1, r9
+						bl cambiar_3bits_menores
+						strb r0, [r6]
+						strb r1, [r10]
+					.LFinSiAmbosValidos:
+					
+					ldrb r7, [r8]
+					
+				.LFinSiValorValido:
+				
+			.LFinSiCero3:
+			sub r3, #1
+			b .LBucleColumnas3
+		.LFinBucleColumnas3:
+		sub r2, #1
+		b .LBucleFilas3
+	.LFinBucleFilas3:
+	
+		mov r2, #0
+		mov r3, #0
+	@; Busqueda de los valores 0 más altos de cada columna
+	.LBucleColumnas4:
+		@; while (j<COLUMNS)
+		cmp r3, #COLUMNS
+		bge .LFinBucleColumnas4
 		
+		.LBucleFilas4:
+			@; while (i<ROWS)
+			cmp r2, #ROWS
+			bge .LFinBucleFilas4
+			@; r5 = matriz[i][j]
+			mov r5, #COLUMNS
+			mla r6, r2, r5, r3
+			ldrb r5, [r6, r4]
+			
+			@; if (matriz[i][j] == bloqueSolido) break;
+			cmp r5, #0x7
+			beq .LFinBucleFilas4
+			
+			.LSiCero4:
+				@; if (matriz[i][j] == 0)
+				tst r5, #0x7
+				bne .LFinSiCero4
+				@; Genero numero random entre 1 y 6
+				mov r0, #5
+				bl mod_random
+				add r0, #1
+				@; Asigno al valor 0 el numero aleatorio
+				add r5, r0
+				strb r5, [r6]
+				@; break
+				b .LFinBucleFilas4
+			.LFinSiCero4:
+			
+			add r2, #1
+			b .LBucleFilas4
+		.LFinBucleFilas4:
+		
+		add r3, #1
+		b .LBucleColumnas4
+	.LFinBucleColumnas4:
+	
 		pop {pc}
 
 
+@; es_valor_valido(valor): rutina para comprovar si un elemento es valido.
+@;	Un elemento es considerado valido si sus 3 bits de menor peso están
+@;	entre [001..110], es decir entre 1 y 6.
+@;	devuelve cierto (1) si el valor es valido o falso (0) si no lo es.
+@;	Parámetros:
+@;		R0 = el valor a comprovar la validez
+@;	Resultado:
+@;		R0 = booleano indicando si el valor es o no valido. 
+es_valor_valido:
+		push {r1,lr}
+		mvn r1, r0
+	.LSi:
+		@; if ((valor & 0x7 == 0) && (!valor & 0x7 == 0))
+		tst r0, #0x7
+		beq .LSino
+		tst r1, #0x7
+		beq .LSino
+		@; el valor es valido
+		mov r0, #1
+		b .LFinSi
+	.LSino:
+		mov r0, #0
+	.LFinSi:
+		pop {r1,pc}
 
+@; cambiar_3bits_menores(valor1, valor2): rutina para intercambiar los 3 bits
+@;	de menor peso de 2 valores.
+@;	Parámetros:
+@;		R0 = el primer valor a intercambiar
+@;		R1 = el segundo valor a intercambiar
+@;	Resultado:
+@;		En los 3 bits de menor peso de R1 quedan los 3 bits de menor peso de R0
+@;		y viceversa.
+cambiar_3bits_menores:
+		push {r2-r3,lr}
+		@; obtengo los 3 bits de menor peso
+		and r2, r0, #0x7
+		and r3, r1, #0x7
+		@; los intercambio
+		sub r0, r2
+		add r0, r3
+		sub r1, r3
+		add r1, r2
+		pop {r2-r3,pc}
 .end
