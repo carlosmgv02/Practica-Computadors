@@ -182,7 +182,7 @@ push {r0-r12, lr}
 		tst r5, #0x07			@;detectar si és 111
 		streqb r11, [r7, r1]	@;guardar 0 a mat_recomb1[i][j]
 		streqb r6, [r8, r1]		@;guardar el codi en mat_recomb2[i][j] si els bits baixos de r6 és 111 (exercici 2)
-		beq .Lendif1			@;saltar si no té els últims 3 bits a 0	
+		beq .Lendif1			@;saltar si té els últims 3 bits a 1	
 	@;guarda el element bàsic sense bits de gelatina
 		and r11, r6, #0x07		@;guardar valor de matriz[i][j] amb el bits de gelatines a 0
 		strb r11, [r7, r1]		@;mat_recomb1[i][j]=r11 (valor de la gel. s. sense el bit de la gelatina)
@@ -190,7 +190,7 @@ push {r0-r12, lr}
 		and r11, r6, #0x18		@;posar a 0 els últims 3 bits que té (codi base de gel.)
 		strb r11, [r8, r1]		@;guardar el codi base de gel a mat_recomb2[i][j]
 	.Lendif1:
-		add r1, #1
+		add r1, #1				@;i++
 		b .Lfor
 	.Lendfor:
 @;-------------------------------------------------------
