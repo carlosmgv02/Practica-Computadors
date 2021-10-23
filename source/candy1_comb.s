@@ -93,7 +93,9 @@ hay_combinacion:
 		mov r7, r3
 		mov r3, r12
 		bl swapV
+		add r1, #1
 		bl detectar_orientacion
+		add r1, #-1
 		mov r12, r7
 		mov r7, r3
 		mov r3, r12
@@ -133,7 +135,9 @@ hay_combinacion:
 		mov r7, r3
 		mov r3, r12
 		bl swapH
+		add r2, #1
 		bl detectar_orientacion
+		add r2, #-1
 		mov r12, r7
 		mov r7, r3
 		mov r3, r12
@@ -170,7 +174,9 @@ hay_combinacion:
 		mov r7, r3
 		mov r3, r12
 		bl swapV
+		add r1, #1
 		bl detectar_orientacion
+		add r1, #-1
 		mov r12, r7
 		mov r7, r3
 		mov r3, r12
@@ -206,7 +212,9 @@ hay_combinacion:
 		mov r7, r3
 		mov r3, r12
 		bl swapH
+		add r2, #1
 		bl detectar_orientacion
+		add r2, #-1
 		mov r12, r7
 		mov r7, r3
 		mov r3, r12
@@ -251,10 +259,42 @@ hay_combinacion:
 @;				guardar� las coordenadas (x1,y1,x2,y2,x3,y3), consecutivamente.
 	.global sugiere_combinacion
 sugiere_combinacion:
-		push {lr}
+		push {r1-r12,lr}
+@;			mov r1,#COLUMNS
+@;			bl mod_random
+@;			add r1,#1
+@;			mov r1,r0
+@;			mov r1,#ROWS		@;i
+@;			bl mod_random
+@;			add r1,#1
+@;
+@;			.Ini_combi:
+@;			bl hay_combinacion
+@;			cmp r0,#1
+@;			bne .noCombi
+@;
+@;			bl detectar_orientacion
+@;			mov r3,r0
+@;			bl generar_posiciones
+@;
+@;			.noCombi:
+@;			add r1,#1
+@;			add r2,#1
+@;			cmp r2,#ROWS-1
+@;			beq .Checkcols
+@;			bl .Ini_combi
+@;			
+@;			.Checkcols:
+@;			cmp r1,#COLUMNS-1
+@;			beq .sugiere_combinacion
+
+
+			
+
+
 		
 		
-		pop {pc}
+@;		pop {pc}
 
 
 
@@ -283,10 +323,39 @@ sugiere_combinacion:
 @;	Resultado:
 @;		vector de posiciones (x1,y1,x2,y2,x3,y3), devuelto por referencia
 generar_posiciones:
-		push {lr}
+@;		push {lr}
+@;			mov r4,r0
+@;			bl detectar_orientacion
+@;			
+@;			mov r3,r0
+@;			.cpi0:
+@;				cmp r4,#0
+@;				bne .cpi1
+@;				add r2,#1
+@;				b .Not
+@;			.cpi1:
+@;				cmp r4,#1
+@;				bne .cpi2
+@;				sub r2,#1
+@;				b .Not
+@;			cpi2:
+@;				cmp r4,#2
+@;				bne .cpi3
+@;				add r1,#1
+@;				b .Not
+@;			cpi3:
+@;				cmp r4,#3
+@;				sub r1,#1
+			
+@;			.Not:
+			
+			
+			
+			
+
+			
 		
-		
-		pop {pc}
+@;		pop {pc}
 
 
 
