@@ -61,7 +61,7 @@ int main(void)
 	{
 		inicializa_matriz(matrix, level);
 		escribe_matriz_debug(matrix);
-		retardo(20);
+		retardo(10);
 		recombina_elementos(matrix);
 		escribe_matriz_debug(matrix);
 		retardo(5);

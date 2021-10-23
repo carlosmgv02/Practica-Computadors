@@ -153,10 +153,10 @@ hay_combinacion:
 		ldrb r7, [r4, r8]	@;matriz[i+1][j]
 		tst r7, #0x07			@;tst	0111, 0[000] = 0000
 		add r1, #-1
-		beq .Lendiftotal
+		beq .LHor
 		mvn r7, r7
 		tst r7, #0x07
-		beq .Lendiftotal
+		beq .LHor
 		mvn r7, r7
 		cmp r7, r3    @; r3 = num izquierda  r7 = num derecha
 		beq .LHor
@@ -259,7 +259,7 @@ hay_combinacion:
 @;				guardar� las coordenadas (x1,y1,x2,y2,x3,y3), consecutivamente.
 	.global sugiere_combinacion
 sugiere_combinacion:
-		push {r1-r12,lr}
+@;		push {r1-r12,lr}
 @;			mov r1,#COLUMNS
 @;			bl mod_random
 @;			add r1,#1
@@ -267,7 +267,7 @@ sugiere_combinacion:
 @;			mov r1,#ROWS		@;i
 @;			bl mod_random
 @;			add r1,#1
-@;
+
 @;			.Ini_combi:
 @;			bl hay_combinacion
 @;			cmp r0,#1
@@ -283,7 +283,7 @@ sugiere_combinacion:
 @;			cmp r2,#ROWS-1
 @;			beq .Checkcols
 @;			bl .Ini_combi
-@;			
+			
 @;			.Checkcols:
 @;			cmp r1,#COLUMNS-1
 @;			beq .sugiere_combinacion
@@ -346,7 +346,7 @@ generar_posiciones:
 @;			cpi3:
 @;				cmp r4,#3
 @;				sub r1,#1
-			
+@;			
 @;			.Not:
 			
 			
