@@ -51,7 +51,7 @@ void actualizar_contadores(int code)
 #define NUMTESTS1E 14
 #define NUMTESTS1F 4
 #define NUMTESTS NUMTESTS1E + NUMTESTS1F
-short nmap[] = {4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 8, 1, 2, 3, 4};
+short nmap[] = {4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 8, 1, 4, 5, 6};
 short posX[] = {0, 0, 0, 0, 4, 4, 4, 0, 0, 5, 4, 1, 1, 1};
 short posY[] = {2, 2, 2, 2, 4, 4, 4, 0, 0, 0, 4, 3, 3, 5};
 short cori[] = {0, 1, 2, 3, 0, 1, 2, 0, 3, 0, 0, 1, 3, 0};
@@ -64,15 +64,15 @@ int main(void)
 	consoleDemoInit();			// inicialización de pantalla de texto
 	printf("candyNDS (prueba tarea 1E & 1F)\n");
 	printf("\x1b[38m\x1b[1;0H  nivel:");
-	level = nmap[0];
+	level = nmap[ntest];
 	actualizar_contadores(1);
 	copia_mapa(matrix, level);
 	escribe_matriz_debug(matrix);
+	swiWaitForVBlank();
 	do							// bucle principal de pruebas
 	{
 		if (ntest < NUMTESTS1E) {
-			printf("\x1b[39m\x1b[2;0H test %d: posXY (%d, %d), c.ori %d",
-									ntest, posX[ntest], posY[ntest], cori[ntest]);
+			printf("\x1b[39m\x1b[2;0H test %d: posXY (%d, %d), c.ori %d", ntest, posX[ntest], posY[ntest], cori[ntest]);
 			printf("\x1b[39m\x1b[3;0H resultado esperado: %d", resp[ntest]);
 		
 			result1E = cuenta_repeticiones(matrix, posY[ntest], posX[ntest], cori[ntest]);
@@ -87,6 +87,8 @@ int main(void)
 				retardo(40);
 				escribe_matriz_debug(matrix);
 			}
+			swiWaitForVBlank();
+			escribe_matriz_debug(matrix);
 			retardo(5);
 			printf("\x1b[38m\x1b[5;19H (pulse A/B)");
 		}
