@@ -205,7 +205,7 @@ push {r0-r12, lr}
 	bhs .Lendfor4			
 @;	carregar matriz[i][j]
 	mov r5, #COLUMNS
-	mla r4, r1, r5, r2
+	mla r4, r1, r5, r2		@;r4=(i*COLUMNS)+j
 	ldrb r6, [r12, r4]		@;r6=matriz[i][j]
 @;	detectar si matriz[i][j] és vuit
 	tst r6, #0x07			@;màscara per detectar 0000
@@ -220,11 +220,11 @@ push {r0-r12, lr}
 @;	calcular rand_i
 	mov r0, #ROWS
 	bl mod_random
-	mov r9, r0
+	mov r9, r0				@;r9=x
 @;	calcular rand_j
 	mov r0, #COLUMNS
 	bl mod_random
-	mov r10, r0
+	mov r10, r0				@;r10=y
 	mov r0, r12
 @;	carregar mat_recomb[x][y]
 	mov r5, #COLUMNS
@@ -235,32 +235,28 @@ push {r0-r12, lr}
 	beq .Lwhile1
 @;	afegir mat_recomb1 a mat_recomb 2 afegint els bits de gelatina
 	ldrb r10, [r8, r4]		@;r10=mat_recomb2[i][j]
-	orr r9, r10				@;r9= mat_recomb1[x][y] or mat_recomb2[i][j]
-	strb r9, [r8, r4]
+	orr r5, r9, r10				@;r9= mat_recomb1[x][y] or mat_recomb2[i][j]
 @;	comprovar que no genera cap seqüencia
-	mov r0, r8
+	mov r0, r8					@;recuperar el paràmetre
 	mov r3, #0x02
 	bl cuenta_repeticiones
 	cmp r0, #0x03
-	strhsb r10, [r8, r4]	@;guardar el valor anterior
-	blo .Lcuenta_repeticiones2
+	blo .Lcuenta_repeticiones2	@;si en una orientació no genera seq. comprova la segona
 .Lhay_repeticion:
 	cmp r1, #ROWS-1
-	blo .Lwhile1
 	bhs .Linici
+	blo .Lwhile1
 .Lcuenta_repeticiones2:
-	mov r0, r8
+	mov r0, r8					@;recuperar el paràmetre
 	mov r3, #0x03
 	bl cuenta_repeticiones
 	cmp r0, #0x03
-	strhsb r10, [r8, r4]	@;guardar el valor anterior
-	bhs .Lhay_repeticion
-@;	guardar 0 en mat_recomb1[x][y]
+	bhs .Lhay_repeticion		@;ha detectat orientació
+@;	guardar 0 en mat_recomb1[x][y] i el valor en recomb2
+	strb r5, [r8, r4]		@;guardar recomb1 en recomb2
 	mov r5, #0x00
-	strb r5, [r7, r11]
-	mov r0, r12
+	strb r5, [r7, r11]		@;posar a 0 el lloc d'on hem tret el valor
 .Lendif2:
-	mov r0, r12
 	add r2, #1				@;j++
 	b .Lfor4
 .Lendfor4:	
@@ -288,8 +284,6 @@ push {r0-r12, lr}
 pop {r0-r12, lr}
 
 @;:::RUTINAS DE SOPORTE:::
-
-
 
 @; mod_random(n): rutina para obtener un número aleatorio entre 0 y n-1,
 @;	utilizando la rutina 'random'
