@@ -111,12 +111,12 @@ cuenta_repeticiones:
 @;				queden movimientos pendientes. 
 	.global baja_elementos
 baja_elementos:
-		push {lr}
+		push {r4,lr}
 		mov r4, r0
 		bl baja_verticales
-		cmp r0, #0
-		ble baja_laterales
-		pop {pc}
+		@;cmp r0, #0
+		@;ble baja_laterales
+		pop {r4,pc}
 
 
 
@@ -133,32 +133,31 @@ baja_elementos:
 @;		R0 = 1 indica que se ha realizado algún movimiento. 
 baja_verticales:
 		push {r1-r11,lr}
-		mov r4, r0			@; r4 = *matriz
 		mov r11, #0			@; r11 = false
-		mov r1, #ROWS		@; r1 = i = ROWS
-		mov r2, #COLUMNS 	@; r2 = j = COLUMNS
+		mov r1, #ROWS-1		@; r1 = i = ROWS-1
+		mov r2, #COLUMNS-1 	@; r2 = j = COLUMNS-1
 		mov r3, #COLUMNS	@; r3 = const
 		
 	@; Recorrido de la matriz sin la primera fila buscando los valores 0
 	.LBucleFilas:
-		@; while (i>1)
-		cmp r1, #1
-		blt .LFinBucleFilas
-		
+		@; while (i>0)
+		cmp r1, #0
+		ble .LFinBucleFilas
+		mov r2, #COLUMNS-1
 		.LBucleColumnas:
-			@; while (j>0)
+			@; while (j>=0)
 			cmp r2, #0
 			blt .LFinBucleColumnas
 			@; r5 = matriz[i][j]
 			mla r6, r1, r3, r2
-			ldrb r5, [r6, r4]
+			ldrb r5, [r4, r6]
 			.LSiCero:
 				@; if (valorFiltrado == 0)
 				tst r5, #0x7
 				bne .LFinSiCero
 				@; r8 = valorSup = matriz[i-1][j]
 				sub r8, r6, #COLUMNS
-				ldrb r7, [r8]
+				ldrb r7, [r4, r8]
 				
 				@; r10 = iTemp
 				mov r10, r1
@@ -171,7 +170,7 @@ baja_verticales:
 					bne .LFinBucleHueco
 					@; Obtengo el siguiente valor superior
 					sub r8, #COLUMNS
-					ldrb r7, [r8]
+					ldrb r7, [r4, r8]
 					@; iTemp--
 					sub r10, #1
 					b .LBucleHueco
@@ -190,8 +189,8 @@ baja_verticales:
 					mov r0, r5
 					mov r1, r7
 					bl cambiar_3bits_menores
-					strb r0, [r6]
-					strb r1, [r8]
+					strb r0, [r4, r6]
+					strb r1, [r4, r8]
 					mov r1, r10
 					
 					@; Ya que ha habido una bajada vertical r11 = true
@@ -214,14 +213,14 @@ baja_verticales:
 		@; while (j<COLUMNS)
 		cmp r2, #COLUMNS
 		bge .LFinBucleColumnas2
-		
+		mov r1, #0
 		.LBucleFilas2:
 			@; while (i<ROWS)
 			cmp r1, #ROWS
 			bge .LFinBucleFilas2
 			@; r5 = matriz[i][j]
 			mla r6, r1, r3, r2
-			ldrb r5, [r6, r4]
+			ldrb r5, [r4, r6]
 			
 			@; if (matriz[i][j] == bloqueSolido) break;
 			cmp r5, #0x7
@@ -238,7 +237,7 @@ baja_verticales:
 				add r0, #1
 				@; Asigno al valor 0 el numero aleatorio
 				add r5, r0
-				strb r5, [r6]
+				strb r5, [r4, r6]
 				mov r0, r7
 				@; break
 				b .LFinBucleFilas2
@@ -251,6 +250,7 @@ baja_verticales:
 		add r2, #1
 		b .LBucleColumnas2
 	.LFinBucleColumnas2:
+		mov r0, r11
 		pop {r1-r11,pc}
 
 
@@ -263,37 +263,35 @@ baja_verticales:
 @;	Resultado:
 @;		R0 = 1 indica que se ha realizado algún movimiento. 
 baja_laterales:
-		push {lr}
+		push {r1-r11,lr}
 		mov r11, #0			@; r11 = valor de retorno, por defecto es falso
-		mov r4, r0			@; r4 = *matriz
-		mov r2, #ROWS		@; r2 = i = ROWS
-		mov r3, #COLUMNS	@; r3 = j = COLUMNS
+		mov r2, #ROWS-1		@; r2 = i = ROWS
+		mov r3, #COLUMNS-1	@; r3 = j = COLUMNS
 		
 	.LBucleFilas3:
-		@; while (i>1)
-		cmp r2, #1
+		@; while (i>0)
+		cmp r2, #0
 		ble .LFinBucleFilas3
+		mov r3, #COLUMNS-1
 		.LBucleColumnas3:
-			@; while (j>0)
+			@; while (j>=0)
 			cmp r3, #0
-			ble .LFinBucleColumnas3
+			blt .LFinBucleColumnas3
 			@; r5 = matriz[i][j], r6 = *matriz[i][j]
 			mov r6, #COLUMNS
 			mla r6, r2, r6, r3
-			ldrb r5, [r6, r4]
+			ldrb r5, [r4, r6]
 			.LSiCero3:
 				@; if (matriz[i][j] == 0)
 				tst r5, #0x7
 				bne .LFinSiCero3
-				
-				
 				
 				.LSiValorValido:
 					@; if (j>=COLUMNS-1 && es_valor_valido(valorIzquierdo))
 					cmp r3, #COLUMNS-1
 					blt .LSinoValorValido1
 					sub r8, r6, #COLUMNS+1	@; r8 = *valorIzquierdo = *matriz[i-1][j-1] = *matriz[i][j]-(COLUMNS+1)
-					ldrb r7, [r8]
+					ldrb r7, [r4, r8]
 					mov r0, r7
 					bl es_valor_valido
 					cmp r0, #1
@@ -302,8 +300,9 @@ baja_laterales:
 					mov r0, r5
 					mov r1, r7
 					bl cambiar_3bits_menores
-					strb r0, [r6]
-					strb r1, [r8]
+					strb r0, [r4, r6]
+					strb r1, [r4, r8]
+					mov r11, #1
 					
 					b .LFinSiValorValido
 				.LSinoValorValido1:
@@ -311,7 +310,7 @@ baja_laterales:
 					cmp r3, #0
 					blt .LSinoValorValido2
 					sub r8, r6, #COLUMNS-1	@; r8 = *valorDerecho = *matriz[i-1][j+1] = *matriz[i][j]-(COLUMNS-1)
-					ldrb r7, [r8]
+					ldrb r7, [r4, r8]
 					mov r0, r7
 					bl es_valor_valido
 					cmp r0, #1
@@ -320,16 +319,17 @@ baja_laterales:
 					mov r0, r5
 					mov r1, r7
 					bl cambiar_3bits_menores
-					strb r0, [r6]
-					strb r1, [r8]
+					strb r0, [r4, r6]
+					strb r1, [r4, r8]
+					mov r11, #1
 					
 					b .LFinSiValorValido
 				.LSinoValorValido2:
 					
 					sub r8, r6, #COLUMNS+1	@; r8 = *valorIzquierdo
-					ldrb r7, [r8]
+					ldrb r7, [r4, r8]
 					sub r10, r6, #COLUMNS-1	@; r10 = *valorDerecho = *matriz[i-1][j+1] = *matriz[i][j]-(COLUMNS-1)
-					ldrb r9, [r10]
+					ldrb r9, [r4, r10]
 					
 					.LSiAmbosValidos:
 						@; if (es_valor_valido(valorIzquierdo) && es_valor_valido(valorDerecho))
@@ -353,8 +353,9 @@ baja_laterales:
 						mov r0, r5
 						mov r1, r7
 						bl cambiar_3bits_menores
-						strb r0, [r6]
-						strb r1, [r8]
+						strb r0, [r4, r6]
+						strb r1, [r4, r8]
+						mov r11, #1
 						
 						b .LFinSiAmbosValidos
 					.LSinoAmbosValidos1:
@@ -367,8 +368,9 @@ baja_laterales:
 						mov r0, r5
 						mov r1, r7
 						bl cambiar_3bits_menores
-						strb r0, [r6]
-						strb r1, [r8]
+						strb r0, [r4, r6]
+						strb r1, [r4, r8]
+						mov r11, #1
 						
 						b .LFinSiAmbosValidos
 					.LSinoAmbosValido2:
@@ -381,11 +383,13 @@ baja_laterales:
 						mov r0, r5
 						mov r1, r9
 						bl cambiar_3bits_menores
-						strb r0, [r6]
-						strb r1, [r10]
+						strb r0, [r4, r6]
+						strb r1, [r4, r10]
+						mov r11, #1
+						
 					.LFinSiAmbosValidos:
 					
-					ldrb r7, [r8]
+					ldrb r7, [r4, r8]
 					
 				.LFinSiValorValido:
 				
@@ -404,7 +408,7 @@ baja_laterales:
 		@; while (j<COLUMNS)
 		cmp r3, #COLUMNS
 		bge .LFinBucleColumnas4
-		
+		mov r2, #0
 		.LBucleFilas4:
 			@; while (i<ROWS)
 			cmp r2, #ROWS
@@ -412,7 +416,7 @@ baja_laterales:
 			@; r5 = matriz[i][j]
 			mov r5, #COLUMNS
 			mla r6, r2, r5, r3
-			ldrb r5, [r6, r4]
+			ldrb r5, [r4, r6]
 			
 			@; if (matriz[i][j] == bloqueSolido) break;
 			cmp r5, #0x7
@@ -428,7 +432,7 @@ baja_laterales:
 				add r0, #1
 				@; Asigno al valor 0 el numero aleatorio
 				add r5, r0
-				strb r5, [r6]
+				strb r5, [r4, r6]
 				@; break
 				b .LFinBucleFilas4
 			.LFinSiCero4:
@@ -440,8 +444,8 @@ baja_laterales:
 		add r3, #1
 		b .LBucleColumnas4
 	.LFinBucleColumnas4:
-	
-		pop {pc}
+		mov r0, r11
+		pop {r1-r11,pc}
 
 
 @; es_valor_valido(valor): rutina para comprovar si un elemento es valido.
