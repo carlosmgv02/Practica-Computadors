@@ -236,13 +236,15 @@ push {r0-r12, lr}
 @;	afegir mat_recomb1 a mat_recomb 2 afegint els bits de gelatina
 	ldrb r10, [r8, r4]		@;r10=mat_recomb2[i][j]
 	orr r5, r9, r10				@;r9= mat_recomb1[x][y] or mat_recomb2[i][j]
+	strb r5, [r8, r4]		@;guardar recomb1 en recomb2
 @;	comprovar que no genera cap seqüencia
 	mov r0, r8					@;recuperar el paràmetre
 	mov r3, #0x02
 	bl cuenta_repeticiones
-	cmp r0, #0x03
+	cmp r0, #3
 	blo .Lcuenta_repeticiones2	@;si en una orientació no genera seq. comprova la segona
 .Lhay_repeticion:
+	strb r10, [r8, r4]
 	cmp r1, #ROWS-1
 	bhs .Linici
 	blo .Lwhile1
@@ -250,10 +252,9 @@ push {r0-r12, lr}
 	mov r0, r8					@;recuperar el paràmetre
 	mov r3, #0x03
 	bl cuenta_repeticiones
-	cmp r0, #0x03
+	cmp r0, #3
 	bhs .Lhay_repeticion		@;ha detectat orientació
 @;	guardar 0 en mat_recomb1[x][y] i el valor en recomb2
-	strb r5, [r8, r4]		@;guardar recomb1 en recomb2
 	mov r5, #0x00
 	strb r5, [r7, r11]		@;posar a 0 el lloc d'on hem tret el valor
 .Lendif2:
