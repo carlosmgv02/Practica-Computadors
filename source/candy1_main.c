@@ -78,6 +78,7 @@ int main(void)
 			level = (level + 1) % MAXLEVEL;
 			actualizar_contadores(1);
 		}
+		
 	} while (1);
 	return(0);
 }

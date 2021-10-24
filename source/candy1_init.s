@@ -197,7 +197,7 @@ push {r0-r12, lr}
 @;-------------------------------------------------------
 	mov r1, #0				@;carregar i=0
 .Lfor3:
-	cmp r1, #ROWS			
+	cmp r1, #ROWS
 	bhs .Lendfor3			
 	mov r2, #0				@;carregar j=0
 .Lfor4:
@@ -213,9 +213,17 @@ push {r0-r12, lr}
 	mvn r11, r6
 	tst r11, #0x07			@;màscara per detectar 0111
 	beq .Lendif2
+	mov r6, #0
+	b .Lwhile1
 @;	ELSE: cas contrari
 	@; r9=  rand_i= x
 	@; r10= rand_j= y
+.Lhaysecuencia:
+@;	comprovar que no sigui de les últimes caselles
+	strb r10, [r8, r4]
+	add r6, #1
+	cmp r6, #ROWS*COLUMNS
+	bhs .Linici
 .Lwhile1:
 @;	calcular rand_i
 	mov r0, #ROWS
@@ -235,26 +243,30 @@ push {r0-r12, lr}
 	beq .Lwhile1
 @;	afegir mat_recomb1 a mat_recomb 2 afegint els bits de gelatina
 	ldrb r10, [r8, r4]		@;r10=mat_recomb2[i][j]
-	orr r5, r9, r10				@;r9= mat_recomb1[x][y] or mat_recomb2[i][j]
+	orr r5, r9, r10			@;r5= mat_recomb1[x][y] or mat_recomb2[i][j]
 	strb r5, [r8, r4]		@;guardar recomb1 en recomb2
-@;	comprovar que no genera cap seqüencia
-	mov r0, r8					@;recuperar el paràmetre
-	mov r3, #0x02
+@;-------------------------------------------------------
+@; CUENTA REPETICIONES
+@;-------------------------------------------------------
+@;	r9= mat_recomb1[x][y]
+@;	r10=mat_recomb2[i][j]
+;@	oest
+	mov r3, #2
+	mov r0, r8
 	bl cuenta_repeticiones
 	cmp r0, #3
-	blo .Lcuenta_repeticiones2	@;si en una orientació no genera seq. comprova la segona
-.Lhay_repeticion:
-	strb r10, [r8, r4]
-	cmp r1, #ROWS-1
-	bhs .Linici
-	blo .Lwhile1
-.Lcuenta_repeticiones2:
-	mov r0, r8					@;recuperar el paràmetre
-	mov r3, #0x03
+	mov r0, r12
+	bhs .Lhaysecuencia
+@;	nord
+	mov r3, #3
+	mov r0, r8
 	bl cuenta_repeticiones
 	cmp r0, #3
-	bhs .Lhay_repeticion		@;ha detectat orientació
-@;	guardar 0 en mat_recomb1[x][y] i el valor en recomb2
+	mov r0, r12
+	bhs .Lhaysecuencia
+@;-------------------------------------------------------
+@; FI CUENTA REPETICIONES
+@;-------------------------------------------------------
 	mov r5, #0x00
 	strb r5, [r7, r11]		@;posar a 0 el lloc d'on hem tret el valor
 .Lendif2:
@@ -294,7 +306,7 @@ pop {r0-r12, lr}
 @;	Parámetros:
 @;		R0 = el rango del número aleatorio (n)
 @;	Resultado:
-@;		R0 = el número aleatorio dentro del rango especificado (0..n-1)                                                         		=
+@;		R0 = el número aleatorio dentro del rango especificado (0..n-1)
 
 	.global mod_random
 mod_random:
