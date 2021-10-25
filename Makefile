@@ -34,7 +34,9 @@ DATA		:=	data
 #---------------------------------------------------------------------------------
 ARCH	:=	 -march=armv5te -mlittle-endian
 
-CFLAGS	:=	-Wall -g -O2 \
+		# va aqui -g -O2 (cuando se ejecuta el programa normal, sustituye -O0 -gdwarf-3 por -g -O2
+CFLAGS	:=	-Wall  -g -O2 \
+
 			$(ARCH) -mtune=arm946e-s -fomit-frame-pointer -ffast-math
 				# -Wall						: enable all warnings
 				# -g						: enable debug info generation

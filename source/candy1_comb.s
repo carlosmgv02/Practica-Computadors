@@ -16,8 +16,6 @@
 		.align 2
 		.arm
 
-
-
 @;TAREA 1G;
 @; hay_combinacion(*matriz): rutina para detectar si existe, por lo menos, una
 @;	combinaci�n entre dos elementos (diferentes) consecutivos que provoquen
@@ -26,12 +24,219 @@
 @;		R0 = direcci�n base de la matriz de juego
 @;	Resultado:
 @;		R0 = 1 si hay una secuencia, 0 en otro caso
+@; USO DE REGISTROS
+@;		R1 = i
+@;		R2 = j
+@;		R3 = matriz[i][j]
+@;		R4 = posicion actual
+@;		R5 = COLUMNS
+@;		R6 = ROWS
+@;		R7 = matriz[i+1][j]
+@;		R8 = aux
+@;		R9 = 
+@;		R10 = 
+@;		R11 = 
+@; 		R12 = 
 	.global hay_combinacion
 hay_combinacion:
-		push {lr}
+		push {r1-r12,lr}
+		mov r5, #COLUMNS
+		mov r6, #ROWS
+		mov r1 ,#0	@;i
+		mov r2 ,#0	@;j
+		mov r4, r0
+	.Lfor_Row:
+		cmp r1,r6
+		bhs .Lendfor_Rows		@; saltar al final si excede el rango
+		mov r2 ,#0	@;j
+	.Lfor_Col:
+		cmp r2,r5
+		bhs .Lendfor_Col		@; saltar al final si excede el rango
+@;	.Lifz:	@;If different from 0
+		mla r8,r1,r5,r2		@;cálculo dirección (i*COLUMNS)+j
+		ldrb r3, [r4, r8]	@;guardo el contenido de la posicion de memoria
+		tst r3, #0x07			@;tst	0111, 0[000] = 0000
+		beq	.Lendiftotal
+		mvn r7, r3
+		tst r7, #0x07
+		beq	.Lendiftotal
+@;	If2
+		cmp r2, #COLUMNS-1
+		bne .Lelse
+@; 	If3
+		cmp r1, #ROWS-1
+		beq .Lendiftotal
+		
+		add r1, #1
+		mla r8, r1, r5, r2
+		ldrb r7, [r4, r8]	@;matriz[i+1][j]
+		tst r7, #0x07			@;tst	0111, 0[000] = 0000
+		add r1, #-1
+		beq .Lendiftotal
+		mvn r7, r7
+		tst r7, #0x07
+		beq .Lendiftotal
+		mvn r7, r7
+		cmp r7, r3    @; r3 = num arriba  r7 = num abajo
+		beq .Lendiftotal
+		
+		bl swapV
+
+		bl detectar_orientacion
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapV
+		cmp r0, #6
+		blo .Lreturn1
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapV
+		add r1, #1
+		bl detectar_orientacion
+		add r1, #-1
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapV
+		cmp r0, #6
+		blo .Lreturn1
+		b .Lendiftotal
+	
+	.Lelse:	
+		
+		cmp r1, #ROWS-1
+		bne .Lelse2
+		
+		add r2, #1
+		mla r8, r1, r5, r2
+		ldrb r7, [r4, r8]	@;matriz[i][j+1]
+		tst r7, #0x07			@;tst	0111, 0[000] = 0000
+		add r2, #-1
+		beq .Lendiftotal
+		mvn r7, r7
+		tst r7, #0x07
+		beq .Lendiftotal
+		mvn r7, r7
+		cmp r7, r3    @; r3 = num arriba  r7 = num abajo
+		beq .Lendiftotal
+
+		bl swapH
+	
+		bl detectar_orientacion
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapH
+		cmp r0, #6
+		blo .Lreturn1
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapH
+		add r2, #1
+		bl detectar_orientacion
+		add r2, #-1
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapH
+		cmp r0, #6
+		blo .Lreturn1
+		b .Lendiftotal
+		
+	.Lelse2:
+		
+		add r1, #1
+		mla r8, r1, r5, r2
+		ldrb r7, [r4, r8]	@;matriz[i+1][j]
+		tst r7, #0x07			@;tst	0111, 0[000] = 0000
+		add r1, #-1
+		beq .LHor
+		mvn r7, r7
+		tst r7, #0x07
+		beq .LHor
+		mvn r7, r7
+		cmp r7, r3    @; r3 = num izquierda  r7 = num derecha
+		beq .LHor
+		
+		bl swapV
+	
+		bl detectar_orientacion
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapV
+		cmp r0, #6
+		blo .Lreturn1
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapV
+		add r1, #1
+		bl detectar_orientacion
+		add r1, #-1
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapV
+		cmp r0, #6
+		blo .Lreturn1
+		mov r3, r7
+
+.LHor:	
+		add r2, #1
+		mla r8, r1, r5, r2
+		ldrb r7, [r4, r8]	@;matriz[i][j+1]
+		tst r7, #0x07			@;tst	0111, 0[000] = 0000
+		add r2, #-1
+		beq .Lendiftotal
+		mvn r7, r7
+		tst r7, #0x07
+		beq .Lendiftotal
+		mvn r7, r7
+		cmp r7, r3    @; r3 = num izquierda  r7 = num derecha
+		beq .Lendiftotal
+
+		bl swapH
+	
+		bl detectar_orientacion
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapH
+		cmp r0, #6
+		blo .Lreturn1
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapH
+		add r2, #1
+		bl detectar_orientacion
+		add r2, #-1
+		mov r12, r7
+		mov r7, r3
+		mov r3, r12
+		bl swapH
+		cmp r0, #6
+		blo .Lreturn1
 		
 		
-		pop {pc}
+	.Lendiftotal:
+		add	r2, #1	@; j++
+		b .Lfor_Col	@; saltar al for
+	.Lendfor_Col:	
+		add r1, #1	@; i++
+		b .Lfor_Row
+	.Lendfor_Rows:
+		mov r0, #0
+		b .Lreturn0
+	.Lreturn1:
+		mov r0, #1
+	.Lreturn0:
+		pop {r1-r12,pc}
+
 
 
 
@@ -54,17 +259,134 @@ hay_combinacion:
 @;				guardar� las coordenadas (x1,y1,x2,y2,x3,y3), consecutivamente.
 	.global sugiere_combinacion
 sugiere_combinacion:
-		push {lr}
+		push {r1-r12,lr}
+			mov r4,r0
+			mov r3,r1
+			mov r5, #COLUMNS
+			mov r0, #COLUMNS
+			bl mod_random
+			mov r2,r0	@;mod_random me devuelve por r0  el num aleatorio
+			
+			mov r0,#ROWS
+			bl mod_random
+			mov r1,r0
+
+.Lwhile:
+
+
+.Lfor1:
+			cmp r1, #ROWS-1
+			bhs .Lfifor1
+			mov r2, #0
+.Lfor2:
+			cmp r2, #COLUMNS
+			bhs .Lfifor2
+
+
+
+			mla r6, r1, r5, r2	@;Calculamos la dirección a partir de la dir base de la matriz
+			strb r3, [r4, r6]	@;Guardamos el contenido en la dirección
+			add r6, #1			@;Para no tener que hacer add r2,#r1 y mla otra vez  
+			strb r7, [r4, r6]	@guardamos en r7 el contenido de la p
+			add r6, #-1	
+
+
+			mov r10, #0
+			bl swapH	@;swap horizontal
+			bl detectar_orientacion
+			mov r12, r7
+			mov r7, r3
+			mov r3, r12
+			bl swapH
+			cmp r0, #6
+			beq .Continuar1
+			bl generar_posiciones
+			b .Lfinal
+.Continuar1:
+			mla r6, r1, r5, r2	@;Calculamos la dirección a partir de la dir base de la matriz
+			strb r3, [r4, r6]	@;Guardamos el contenido en la dirección
+			add r6, #-1			@;Para no tener que hacer add r2,#r1 y mla otra vez  
+			strb r7, [r4, r6]	@guardamos en r7 el contenido de la p
+			add r6, #1	
+
+
+			mov r10, #1
+			bl swapH2
+			bl detectar_orientacion
+			mov r12, r7
+			mov r7, r3
+			mov r3, r12
+			bl swapH2
+			cmp r0, #6
+			beq .Continuar2
+			bl generar_posiciones
+			b .Lfinal
+
+.Continuar2:
+			mla r6, r1, r5, r2	@;Calculamos la dirección a partir de la dir base de la matriz
+			strb r3, [r4, r6]	@;Guardamos el contenido en la dirección
+			add r1, #1			@;Para no tener que hacer add r2,#r1 y mla otra vez  
+			mla r6, r1, r5, r2
+			strb r7, [r4, r6]	@guardamos en r7 el contenido de la p
+			add r6, #-1	
 		
+			mov r10, #2
+			
+			bl swapV		@;swap vertical abajo
+
+			bl detectar_orientacion
+			mov r12, r7
+			mov r7, r3
+			mov r3, r12
+			bl swapV
+			cmp r0, #6
+			beq .Continuar3
+			bl generar_posiciones
+			b .Lfinal
+
+.Continuar3:
+
+			mla r6, r1, r5, r2	@;Calculamos la dirección a partir de la dir base de la matriz
+			strb r3, [r4, r6]	@;Guardamos el contenido en la dirección
+			add r1, #-1			@;Para no tener que hacer add r2,#r1 y mla otra vez  
+			mla r6, r1, r5, r2
+			strb r7, [r4, r6]	@guardamos en r7 el contenido de la p
+			add r6, #1	
 		
+			mov r10, #3
+			
+			bl swapV2		@;swap vertical abajo
+
+			bl detectar_orientacion
+			mov r12, r7
+			mov r7, r3
+			mov r3, r12
+			bl swapV2
+			cmp r0, #6
+			beq .Continuar4
+			bl generar_posiciones
+			b .Lfinal	
+
+.Continuar4:
+
+			add r2, #1
+			b .Lfor2
+.Lfifor2:
+			add r1, #1
+			b .Lfor1
+.Lfifor1:	
+			mov r1, #0
+			mov r2, #0
+			b .Lwhile
+
+.Lfinal:
+
 		pop {pc}
 
 
 
 
 @;:::RUTINAS DE SOPORTE:::
-
-
 
 @; generar_posiciones(vect_pos,f,c,ori,cpi): genera las posiciones de sugerencia
 @;	de combinaci�n, a partir de la posici�n inicial (f,c), el c�digo de
@@ -84,11 +406,163 @@ sugiere_combinacion:
 @;		R4 = c�digo de posici�n inicial:
 @;				0 -> izquierda, 1 -> derecha, 2 -> arriba, 3 -> abajo
 @;	Resultado:
+
+@; Si detectas en r10 = 0 el primer x1,y1 es el de la derecha, si r10 = 1 el primer x1,y1 es el de la izquierda, si r10 = 2 el primer x1,y1 es el de abajo, si r10 = 3 el primer x1,y1 es el de arriba,
+
+@; Si r0 = 0 los dos segundos puntos son el de la derecha, si r0 = 1 los ods puntos don los de abajo, 
+@;si r0 = 2 los dos puntos son los de la izquierda, si r0 = 3 los dos puntos son los de arriba, si r0 = 4 
+@;el segundo punto es el de la izquierda y el otro es de la derecha, si r0 = 5 el segundo es de arriba y el 
+@;otro es de abajo
+
+
 @;		vector de posiciones (x1,y1,x2,y2,x3,y3), devuelto por referencia
 generar_posiciones:
 		push {lr}
-		
-		
+			cmp r10,#0
+			bne .Next
+			add r2,#1
+			mla r6,r1,r5,r2		@;cálculo dirección (i*COLUMNS)+j
+			ldrb r7,[r6]
+			strb r7,[r4] 	@;r4 dir del vect
+			add r2,#1
+			add r4,#1
+			mla r6,r1,r5,r2
+			ldrb r7,[r6]
+			strb r7,[r4]
+			add r2,#-2
+			.Liniposis:
+			cmp r0,#0
+			bne .ContPunt
+			add r2,#1	@;cojo la columna de la derecha
+			mla r6,r1,r5,r2	@;calculo dir de memoria de la derecha
+			ldrb r7,[r6]	@;cargo contenido de la dir de memoria
+			add r4,#1		
+			strb r7,[r4]	@;lo cargo en la posi siguiente del vector para no perder los valores q hay
+			add r2,#1
+			mla r6,r1,r5,r2
+			ldrb r7, [r6]
+			add r4,#1
+			strb r7,[r4]
+			.ContPunt:	@;fila de abajo
+			cmp r0,#1
+			bne .ContPunt2
+			add r1,#1
+			mla r6,r1,r5,r2
+			ldrb r7,[r6]
+			add r4,#1
+			strb r7,[r4]
+			add r1,#1
+			mla r6,r1,r5,r2
+			ldrb r7, [r6]
+			add r4,#1
+			strb r7,[r4]
+			.ContPunt2:	@;abajo
+			cmp r0,#2
+			bne .ContPunt3
+			add r2,#-1
+			mla r6,r1,r5,r2
+			ldrb r7,[r6]
+			add r4,#1
+			strb r7,[r4]
+			add r2,#-1
+			mla r6,r1,r5,r2
+			ldrb r7, [r6]
+			add r4,#1
+			strb r7,[r4]
+			.ContPunt3:
+			cmp r0,#3
+			bne .ContPunt4
+			add r1,#-1
+			mla r6,r1,r5,r2
+			ldrb r7,[r6]
+			add r4,#1
+			strb r7,[r4]
+			add r1,#-1
+			mla r6,r1,r5,r2
+			ldrb r7, [r6]
+			add r4,#1
+			strb r7,[r4]
+			.ContPunt4:
+			cmp r0,#4
+			bne .ContPunt5
+			add r2,#1
+			mla r6,r1,r5,r2
+			ldrb r7,[r6]
+			add r4,#1
+			strb r7,[r4]
+			add r2,#-2
+			mla r6,r1,r5,r2
+			ldrb r7, [r6]
+			add r4,#1
+			strb r7,[r4]
+			.ContPunt5:
+			cmp r0,#5
+			bne .ContPunt3
+			add r1,#1
+			mla r6,r1,r5,r2
+			ldrb r7,[r6]
+			add r4,#1
+			strb r7,[r4]
+			add r1,#-2
+			mla r6,r1,r5,r2
+			ldrb r7, [r6]
+			add r4,#1
+			strb r7,[r4]
+			b .Lfin
+
+
+			.Next:
+			cmp r10,#1
+			bne .Next1
+			add r2,#-1
+			mla r6,r1,r5,r2		@;cálculo dirección (i*COLUMNS)+j
+			ldrb r7,[r6]
+			strb r7,[r4] 	@;r4 dir del vect
+			add r2,#-1
+			add r4,#1
+			mla r6,r1,r5,r2
+			ldrb r7,[r6]
+			strb r7,[r4]
+			add r2,#2
+			b .Liniposis
+			.Next1:
+			cmp r10,#2
+			bne .Next2
+			add r1,#1
+			mla r6,r1,r5,r2		@;cálculo dirección (i*COLUMNS)+j
+			ldrb r7,[r6]
+			strb r7,[r4] 	@;r4 dir del vect
+			add r1,#1
+			add r4,#1
+			mla r6,r1,r5,r2
+			ldrb r7,[r6]
+			strb r7,[r4]
+			add r1,#-2
+			b .Liniposis
+			.Next2:
+			cmp r10,#3
+			bne .Lfin
+			add r1,#-1
+			mla r6,r1,r5,r2		@;cálculo dirección (i*COLUMNS)+j
+			ldrb r7,[r6]
+			strb r7,[r4] 	@;r4 dir del vect
+			add r1,#-1
+			add r4,#1
+			mla r6,r1,r5,r2
+			ldrb r7,[r6]
+			strb r7,[r4]
+			add r1,#2
+			b .Liniposis
+
+			
+			
+			.Lfin:
+			
+			
+			
+			
+
+			
 		pop {pc}
 
 
@@ -157,5 +631,67 @@ detectar_orientacion:
 		
 		pop {r3, r5, pc}
 
+
+
+		@; r3 = num izquierda  r7 = num derecha
+		@; r4 = direccion de la matriz r5 = Columnas
+		@; r1 = i  r2 = j
+	swapH:
+		push {r1-r7,lr}
+			
+		mla r6, r1, r5, r2
+		strb r7,[r4,r6]
+		add r2, #1
+		mla r6, r1, r5, r2
+		strb r3,[r4,r6]
+			
+		pop {r1-r7,pc}
+	
+	
+	
+		@; r3 = num arriba  r7 = num abajo
+		@; r4 = direccion de la matriz r5 = Columnas
+		@; r1 = i  r2 = j
+	swapV:
+		push {r1-r7,lr}
+		
+			mla r6, r1, r5, r2
+			strb r7,[r4,r6]
+			add r1, #1
+			mla r6, r1, r5, r2
+			strb r3,[r4,r6]
+		
+		pop {r1-r7,pc}
+
+		@; r3 = num izquierda  r7 = num derecha
+		@; r4 = direccion de la matriz r5 = Columnas
+		@; r1 = i  r2 = j
+	swapH2:
+		push {r1-r7,lr}
+			
+		mla r6, r1, r5, r2
+		strb r7,[r4,r6]
+		add r2, #-1
+		mla r6, r1, r5, r2
+		strb r3,[r4,r6]
+			
+		pop {r1-r7,pc}
+
+
+
+
+	@; r3 = num arriba  r7 = num abajo
+		@; r4 = direccion de la matriz r5 = Columnas
+		@; r1 = i  r2 = j
+	swapV2:
+		push {r1-r7,lr}
+		
+			mla r6, r1, r5, r2
+			strb r7,[r4,r6]
+			add r1, #-1
+			mla r6, r1, r5, r2
+			strb r3,[r4,r6]
+		
+		pop {r1-r7,pc}
 
 .end
