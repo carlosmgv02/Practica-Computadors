@@ -169,27 +169,20 @@ baja_verticales:
 				.LFinBucleHueco:
 				
 				@; Si hay un elemento superior válido, entonces hay una bajada vertical
-				mvn r9, r7
 				.LSiElementoValido:
-					@; if (valorSup != elementoVacío && valorSup != bloqueSolido\hueco)
-					tst r7, #0x7
-					beq .LFinSiElementoValido
-					tst r9, #0x7
-					beq .LFinSiElementoValido
+					@; if (esValorValido(valorSup))
+					mov r0, r7
+					bl es_valor_valido
+					cmp r0, #1
+					bne .LFinSiElementoValido
 					
-					mov r10, r1
-					@; obtengo los 3 bits de menor peso
-					and r0, r5, #0x7
-					and r1, r7, #0x7
-					@; los intercambio
-					sub r5, r0
-					add r5, r1
-					sub r7, r1
-					add r7, r0
-					
+					@; Obtengo el valor del elemento
+					and r0, r7, #0x7
+					sub r7, r0
+					add r5, r0	@; r5 & 0x7 = 0 así que puedo añadir directamente el valor
+					@; Intercambio los elementos conservando gelatinas
 					strb r5, [r4, r6]
 					strb r7, [r4, r8]
-					mov r1, r10
 					
 					@; Ya que ha habido una bajada vertical r11 = true
 					mov r11, #1
@@ -243,6 +236,8 @@ baja_laterales:
 				tst r5, #0x7
 				bne .LFinSiCero3
 				
+				@; r0 = booleano indicando si el valor izquierdo es valido
+				@; r1 = booleano indicando si el valor derecho es valido
 				mov r0, #0
 				mov r1, #0
 				.LSiIzquierdoEsValido:
@@ -264,10 +259,6 @@ baja_laterales:
 					bl es_valor_valido
 				.LFinEsValido:
 				
-					
-				@; ValorIzquierdo: !limIzquierdo && (es_valor_valido(valorIzquierdo) && (limDerecho || random==0) )
-				@; ValorDerecho: !limDerecho && (es_valor_valido(valorDerecho) && (limIzquierdo || random==1) )
-				
 				tst r0, r1
 				bne .LAmbosValidos
 				cmp r0, #1
@@ -280,14 +271,14 @@ baja_laterales:
 					mov r0, #2
 					bl mod_random
 					cmp r0, #0
-					subeq r8, r6, #COLUMNS+1	@; r8 = *valorIzquierdo
-					subne r8, r6, #COLUMNS-1	@; r8 = *valorDerecho
+					subeq r8, r6, #COLUMNS+1	@; si r0 = 0 -> r8 = *valorIzquierdo
+					subne r8, r6, #COLUMNS-1	@; si r0 != 0 -> r8 = *valorDerecho
 					b .LFinValidos
 				.LIzquierdoValido:
 					sub r8, r6, #COLUMNS+1	@; r8 = *valorIzquierdo
 					b .LFinValidos
 				.LDerechoValido:
-					sub r8, r6, #COLUMNS-1	@; r8 = *valorIzquierdo
+					sub r8, r6, #COLUMNS-1	@; r8 = *valorDerecho
 					b .LFinValidos
 				.LFinValidos:
 					@; r7 = elemento seleccionado (Izquierdo o derecho)
@@ -298,7 +289,7 @@ baja_laterales:
 					add r5, r12
 					strb r5, [r4, r6]
 					strb r7, [r4, r8]
-					@; Exito
+					@; Exito, ha habido bajada
 					mov r11, #1
 				.LNoValidos:
 				

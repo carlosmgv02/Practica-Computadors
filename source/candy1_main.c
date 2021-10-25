@@ -86,7 +86,7 @@ int main(void)
 			printf("\x1b[39m\x1b[2;0H test %d:", ntest-NUMTESTS1E);
 			while(baja_elementos(matrix))
 			{
-				retardo(50);
+				retardo(10);
 				escribe_matriz_debug(matrix);
 			}
 			swiWaitForVBlank();
