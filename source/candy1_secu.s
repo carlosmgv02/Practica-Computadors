@@ -95,22 +95,20 @@ hay_secuencia:
 		blo .Lfiif2
 		b .Lreturn1
 	.Lelse2:
-		cmp r1, r8						@; i >= filas-2
-		blo .Lelse22
 	.Lif4:
 		mov r10, r3						@; Guardar filas en R10
 		mov r11, r0						@; Guardar dirección base de la matriz de juego en R11
-		mov r3, #0						@; Añadir dirección(este) en R3
+		mov r3, #1						@; Añadir dirección(este) en R3
 		bl cuenta_repeticiones			@; Llamar funcion cuenta repeticiones
 		cmp r0, #3						@; nº de reèticiones >= 3
 		blo .Lfiif2
 		b .Lreturn1
 	.Lelse22:
 		cmp r2, r9						@; j >= colimnas-2
-		blo .Lfiif1
+		bhs .Lfiif1
 		mov r10, r3						@; Guardar filas en R10
 		mov r11, r0						@; Guardar dirección base de la matriz de juego en R11
-		mov r3, #1						@; Añadir dirección(sur) en R3
+		mov r3, #0						@; Añadir dirección(sur) en R3
 		bl cuenta_repeticiones			@; Llamar funcion cuenta repeticiones
 		cmp r0, #3						@; nº de repeticiones >= 3
 		blo .Lfiif2
