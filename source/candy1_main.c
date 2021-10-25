@@ -9,7 +9,7 @@
 	Programador 1: xxx.xxx@estudiants.urv.cat
 	Programador 2: yyy.yyy@estudiants.urv.cat
 	Programador 3: zzz.zzz@estudiants.urv.cat
-	Programador 4: uuu.uuu@estudiants.urv.cat
+	Programador 4: carlos.martinezg@estudiants.urv.cat
 
 ------------------------------------------------------------------------------*/
 #include <nds.h>
@@ -49,10 +49,11 @@ void actualizar_contadores(int code)
 /* candy1_main.c : función principal main() para test de tarea 1G 	*/
 /*					(requiere tener implementada la tarea 1E)		*/
 /* ---------------------------------------------------------------- */
+/*
 int main(void)
 {
 	consoleDemoInit();			// inicialización de pantalla de texto
-	printf("candyNDS (prueba tarea 1G)\n");
+	printf("candyNDS (prueba tarea 1c)\n");
 	printf("\x1b[38m\x1b[1;0H  nivel:");
 	actualizar_contadores(1);
 
@@ -62,6 +63,38 @@ int main(void)
 		escribe_matriz_debug(matrix);
 		if (hay_combinacion(matrix))			// si hay combinaciones
 			printf("\x1b[39m\x1b[3;0Hhay combinacion: SI");
+		else
+			printf("\x1b[39m\x1b[3;0Hhay combinacion: NO");
+		retardo(5);
+		printf("\x1b[38m\x1b[3;19H (pulse A/B)");
+		do
+		{	swiWaitForVBlank();
+			scanKeys();					// esperar pulsación tecla 'A' o 'B'
+		} while (!(keysHeld() & (KEY_A | KEY_B)));
+		printf("\x1b[3;0H                               ");
+		retardo(5);
+		if (keysHeld() & KEY_A)			// si pulsa 'A',
+		{								// pasa a siguiente nivel
+			level = (level + 1) % MAXLEVEL;
+			actualizar_contadores(1);
+		}
+	} while (1);
+*/
+	int main(void){
+		char posi[6];
+	consoleDemoInit();			// inicialización de pantalla de texto
+	printf("candyNDS (prueba tarea 1H)\n");
+	printf("\x1b[38m\x1b[1;0H  nivel:");
+	actualizar_contadores(1);
+	do							// bucle principal de pruebas
+	{
+		copia_mapa(matrix, level);		// sustituye a inicializa_matriz()
+		escribe_matriz_debug(matrix);
+		if (hay_combinacion(matrix))	{		// si hay combinaciones
+			printf("\x1b[39m\x1b[3;0Hhay combinacion: SI");
+			/*sugiere_combinacion(matrix,posi);
+			printf("Hay combi en la posi %c,%c",posi[0],posi[1]);
+			*/}
 		else
 			printf("\x1b[39m\x1b[3;0Hhay combinacion: NO");
 		retardo(5);
