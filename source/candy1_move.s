@@ -186,7 +186,7 @@ baja_verticales:
 					add r5, r1
 					sub r7, r1
 					add r7, r0
-		
+					
 					strb r5, [r4, r6]
 					strb r7, [r4, r8]
 					mov r1, r10
@@ -203,10 +203,10 @@ baja_verticales:
 		sub r1, #1
 		b .LBucleFilas
 	.LFinBucleFilas:
-		cmp r11, #1
-		bleq genera_elementos
 		
-		mov r0, r11
+		bl genera_elementos
+		@; Si ha habido una bajada de elemento o se han generado elementos entonces retorna cierto
+		orr r0, r11
 		pop {r1-r11,pc}
 
 
@@ -310,10 +310,9 @@ baja_laterales:
 		b .LBucleFilas3
 	.LFinBucleFilas3:
 		
-		cmp r11, #1
-		bleq genera_elementos
-		
-		mov r0, r11
+		bl genera_elementos
+		@; Si ha habido una bajada de elemento o se han generado elementos entonces retorna cierto
+		orr r0, r11
 		pop {r1-r12,pc}
 
 @; genera_elementos(mat): rutina para generar aleatoriamente el valor de los
