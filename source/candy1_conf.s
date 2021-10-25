@@ -1,5 +1,5 @@
 @;=                                                        				=
-@;=== candy1_conf: variables globales de configuración del juego  	  ===
+@;=== candy1_conf: variables globales de configuraciï¿½n del juego  	  ===
 @;=                                                       	        	=
 @;=== autor: santiago.romani@urv.cat 	(2014-08-20)				  ===
 @;=                                                       	        	=
@@ -10,10 +10,10 @@
 		.align 2
 
 
-@; límites de movimientos para cada nivel;
-@;	los límites corresponderán a los niveles 0, 1, 2, ..., hasta MAXLEVEL-1
-@;								(MAXLEVEL está definida en "include/candy1.h")
-@;	cada límite debe ser un número entre 3 y 99.
+@; lï¿½mites de movimientos para cada nivel;
+@;	los lï¿½mites corresponderï¿½n a los niveles 0, 1, 2, ..., hasta MAXLEVEL-1
+@;								(MAXLEVEL estï¿½ definida en "include/candy1.h")
+@;	cada lï¿½mite debe ser un nï¿½mero entre 3 y 99.
 		.global max_mov
 	max_mov:	.byte 20, 27, 31, 45, 52, 32, 21, 90, 50 
 
@@ -21,7 +21,7 @@
 @; objetivo de puntos para cada nivel;
 @;	si el objetivo es cero, se supone que existe otro reto para superar el
 @;	nivel, por ejemplo, romper todas las gelatinas.
-@;	el objetivo de puntos debe ser un número menor que cero, que se irá
+@;	el objetivo de puntos debe ser un nï¿½mero menor que cero, que se irï¿½
 @;	incrementando a medida que se rompan elementos.
 		.align 2
 		.global pun_obj
@@ -29,14 +29,14 @@
 
 
 
-@; mapas de configuración de la matriz;
-@;	cada mapa debe contener tantos números como posiciones tiene la matriz,
+@; mapas de configuraciï¿½n de la matriz;
+@;	cada mapa debe contener tantos nï¿½meros como posiciones tiene la matriz,
 @;	con el siguiente significado para cada posicion:
-@;		0:		posición vacía (a rellenar con valor aleatorio)
+@;		0:		posiciï¿½n vacï¿½a (a rellenar con valor aleatorio)
 @;		1-6:	elemento concreto
-@;		7:		bloque sólido (irrompible)
-@;		8+:		gelatinas simple (a sumarle código de elemento)
-@;		16+:	gelatina doble (a sumarle código de elemento)
+@;		7:		bloque sï¿½lido (irrompible)
+@;		8+:		gelatinas simple (a sumarle cï¿½digo de elemento)
+@;		16+:	gelatina doble (a sumarle cï¿½digo de elemento)
 		.global mapas
 	mapas:
 
@@ -62,7 +62,7 @@
 		.byte 0,0,7,7,7,7,0,0,7
 		.byte 0,0,0,0,0,0,0,0,7
 
-	@; mapa 2: huecos y bloques sólidos
+	@; mapa 2: huecos y bloques sï¿½lidos
 		.byte 15,15,7,15,0,0,0,0,0
 		.byte 0,15,15,7,15,0,0,0,15
 		.byte 0,0,0,0,0,15,0,0,15

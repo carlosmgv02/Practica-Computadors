@@ -19,8 +19,10 @@
 
 
 /* variables globales */
+char pos_sug[6];
 char matrix[ROWS][COLUMNS];		// matriz global de juego
-int seed32;						// semilla de números aleatorios
+int seed32;	
+int i;					// semilla de números aleatorios
 int level = 0;					// nivel del juego (nivel inicial = 0)
 int points;						// contador global de puntos
 int movements;					// número de movimientos restantes
@@ -81,20 +83,29 @@ int main(void)
 	} while (1);
 */
 	int main(void){
-		char posi[6];
 	consoleDemoInit();			// inicialización de pantalla de texto
-	printf("candyNDS (prueba tarea 1H)\n");
+	printf("candyNDS (prueba tarea 1G-1H)\n");
 	printf("\x1b[38m\x1b[1;0H  nivel:");
+	
 	actualizar_contadores(1);
+
+	for(i=0;i<6;i++){
+		pos_sug[i]=0;
+	}
 	do							// bucle principal de pruebas
 	{
 		copia_mapa(matrix, level);		// sustituye a inicializa_matriz()
 		escribe_matriz_debug(matrix);
 		if (hay_combinacion(matrix))	{		// si hay combinaciones
 			printf("\x1b[39m\x1b[3;0Hhay combinacion: SI");
-			/*sugiere_combinacion(matrix,posi);
-			printf("Hay combi en la posi %c,%c",posi[0],posi[1]);
-			*/}
+				//sugiere_combinacion(matrix, pos_sug);
+				borra_puntuaciones();
+				oculta_elementos(matrix);
+				escribe_matriz(matrix);
+				retardo(5);
+				muestra_elementos(matrix);
+				escribe_matriz(matrix);
+			}
 		else
 			printf("\x1b[39m\x1b[3;0Hhay combinacion: NO");
 		retardo(5);
