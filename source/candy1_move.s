@@ -11,7 +11,7 @@
 
 
 
-@;-- .text. código de las rutinas ---
+@;-- .text. cï¿½digo de las rutinas ---
 .text	
 		.align 2
 		.arm
@@ -19,26 +19,28 @@
 
 
 @;TAREA 1E;
-@; cuenta_repeticiones(*matriz,f,c,ori): rutina para contar el número de
-@;	repeticiones del elemento situado en la posición (f,c) de la matriz, 
-@;	visitando las siguientes posiciones según indique el parámetro de
-@;	orientación 'ori'.
+@; cuenta_repeticiones(*matriz,f,c,ori): rutina para contar el nï¿½mero de
+@;	repeticiones del elemento situado en la posiciï¿½n (f,c) de la matriz, 
+@;	visitando las siguientes posiciones segï¿½n indique el parï¿½metro de
+@;	orientaciï¿½n 'ori'.
 @;	Restricciones:
-@;		* sólo se tendrán en cuenta los 3 bits de menor peso de los códigos
-@;			almacenados en las posiciones de la matriz, de modo que se ignorarán
+@;		* sï¿½lo se tendrï¿½n en cuenta los 3 bits de menor peso de los cï¿½digos
+@;			almacenados en las posiciones de la matriz, de modo que se ignorarï¿½n
 @;			las marcas de gelatina (+8, +16)
-@;		* la primera posición también se tiene en cuenta, de modo que el número
-@;			mínimo de repeticiones será 1, es decir, el propio elemento de la
-@;			posición inicial
-@;	Parámetros:
-@;		R0 = dirección base de la matriz
+@;		* la primera posiciï¿½n tambiï¿½n se tiene en cuenta, de modo que el nï¿½mero
+@;			mï¿½nimo de repeticiones serï¿½ 1, es decir, el propio elemento de la
+@;			posiciï¿½n inicial
+@;	Parï¿½metros:
+@;		R0 = direcciï¿½n base de la matriz
 @;		R1 = fila 'f'
 @;		R2 = columna 'c'
-@;		R3 = orientación 'ori' (0 -> Este, 1 -> Sur, 2 -> Oeste, 3 -> Norte)
+@;		R3 = orientaciï¿½n 'ori' (0 -> Este, 1 -> Sur, 2 -> Oeste, 3 -> Norte)
 @;	Resultado:
-@;		R0 = número de repeticiones detectadas (mínimo 1)
+@;		R0 = nï¿½mero de repeticiones detectadas (mï¿½nimo 1)
 	.global cuenta_repeticiones
 cuenta_repeticiones:
+
+
 		push {r1-r8, lr}
 		
 		mov r5, #COLUMNS
@@ -52,6 +54,7 @@ cuenta_repeticiones:
 		@; r7 = # posiciones a comprovar  
 		@; r8 = posiciones a moverse hasta la siguiente casilla a evaluar
 		@; Este
+
 		cmp r3, #0
 		rsb r7, r2, #COLUMNS 	
 		moveq r8, #1			
@@ -67,41 +70,45 @@ cuenta_repeticiones:
 		cmp r3, #3
 		moveq r7, r1
 		moveq r8, #-COLUMNS
-			
+
 	.LBucle:
 		@; (i != 0)
 		cmp r7, #0
 		beq .LFinBucle
 		@; Obtener el siguiente valor
+
+
 		add r4, r8
 		ldrb r3, [r4]
 		and r3, #7
 		@; Evaluar el siguiente valor
 		cmp r5, r3
+
 		addeq r0, #1
 		bne .LFinBucle
 		@; i--
 		sub r7, #1
 		b .LBucle
 	.LFinBucle:
-		
+
 		pop {r1-r8, pc}
+
 
 
 
 @;TAREA 1F;
 @; baja_elementos(*matriz): rutina para bajar elementos hacia las posiciones
-@;	vacías, primero en vertical y después en sentido inclinado; cada llamada a
-@;	la función sólo baja elementos una posición y devuelve cierto (1) si se ha
-@;	realizado algún movimiento, o falso (0) si está todo quieto.
+@;	vacï¿½as, primero en vertical y despuï¿½s en sentido inclinado; cada llamada a
+@;	la funciï¿½n sï¿½lo baja elementos una posiciï¿½n y devuelve cierto (1) si se ha
+@;	realizado algï¿½n movimiento, o falso (0) si estï¿½ todo quieto.
 @;	Restricciones:
-@;		* para las casillas vacías de la primera fila se generarán nuevos
+@;		* para las casillas vacï¿½as de la primera fila se generarï¿½n nuevos
 @;			elementos, invocando la rutina 'mod_random' (ver fichero
 @;			"candy1_init.s")
-@;	Parámetros:
-@;		R0 = dirección base de la matriz de juego
+@;	Parï¿½metros:
+@;		R0 = direcciï¿½n base de la matriz de juego
 @;	Resultado:
-@;		R0 = 1 indica se ha realizado algún movimiento, de modo que puede que
+@;		R0 = 1 indica se ha realizado algï¿½n movimiento, de modo que puede que
 @;				queden movimientos pendientes. 
 	.global baja_elementos
 baja_elementos:
@@ -116,13 +123,15 @@ baja_elementos:
 
 @;:::RUTINAS DE SOPORTE:::
 
+
 @; baja_verticales(mat): rutina para bajar elementos hacia las posiciones vacías
 @;	en vertical; cada llamada a la función sólo baja elementos una posición y
 @;	devuelve cierto (1) si se ha realizado algún movimiento.
 @;	Parámetros:
 @;		R4 = dirección base de la matriz de juego
+
 @;	Resultado:
-@;		R0 = 1 indica que se ha realizado algún movimiento. 
+@;		R0 = 1 indica que se ha realizado algï¿½n movimiento. 
 baja_verticales:
 		push {r1-r11,lr}
 		mov r11, #0			@; r11 = false
@@ -212,13 +221,13 @@ baja_verticales:
 
 
 
-@; baja_laterales(mat): rutina para bajar elementos hacia las posiciones vacías
-@;	en diagonal; cada llamada a la función sólo baja elementos una posición y
-@;	devuelve cierto (1) si se ha realizado algún movimiento.
-@;	Parámetros:
-@;		R4 = dirección base de la matriz de juego
+@; baja_laterales(mat): rutina para bajar elementos hacia las posiciones vacï¿½as
+@;	en diagonal; cada llamada a la funciï¿½n sï¿½lo baja elementos una posiciï¿½n y
+@;	devuelve cierto (1) si se ha realizado algï¿½n movimiento.
+@;	Parï¿½metros:
+@;		R4 = direcciï¿½n base de la matriz de juego
 @;	Resultado:
-@;		R0 = 1 indica que se ha realizado algún movimiento. 
+@;		R0 = 1 indica que se ha realizado algï¿½n movimiento. 
 baja_laterales:
 		push {r1-r12,lr}
 		mov r11, #0			@; r11 = valor de retorno, por defecto es falso

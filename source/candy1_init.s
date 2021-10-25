@@ -41,13 +41,78 @@
 @;			'cuenta_repeticiones' (ver fichero "candy1_move.s")
 @;	Parámetros:
 @;		R0 = dirección base de la matriz de juego
-@;		R1 = número de mapa de configuración
+@;		R1 = numero de mapa
+@;		Uso de registros:
+@; 		r0 = dirección base de la matriz de juego
+@;		r1 = i 
+@;		r2 = j 
+@; 		r3 = orientación
+@;		r4 = (i*COLUMNS)+j
+@;		r5 = @mapa[0][0]
+@;		r6 = #COLUMNS
+@;		r7 = temporal (usado una vez para guardar n de mapa)
+@;		r8 = temporal (ROWS * COLUMNS)
+@;		r9 = temporal (no usado)
+@;		r10 = temporal (usado una vez para conseguir @mapa[0][0])
+@;		r11 = mapa[i][j]
+@;		r12 = backup de r0
+
 	.global inicializa_matriz
 inicializa_matriz:
-		push {lr}		@;guardar registros utilizados
-		
-		
-		pop {pc}			@;recuperar registros y volver
+	push {r0-r12, lr}
+	mov r7, r1					@;mover el número de mapa a otro registro
+	mov r1, #0					@;inicializar i
+	mov r2, #0					@;inicializar j
+	mov r8, #ROWS*COLUMNS		@;r8=ROWS*COLUMNS
+	mov r6, #COLUMNS			@;r9=COLUMNS
+	ldr r10, =mapas				@;r10=direccion base de mapas
+	mla r5, r8, r7, r10			@;r5=@mapa[0][0]
+	
+.Lfor1:
+	cmp r1, #ROWS				@;comprovar que no s'ha sortit de la taula
+	bhs .Lendfor1				@;saltar si ja ha recorregut totes les files
+	mov r2, #0					@;resetejar la variable j per tornar a recórrer les columnes
+.Lfor2:				
+	cmp r2, #COLUMNS			@;comprovar que no s'ha sortit de la taula
+	bhs .Lendfor2				@;saltar si ja ha recorregut totes les columnes
+	
+	mla r4, r1, r6, r2			@;r4=(i*COLUMNS)+j
+@; IF
+	ldrb r11, [r5, r4]			@;r11=matriz[i][j]
+	tst r11, #0x07				@;comparar si té els tres últims bits a 0
+	beq .Lelse					@;salta si son tots 0's
+	strb r11, [r0, r4]			@;si no son tots 0's, es guarda el valor
+	b .Lendif					
+.Lelse:
+	mov r12, r0					@;backup de r0
+.Lwhile:
+	mov r0, #6					@;posar el paràmetre n
+	bl mod_random				@;trucar a la funció
+	add r0, #1					@;obternir un resultat d'entre 1 i 6
+	orr r0, r11					@;afegir les gelatines
+	strb r0, [r12, r4]			@;guardar el valor en la matriu
+@;comprovacions
+	mov r0, r12					@;recuperar la matriu
+	mov r3, #2					@;pasar el paràmetre d'orientació
+	bl cuenta_repeticiones		
+	cmp r0, #3					@;mirar si té una seqüencia de 3 o més
+	bhs .Lwhile					@;Si és igual o major, es retorna a calcular el valor
+	mov r0, r12					@;recuperar la matriu
+	mov r3, #3					@;pasar el paràmetre d'orientació
+	bl cuenta_repeticiones		@;Si és igual o major, es retorna a calcular el valor
+	cmp r0, #3					@;mirar si té una seqüencia de 3 o més
+	mov r0, r12					@;recuperar la matriu
+	bhs .Lwhile		
+.Lendif:
+	add r2, #1					@;j++
+	b .Lfor2
+.Lendfor2:		
+	add r1, #1					@;i++
+	b .Lfor1
+.Lendfor1:
+	
+	pop {r0-r12, pc}			@;recuperar registros y volver
+
 
 
 
@@ -69,18 +134,169 @@ inicializa_matriz:
 @;			con combinaciones
 @;	Parámetros:
 @;		R0 = dirección base de la matriz de juego
+@;	7=  00 0[111] (bloque solido)
+@;	15= 00 1[111] (hueco)
+@;	8=  00 1[000] (gel. s. vacia)
+@;	16= 01 0[000] (gel. d. vacia)
+@;-------------------------------------------------------
+@; USO DE REGISTROS 
+@;-------------------------------------------------------
+@;	r0= dirección base de la matriz de juego
+@;	r1= i
+@;	r2= j (a la primera part és ROWS*COLUMNS)
+@;	r3= orientación para otras funciones
+@;	r4= (i*COLUMNS)+j
+@;	r5= (temporal) usat com #COLUMNS abans de carregar valors (ldrb)
+@;	r6= valor actual de matriz[i][j]
+@;	r7= @mat_recomb1[0][0]
+@;	r8= @mat_recomb2[0][0]
+@;	r9= temporal (rand_i, resultats de operacions, etc)
+@;	r10= temporal (rand_j, resultats de operacions, etc)
+@;	r11= temporal (valor per comparar / per a guardar valores / (rand_i*COLUMNS)+rand_j)
+@;	r12= Copia de la dirección base de la matriz de juego
+@;	PARÁMETROS: R0 = dirección base de la matriz de juego
 	.global recombina_elementos
 recombina_elementos:
-		push {lr}
-		
-		
-		pop {pc}
+push {r0-r12, lr}
+.Linici:
+	mov r1, #0
+	mov r2, #ROWS*COLUMNS	@;posicions totals per moure's en la primera part
+	ldr r7, =mat_recomb1	@;r7=@mat_recomb1[0][0]
+	ldr r8, =mat_recomb2	@;r8=@mat_recomb2[0][0]
+	mov r12, r0				@;backup de r0
+@;-------------------------------------------------------
+@; PRIMERA PART
+@;-------------------------------------------------------
+.Lfor:
+	cmp r1, r2
+	bhs .Lendfor
+	ldrb r6, [r12, r1]
+@;	detectar 000 i 111
+	mov r11, #0x0
+	tst r6, #0x07			@;màscara per detectar 0000
+	streqb r11, [r7, r1]	@;guardar 0 en matriz
+	streqb r6, [r8, r1]		@;guardar directament en matriz
+	beq .Lendif1
+	mvn r5, r6				
+	tst r5, #0x07			@;màscara per detectar 0111
+	streqb r11, [r7, r1]	@;guardar 0 en matriz
+	streqb r6, [r8, r1]		@;guardar directament en matriz
+	beq .Lendif1
+@;	guardar l'element basic
+	and r11, r6, #0x07
+	strb r11, [r7, r1]
+@;	guardar només la gelatina
+	and r11, r6, #0x18
+	strb r11, [r8, r1]
+.Lendif1:
+	add r1, #0x01
+	b .Lfor
+.Lendfor:
+@;-------------------------------------------------------
+@; SEGONA PART
+@;-------------------------------------------------------
+	mov r1, #0				@;carregar i=0
+.Lfor3:
+	cmp r1, #ROWS
+	bhs .Lendfor3			
+	mov r2, #0				@;carregar j=0
+.Lfor4:
+	cmp r2, #COLUMNS		
+	bhs .Lendfor4			
+@;	carregar matriz[i][j]
+	mov r5, #COLUMNS
+	mla r4, r1, r5, r2		@;r4=(i*COLUMNS)+j
+	ldrb r6, [r12, r4]		@;r6=matriz[i][j]
+@;	detectar si matriz[i][j] és vuit
+	tst r6, #0x07			@;màscara per detectar 0000
+	beq .Lendif2
+	mvn r11, r6
+	tst r11, #0x07			@;màscara per detectar 0111
+	beq .Lendif2
+	mov r6, #0
+	b .Lwhile1
+@;	ELSE: cas contrari
+	@; r9=  rand_i= x
+	@; r10= rand_j= y
+.Lhaysecuencia:
+@;	comprovar que no sigui de les últimes caselles
+	strb r10, [r8, r4]
+	add r6, #1
+	cmp r6, #ROWS*COLUMNS
+	bhs .Linici
+.Lwhile1:
+@;	calcular rand_i
+	mov r0, #ROWS
+	bl mod_random
+	mov r9, r0				@;r9=x
+@;	calcular rand_j
+	mov r0, #COLUMNS
+	bl mod_random
+	mov r10, r0				@;r10=y
+	mov r0, r12
+@;	carregar mat_recomb[x][y]
+	mov r5, #COLUMNS
+	mla r11, r9, r5, r10	@;r11=(rand_i * COLUMNS)+rand_j
+	ldrb r9, [r7, r11]		@;r9=mat_recomb1[x][y]
+@;	comprovar que mat_recomb1[x][y] no sigui 0
+	cmp r9, #0x0			@;màscara per detectar 0000
+	beq .Lwhile1
+@;	afegir mat_recomb1 a mat_recomb 2 afegint els bits de gelatina
+	ldrb r10, [r8, r4]		@;r10=mat_recomb2[i][j]
+	orr r5, r9, r10			@;r5= mat_recomb1[x][y] or mat_recomb2[i][j]
+	strb r5, [r8, r4]		@;guardar recomb1 en recomb2
+@;-------------------------------------------------------
+@; CUENTA REPETICIONES
+@;-------------------------------------------------------
+@;	r9= mat_recomb1[x][y]
+@;	r10=mat_recomb2[i][j]
+;@	oest
+	mov r3, #2
+	mov r0, r8
+	bl cuenta_repeticiones
+	cmp r0, #3
+	mov r0, r12
+	bhs .Lhaysecuencia
+@;	nord
+	mov r3, #3
+	mov r0, r8
+	bl cuenta_repeticiones
+	cmp r0, #3
+	mov r0, r12
+	bhs .Lhaysecuencia
+@;-------------------------------------------------------
+@; FI CUENTA REPETICIONES
+@;-------------------------------------------------------
+	mov r5, #0x00
+	strb r5, [r7, r11]		@;posar a 0 el lloc d'on hem tret el valor
+.Lendif2:
+	add r2, #1				@;j++
+	b .Lfor4
+.Lendfor4:	
+	add r1, #1				@;i++
+	b .Lfor3
+.Lendfor3:	
 
-
+@;	comprovar que hi ha combinacions a la nova matriu
+	mov r0, r8
+	bl hay_combinacion
+	cmp r0, #1				@;màscara per observar el resultat
+	mov r0, r12				@;recuperar matriu base
+	bne .Linici
+@;	guardar mat_recomb2 en matriz
+	mov r1, #0				@;preparar el comptador
+	mov r2, #ROWS*COLUMNS	@;número de posicions a recórrer
+.Lfor5:
+	cmp r1, r2				@;mirar si s'ha sortit del rang
+	bhs .Lendfor5
+	ldrb r10, [r8, r1]	@;carregar el valor de mat_recomb2[i][j]
+	strb r10, [r12, r1]		@;matriz[i][j]=mat_recomb2[i][j];
+	add r1, #1				@;i++
+	b .Lfor5
+.Lendfor5:
+pop {r0-r12, lr}
 
 @;:::RUTINAS DE SOPORTE:::
-
-
 
 @; mod_random(n): rutina para obtener un número aleatorio entre 0 y n-1,
 @;	utilizando la rutina 'random'
@@ -90,7 +306,7 @@ recombina_elementos:
 @;	Parámetros:
 @;		R0 = el rango del número aleatorio (n)
 @;	Resultado:
-@;		R0 = el número aleatorio dentro del rango especificado (0..n-1)                                                         		=
+@;		R0 = el número aleatorio dentro del rango especificado (0..n-1)
 
 	.global mod_random
 mod_random:
