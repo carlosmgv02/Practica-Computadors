@@ -47,7 +47,6 @@ cuenta_repeticiones:
 		mla r6, r1, r5, r2		@;R6 = f * COLUMNS + c
 		add r4, r0, r6			@;R4 apunta al elemento (f,c) de 'mat'
 		ldrb r5, [r4]
-<<<<<<< HEAD
 		
 		and r5, #7				@;R5 es el valor filtrado (sin marcas de gel.)
 		mov r0, #1				@;R0 = número de repeticiones

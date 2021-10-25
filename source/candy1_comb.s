@@ -222,18 +222,7 @@ hay_combinacion:
 		cmp r0, #6
 		blo .Lreturn1
 		
-		add r1, #1
-		mla r8, r1, r5, r2
-		ldrb r7, [r4, r8]	@;matriz[i+1][j]
-		tst r7, #0x07			@;tst	0111, 0[000] = 0000
-		add r1, #-1
-		beq .Lendiftotal
-		mvn r7, r7
-		tst r7, #0x07
-		beq .Lendiftotal
-		mvn r7, r7
-		cmp r7, r3    @; r3 = num arriba  r7 = num abajo
-		beq .Lendiftotal
+		
 	.Lendiftotal:
 		add	r2, #1	@; j++
 		b .Lfor_Col	@; saltar al for
@@ -270,41 +259,6 @@ hay_combinacion:
 @;				guardar� las coordenadas (x1,y1,x2,y2,x3,y3), consecutivamente.
 	.global sugiere_combinacion
 sugiere_combinacion:
-
-@;		push {r1-r12,lr}
-@;			mov r1,#COLUMNS
-@;			bl mod_random
-@;			add r1,#1
-@;			mov r1,r0
-@;			mov r1,#ROWS		@;i
-@;			bl mod_random
-@;			add r1,#1
-
-@;			.Ini_combi:
-@;			bl hay_combinacion
-@;			cmp r0,#1
-@;			bne .noCombi
-@;
-@;			bl detectar_orientacion
-@;			mov r3,r0
-@;			bl generar_posiciones
-@;
-@;			.noCombi:
-@;			add r1,#1
-@;			add r2,#1
-@;			cmp r2,#ROWS-1
-@;			beq .Checkcols
-@;			bl .Ini_combi
-			
-@;			.Checkcols:
-@;			cmp r1,#COLUMNS-1
-@;			beq .sugiere_combinacion
-
-
-			
-
-
-
 		push {r1-r12,lr}
 			mov r4,r0
 			mov r3,r1
@@ -375,7 +329,6 @@ sugiere_combinacion:
 			mla r6, r1, r5, r2
 			strb r7, [r4, r6]	@guardamos en r7 el contenido de la p
 			add r6, #-1	
-
 		
 			mov r10, #2
 			
@@ -399,13 +352,10 @@ sugiere_combinacion:
 			mla r6, r1, r5, r2
 			strb r7, [r4, r6]	@guardamos en r7 el contenido de la p
 			add r6, #1	
-
-@;		pop {pc}
-
+		
 			mov r10, #3
 			
 			bl swapV2		@;swap vertical abajo
-
 
 			bl detectar_orientacion
 			mov r12, r7
@@ -608,8 +558,12 @@ generar_posiciones:
 			
 			.Lfin:
 			
-		pop {pc}
+			
+			
+			
 
+			
+		pop {pc}
 
 
 
