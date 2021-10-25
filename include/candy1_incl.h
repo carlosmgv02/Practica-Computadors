@@ -12,7 +12,7 @@
 #define COLUMNS	9
 #define DFIL	(24-ROWS*2)				// desplazamiento vertical de filas
 
-#define MAXLEVEL	9					// nivel màximo (niveles 0..MAXLEVEL-1)
+#define MAXLEVEL	11					// nivel màximo (niveles 0..MAXLEVEL-1)
 
 #define PUNT_SEC3	30					// puntos secuencia de 3 elementos
 #define PUNT_SEC4	60					// puntos secuencia de 4 elementos
