@@ -6,10 +6,10 @@
 	(2º curso de Grado de Ingeniería Informática - ETSE - URV)
 	
 	Analista-programador: santiago.romani@urv.cat
-	Programador 1: xxx.xxx@estudiants.urv.cat
-	Programador 2: yyy.yyy@estudiants.urv.cat
-	Programador 3: zzz.zzz@estudiants.urv.cat
-	Programador 4: uuu.uuu@estudiants.urv.cat
+	Programador 1: Jialiang.chen@estudiants.urv.cat
+	Programador 2: Ismael.ruiz@estudiants.urv.cat
+	Programador 3: Joseluis.pueyo@estudiants.urv.cat
+	Programador 4: Carlos.martinezg@estudiants.urv.cat
 
 ------------------------------------------------------------------------------*/
 #include <nds.h>
