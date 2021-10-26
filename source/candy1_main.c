@@ -2,8 +2,8 @@
 
 	$ candy1_main.c $
 
-	Programa principal para la práctica de Computadores: candy-crash para NDS
-	(2º curso de Grado de Ingeniería Informática - ETSE - URV)
+	Programa principal para la prï¿½ctica de Computadores: candy-crash para NDS
+	(2ï¿½ curso de Grado de Ingenierï¿½a Informï¿½tica - ETSE - URV)
 	
 	Analista-programador: santiago.romani@urv.cat
 	Programador 1: Jialiang.chen@estudiants.urv.cat
@@ -20,16 +20,16 @@
 
 /* variables globales */
 char matrix[ROWS][COLUMNS];		// matriz global de juego
-int seed32;						// semilla de números aleatorios
+int seed32;						// semilla de nï¿½meros aleatorios
 int level = 0;					// nivel del juego (nivel inicial = 0)
 int points;						// contador global de puntos
-int movements;					// número de movimientos restantes
-int gelees;						// número de gelatinas restantes
+int movements;					// nï¿½mero de movimientos restantes
+int gelees;						// nï¿½mero de gelatinas restantes
 
 
 
 /* actualizar_contadores(code): actualiza los contadores que se indican con el
-	parámetro 'code', que es una combinación binaria de booleanos, con el
+	parï¿½metro 'code', que es una combinaciï¿½n binaria de booleanos, con el
 	siguiente significado para cada bit:
 		bit 0:	nivel
 		bit 1:	puntos
@@ -52,10 +52,10 @@ int main(void)
 	int change = 0;				// =1 indica que ha habido cambios en la matriz
 	int falling = 0;			// =1 indica que los elementos estan bajando
 	int initializing = 1;		// =1 indica que hay que inicializar un juego
-	int mX, mY, dX, dY;			// variables de detección de pulsaciones
+	int mX, mY, dX, dY;			// variables de detecciï¿½n de pulsaciones
 
-	seed32 = time(NULL);		// fijar semilla de números aleatorios
-	consoleDemoInit();			// inicialización de pantalla de texto
+	seed32 = time(NULL);		// fijar semilla de nï¿½meros aleatorios
+	consoleDemoInit();			// inicializaciï¿½n de pantalla de texto
 	printf("candyNDS (version 1: texto)\n");
 	printf("\x1b[38m\x1b[1;0H  nivel:");
 	printf("\x1b[39m\x1b[2;0H puntos:");
@@ -65,7 +65,7 @@ int main(void)
 
 	do							// bucle principal del juego
 	{
-		if (initializing)		//////	SECCIÓN DE INICIALIZACIÓN	//////
+		if (initializing)		//////	SECCIï¿½N DE INICIALIZACIï¿½N	//////
 		{
 			inicializa_matriz(matrix, level);
 			//copia_mapa(matrix, 8);
@@ -88,11 +88,11 @@ int main(void)
 			gelees = contar_gelatinas(matrix);
 			actualizar_contadores(15);
 		}
-		else if (falling)		//////	SECCIÓN BAJADA DE ELEMENTOS	//////
+		else if (falling)		//////	SECCIï¿½N BAJADA DE ELEMENTOS	//////
 		{
 			falling = baja_elementos(matrix);	// realiza la siguiente bajada
 			retardo(4);
-			if (!falling)						// si no está bajando
+			if (!falling)						// si no estï¿½ bajando
 			{
 				if (hay_secuencia(matrix))		// si hay secuencias
 				{
@@ -106,7 +106,7 @@ int main(void)
 			}
 			escribe_matriz(matrix);			// visualiza bajadas o eliminaciones
 		}
-		else					//////	SECCIÓN DE JUGADAS	//////
+		else					//////	SECCIï¿½N DE JUGADAS	//////
 		{
 			if (procesar_touchscreen(matrix, &mX, &mY, &dX, &dY))
 			{
@@ -130,11 +130,11 @@ int main(void)
 				escribe_matriz(matrix);	// muetra las eliminaciones o el retorno
 			}
 			while (keysHeld() & KEY_TOUCH)		// esperar a liberar la
-			{	swiWaitForVBlank();				// pantalla táctil
+			{	swiWaitForVBlank();				// pantalla tï¿½ctil
 				scanKeys();
 			}
 		}
-		if (!falling)			//////	SECCIÓN DE DEPURACIÓN	//////
+		if (!falling)			//////	SECCIï¿½N DE DEPURACIï¿½N	//////
 		{
 			swiWaitForVBlank();
 			scanKeys();
@@ -149,7 +149,7 @@ int main(void)
 			}
 			lapse++;
 		}
-		if (change)				//////	SECCIÓN CAMBIO DE NIVEL	//////
+		if (change)				//////	SECCIï¿½N CAMBIO DE NIVEL	//////
 		{
 			change = 0;
 			if (((points >= 0) && (gelees == 0))
@@ -165,7 +165,7 @@ int main(void)
 				printf("\x1b[39m\x1b[8;20H (pulse A)");
 				do
 				{	swiWaitForVBlank();
-					scanKeys();					// esperar pulsación tecla 'A'
+					scanKeys();					// esperar pulsaciï¿½n tecla 'A'
 				} while (!(keysHeld() & KEY_A));
 				printf("\x1b[6;20H           ");
 				printf("\x1b[8;20H           ");	// borra mensajes
@@ -182,13 +182,13 @@ int main(void)
 				{
 					recombina_elementos(matrix);
 					escribe_matriz(matrix);
-					change = 1;					// forzar nueva verificación
+					change = 1;					// forzar nueva verificaciï¿½n
 				}								// de combinaciones
 				borra_puntuaciones();
 			}
 			lapse = 0;
 		}
-		/*else if (lapse >= 192)	//////	SECCIÓN DE SUGERENCIAS	//////
+		else if (lapse >= 192)	//////	SECCIï¿½N DE SUGERENCIAS	//////
 		{
 			if (lapse == 192) 		// a los 8 segundos sin actividad (aprox.)
 			{
@@ -203,9 +203,9 @@ int main(void)
 				muestra_elementos(matrix);
 				escribe_matriz(matrix);
 			}
-		}*/
+		}
 	} while (1);				// bucle infinito
 	
-	return(0);					// nunca retornará del main
+	return(0);					// nunca retornarï¿½ del main
 }
 
