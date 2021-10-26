@@ -188,7 +188,7 @@ int main(void)
 			}
 			lapse = 0;
 		}
-		else if (lapse >= 192)	//////	SECCI�N DE SUGERENCIAS	//////
+		/*else if (lapse >= 192)	//////	SECCI�N DE SUGERENCIAS	//////
 		{
 			if (lapse == 192) 		// a los 8 segundos sin actividad (aprox.)
 			{
@@ -203,7 +203,7 @@ int main(void)
 				muestra_elementos(matrix);
 				escribe_matriz(matrix);
 			}
-		}
+		}*/
 	} while (1);				// bucle infinito
 	
 	return(0);					// nunca retornar� del main
