@@ -2,34 +2,34 @@
 
 	$Id: candy1_incl.h $
 
-	Definiciones externas en C para la versión 1 del juego (modo texto)
+	Definiciones externas en C para la versiï¿½n 1 del juego (modo texto)
 
 ------------------------------------------------------------------------------*/
 
-// Rango de los números de filas y de columnas:
-// mínimo: 3, máximo: 11
+// Rango de los nï¿½meros de filas y de columnas:
+// mï¿½nimo: 3, mï¿½ximo: 11
 #define ROWS	9						// dimensiones de la matriz de juego
 #define COLUMNS	9
 #define DFIL	(24-ROWS*2)				// desplazamiento vertical de filas
 
-#define MAXLEVEL	9					// nivel màximo (niveles 0..MAXLEVEL-1)
+#define MAXLEVEL	10					// nivel mï¿½ximo (niveles 0..MAXLEVEL-1)
 
 #define PUNT_SEC3	30					// puntos secuencia de 3 elementos
 #define PUNT_SEC4	60					// puntos secuencia de 4 elementos
 #define PUNT_SEC5	120					// puntos secuencia de 5 elementos
-#define PUNT_COM5	150					// puntos combinación de 5 elementos
-#define PUNT_COM6	200					// puntos combinación de 6 elementos
-#define PUNT_COM7	300					// puntos combinación de 7 elementos
+#define PUNT_COM5	150					// puntos combinaciï¿½n de 5 elementos
+#define PUNT_COM6	200					// puntos combinaciï¿½n de 6 elementos
+#define PUNT_COM7	300					// puntos combinaciï¿½n de 7 elementos
 
 
 	// candy1_conf.s //
 extern int pun_obj[MAXLEVEL];			// objetivo de puntos por nivel
-extern char max_mov[MAXLEVEL];			// movimientos máximos por nivel
-extern char mapas[MAXLEVEL][ROWS][COLUMNS];	// mapas de configuración
+extern char max_mov[MAXLEVEL];			// movimientos mï¿½ximos por nivel
+extern char mapas[MAXLEVEL][ROWS][COLUMNS];	// mapas de configuraciï¿½n
 
 	// candy1_sopo.c //
 extern char mat_mar[ROWS][COLUMNS];		// matriz de marcas
-extern char pos_sug[6];					// posiciones sugerencia de combinación
+extern char pos_sug[6];					// posiciones sugerencia de combinaciï¿½n
 extern void escribe_matriz(char mat[][COLUMNS]);
 extern void escribe_matriz_debug(char mat[][COLUMNS]);
 extern int contar_gelatinas(char mat[][COLUMNS]);

@@ -98,7 +98,7 @@ int main(void)
 		escribe_matriz_debug(matrix);
 		if (hay_combinacion(matrix))	{		// si hay combinaciones
 			printf("\x1b[39m\x1b[3;0Hhay combinacion: SI");
-				//sugiere_combinacion(matrix, pos_sug);
+				sugiere_combinacion(matrix, pos_sug);
 				borra_puntuaciones();
 				oculta_elementos(matrix);
 				escribe_matriz(matrix);
@@ -111,7 +111,8 @@ int main(void)
 		retardo(5);
 		printf("\x1b[38m\x1b[3;19H (pulse A/B)");
 		do
-		{	swiWaitForVBlank();
+		{	
+			swiWaitForVBlank();
 			scanKeys();					// esperar pulsación tecla 'A' o 'B'
 		} while (!(keysHeld() & (KEY_A | KEY_B)));
 		printf("\x1b[3;0H                               ");

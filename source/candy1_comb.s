@@ -259,135 +259,136 @@ hay_combinacion:
 @;				guardar� las coordenadas (x1,y1,x2,y2,x3,y3), consecutivamente.
 	.global sugiere_combinacion
 sugiere_combinacion:
-@;		push {r2-r12,lr}
-@;			mov r4,r0
-@;			mov r8,r1
-@;			mov r5, #COLUMNS
-@;			mov r0, #COLUMNS
-@;			bl mod_random
-@;			mov r2,r0	@;mod_random me devuelve por r0  el num aleatorio
-@;			
-@;			mov r0,#ROWS
-@;			bl mod_random
-@;			mov r1,r0
+		push {r2-r12,lr}
+			mov r4,r0
+			mov r8,r1
+			mov r5, #COLUMNS
+			mov r0, #COLUMNS
+			bl mod_random
+			mov r2,r0	@;mod_random me devuelve por r0  el num aleatorio
+			
+			mov r0,#ROWS
+			bl mod_random
+			mov r1,r0
 
-@;.Lwhile:		
-@;.Lfor1:
-@;			cmp r1, #ROWS	@;-1
-@;			bhs .Lfifor1
-@;.Lfor2:
-@;			cmp r2, #COLUMNS
-@;			bhs .Lfifor2
+.Lwhile:		
+.Lfor1:
+			cmp r1, #ROWS	@;-1
+			bhs .Lfifor1
+.Lfor2:
+			cmp r2, #COLUMNS
+			bhs .Lfifor2
 
-@;			mla r6, r1, r5, r2	@;Calculamos la dirección a partir de la dir base de la matriz
-@;			strb r9, [r4, r6]	@;Guardamos el contenido en la dirección
-@;			add r6, #1			@;Para no tener que hacer add r2,#r1 y mla otra vez  
-@;			strb r7, [r4, r6]	@guardamos en r7 el contenido de la p
-@;			add r6, #-1	
+			mla r6, r1, r5, r2	@;Calculamos la dirección a partir de la dir base de la matriz
+			strb r9, [r4, r6]	@;Guardamos el contenido en la dirección
+			add r6, #1			@;Para no tener que hacer add r2,#r1 y mla otra vez  
+			strb r7, [r4, r6]	@guardamos en r7 el contenido de la p
+			add r6, #-1	
 
 
-@;			mov r10, #0
-@;			bl swapH	@;swap horizontal
-@;			bl detectar_orientacion
-@;			mov r12, r7
-@;			mov r7, r9
-@;			mov r9, r12
-@;			bl swapH
-@;			cmp r0, #6
-@;			beq .Continuar1
-@;			mov r4, r10
-@;			mov r3, r0
-@;			mov r0, r8
-@;			bl generar_posiciones
-@;			b .Lfinal
-@;.Continuar1:
-@;			mla r6, r1, r5, r2	@;Calculamos la dirección a partir de la dir base de la matriz
-@;			strb r9, [r4, r6]	@;Guardamos el contenido en la dirección
-@;			add r6, #-1			@;Para no tener que hacer add r2,#r1 y mla otra vez  
-@;			strb r7, [r4, r6]	@guardamos en r7 el contenido de la p
-@;			add r6, #1	
+			mov r10, #0
+			bl swapH	@;swap horizontal
+			bl detectar_orientacion
+			mov r12, r7
+			mov r7, r9
+			mov r9, r12
+			bl swapH
+			cmp r0, #6
+			beq .Continuar1
+			mov r4, r10
+			mov r3, r0
+			mov r0, r8
+			bl generar_posiciones
+			b .Lfinal
+.Continuar1:
+			mla r6, r1, r5, r2	@;Calculamos la dirección a partir de la dir base de la matriz
+			strb r9, [r4, r6]	@;Guardamos el contenido en la dirección
+			add r6, #-1			@;Para no tener que hacer add r2,#r1 y mla otra vez  
+			strb r7, [r4, r6]	@guardamos en r7 el contenido de la p
+			add r6, #1	
 
-@;			mov r10, #1
-@;			bl swapH2
-@;			bl detectar_orientacion
-@;			mov r12, r7
-@;			mov r7, r9
-@;			mov r9, r12
-@;			bl swapH2
-@;			cmp r0, #6
-@;			beq .Continuar2
-@;			mov r4, r10
-@;			mov r3, r0
-@;			mov r0, r8
-@;			bl generar_posiciones
-@;			b .Lfinal
+			mov r10, #1
+			bl swapH2
+			bl detectar_orientacion
+			mov r12, r7
+			mov r7, r9
+			mov r9, r12
+			bl swapH2
+			cmp r0, #6
+			beq .Continuar2
+			mov r4, r10
+			mov r3, r0
+			mov r0, r8
+			bl generar_posiciones
+			b .Lfinal
 
-@;.Continuar2:
-@;			mla r6, r1, r5, r2	@;Calculamos la dirección a partir de la dir base de la matriz
-@;			strb r9, [r4, r6]	@;Guardamos el contenido en la dirección
-@;			add r1, #1			@;Para no tener que hacer add r2,#r1 y mla otra vez  
-@;			mla r6, r1, r5, r2
-@;			strb r7, [r4, r6]	@guardamos en r7 el contenido de la p
-@;			add r6, #-1	
+.Continuar2:
+			mla r6, r1, r5, r2	@;Calculamos la dirección a partir de la dir base de la matriz
+			strb r9, [r4, r6]	@;Guardamos el contenido en la dirección
+			add r1, #1			@;Para no tener que hacer add r2,#r1 y mla otra vez  
+			mla r6, r1, r5, r2
+			strb r7, [r4, r6]	@guardamos en r7 el contenido de la p
+			add r6, #-1	
 		
-@;			mov r10, #2
+			mov r10, #2
 			
-@;			bl swapV		@;swap vertical abajo
+			bl swapV		@;swap vertical abajo
 
-@;			bl detectar_orientacion
-@;			mov r12, r7
-@;			mov r7, r9
-@;			mov r9, r12
-@;			bl swapV
-@;			cmp r0, #6
-@;			beq .Continuar3
-@;			mov r4, r10
-@;			mov r3, r0
-@;			mov r0, r8
-@;			bl generar_posiciones
-@;			b .Lfinal
+			bl detectar_orientacion
+			mov r12, r7
+			mov r7, r9
+			mov r9, r12
+			bl swapV
+			cmp r0, #6
+			beq .Continuar3
+			mov r4, r10
+			mov r3, r0
+			mov r0, r8
+			bl generar_posiciones
+			b .Lfinal
 
-@;.Continuar3:
+.Continuar3:
 
-@;			mla r6, r1, r5, r2	@;Calculamos la dirección a partir de la dir base de la matriz
-@;			strb r9, [r4, r6]	@;Guardamos el contenido en la dirección
-@;			add r1, #-1			@;Para no tener que hacer add r2,#r1 y mla otra vez  
-@;			mla r6, r1, r5, r2
-@;			strb r7, [r4, r6]	@guardamos en r7 el contenido de la p
-@;			add r6, #1	
+			mla r6, r1, r5, r2	@;Calculamos la dirección a partir de la dir base de la matriz
+			strb r9, [r4, r6]	@;Guardamos el contenido en la dirección
+			add r1, #-1			@;Para no tener que hacer add r2,#r1 y mla otra vez  
+			mla r6, r1, r5, r2
+			strb r7, [r4, r6]	@guardamos en r7 el contenido de la p
+			add r6, #1	
 	
-@;			mov r10, #3
+			mov r10, #3
 			
-@;			bl swapV2		@;swap vertical abajo
+			bl swapV2		@;swap vertical abajo
 
-@;			bl detectar_orientacion
-@;			mov r12, r7
-@;			mov r7, r9
-@;			mov r9, r12
-@;			bl swapV2
-@;			cmp r0, #6
-@;			beq .Continuar4
-@;			mov r4, r10
-@;			mov r3, r0
-@;			mov r0, r8
-@;			bl generar_posiciones
-@;			b .Lfinal	
+			bl detectar_orientacion
+			mov r12, r7
+			mov r7, r9
+			mov r9, r12
+			bl swapV2
+			cmp r0, #6
+			beq .Continuar4
+			mov r4, r10
+			mov r3, r0
+			mov r0, r8
+			bl generar_posiciones
+			b .Lfinal	
 
-@;.Continuar4:
-@;			add r2, #1
-@;			b .Lfor2
-@;.Lfifor2:
-@;			mov r2, #0
-@;			add r1, #1
-@;			b .Lfor1
-@;.Lfifor1:	
-@;			mov r1, #0
-@;			mov r2, #0
-@;			b .Lwhile
+.Continuar4:
+			add r2, #1
+			b .Lfor2
+.Lfifor2:
+			mov r2, #0
+			add r1, #1
+			b .Lfor1
+.Lfifor1:	
+			mov r1, #0
+			mov r2, #0
+			b .Lwhile
 
-@;.Lfinal:
+.Lfinal:
 
-@;		pop {r2-r12,pc}
+		pop {r2-r12,pc}
+
 
 
 @;:::RUTINAS DE SOPORTE:::
@@ -484,7 +485,7 @@ generar_posiciones:
 			b .Lfin
 		.ContPunt5:
 			cmp r3,#5
-			bne .ContPunt3
+			bne .Lfin
 			add r1,#-1
 			add r0,#1
 			strb r2,[r0]
