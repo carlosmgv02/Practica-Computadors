@@ -528,7 +528,6 @@ generar_posiciones:
 		.Lfin:
 				pop {r0-r10,pc}
 
-
 @; detectar_orientacion(f,c,mat): devuelve el c�digo de la primera orientaci�n
 @;	en la que detecta una secuencia de 3 o m�s repeticiones del elemento de la
 @;	matriz situado en la posici�n (f,c).
