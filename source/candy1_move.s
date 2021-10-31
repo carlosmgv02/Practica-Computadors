@@ -39,41 +39,41 @@
 @;		R0 = número de repeticiones detectadas (mínimo 1)
 	.global cuenta_repeticiones
 cuenta_repeticiones:
-		push {r1-r8, lr}
+		push {r1-r5, lr}
 		
-		mov r5, #COLUMNS
-		mla r6, r1, r5, r2		@;R6 = f * COLUMNS + c
-		add r4, r0, r6			@;R4 apunta al elemento (f,c) de 'mat'
+		mov r4, #COLUMNS
+		mla r5, r1, r4, r2		@;R6 = f * COLUMNS + c
+		add r4, r0, r5			@;R4 apunta al elemento (f,c) de 'mat'
 		ldrb r5, [r4]
 		
 		and r5, #7				@;R5 es el valor filtrado (sin marcas de gel.)
 		mov r0, #1				@;R0 = número de repeticiones
 		
-		@; r7 = # posiciones a comprovar  
-		@; r8 = posiciones a moverse hasta la siguiente casilla a evaluar
+		@; r1 = # posiciones a comprovar  
+		@; r2 = posiciones a moverse hasta la siguiente casilla a evaluar
 		@; Este
 		cmp r3, #0
-		rsb r7, r2, #COLUMNS 	
-		moveq r8, #1			
+		rsbeq r1, r2, #COLUMNS-1 	
+		moveq r2, #1			
 		@; Sur
 		cmp r3, #1
-		rsb r7, r1, #ROWS
-		moveq r8, #COLUMNS
+		rsbeq r1, r1, #ROWS-1
+		moveq r2, #COLUMNS
 		@; Oeste
 		cmp r3, #2
-		moveq r7, r2
-		moveq r8, #-1			
+		moveq r1, r2
+		moveq r2, #-1			
 		@;Norte
 		cmp r3, #3
-		moveq r7, r1
-		moveq r8, #-COLUMNS
+		moveq r1, r1
+		moveq r2, #-COLUMNS
 			
 	.LBucle:
 		@; (i != 0)
-		cmp r7, #0
+		cmp r1, #0
 		beq .LFinBucle
 		@; Obtener el siguiente valor
-		add r4, r8
+		add r4, r2
 		ldrb r3, [r4]
 		and r3, #7
 		@; Evaluar el siguiente valor
@@ -81,11 +81,11 @@ cuenta_repeticiones:
 		addeq r0, #1
 		bne .LFinBucle
 		@; i--
-		sub r7, #1
+		sub r1, #1
 		b .LBucle
 	.LFinBucle:
 		
-		pop {r1-r8, pc}
+		pop {r1-r5, pc}
 
 
 

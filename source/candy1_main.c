@@ -48,17 +48,17 @@ void actualizar_contadores(int code)
 /* ---------------------------------------------------------------- */
 /* candy1_main.c : función principal main() para test de tarea 1E 	*/
 /* ---------------------------------------------------------------- */
-#define NUMTESTS1E 14
+#define NUMTESTS1E 15
 #define NUMTESTS1F 5
 #define NUMTESTS NUMTESTS1E + NUMTESTS1F
-short nmap[] = {4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 8, 0, 1, 2, 3, 4};
-short posX[] = {0, 0, 0, 0, 4, 4, 4, 0, 0, 5, 4, 1, 1, 1};
-short posY[] = {2, 2, 2, 2, 4, 4, 4, 0, 0, 0, 4, 3, 3, 5};
-short cori[] = {0, 1, 2, 3, 0, 1, 2, 0, 3, 0, 0, 1, 3, 0};
-short resp[] = {1, 2, 1, 1, 2, 1, 1, 3, 1, 3, 5, 2, 4, 2};
+short nmap[] = {4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 8, 8, 0, 1, 2, 3, 4};
+short posX[] = {0, 0, 0, 0, 4, 4, 4, 0, 0, 5, 4, 1, 1, 1, 5};
+short posY[] = {2, 2, 2, 2, 4, 4, 4, 0, 0, 0, 4, 3, 3, 5, 0};
+short cori[] = {0, 1, 2, 3, 0, 1, 2, 0, 3, 0, 0, 1, 3, 0, 0};
+short resp[] = {1, 2, 1, 1, 2, 1, 1, 3, 1, 3, 5, 2, 4, 2, 4};
 int main(void)
 {
-	int ntest = 14;
+	int ntest = 0;
 	int result1E;
 
 	consoleDemoInit();			// inicialización de pantalla de texto
