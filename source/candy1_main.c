@@ -69,7 +69,7 @@ int main(void)
 			escribe_matriz_debug(matrix);
 			retardo(20);
 			printf("\x1b[39m\x1b[3;0H Matriz de  Marcas");
-			escribe_matriz_debug(marcas);
+			escribe_matriz(marcas);
 		}else{
 			printf("\x1b[39m\x1b[3;0H hay secuencia: NO");
 		}

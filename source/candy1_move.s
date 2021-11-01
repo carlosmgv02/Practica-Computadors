@@ -11,7 +11,7 @@
 
 
 
-@;-- .text. cï¿½digo de las rutinas ---
+@;-- .text. código de las rutinas ---
 .text	
 		.align 2
 		.arm
@@ -19,96 +19,89 @@
 
 
 @;TAREA 1E;
-@; cuenta_repeticiones(*matriz,f,c,ori): rutina para contar el nï¿½mero de
-@;	repeticiones del elemento situado en la posiciï¿½n (f,c) de la matriz, 
-@;	visitando las siguientes posiciones segï¿½n indique el parï¿½metro de
-@;	orientaciï¿½n 'ori'.
+@; cuenta_repeticiones(*matriz,f,c,ori): rutina para contar el número de
+@;	repeticiones del elemento situado en la posición (f,c) de la matriz, 
+@;	visitando las siguientes posiciones según indique el parámetro de
+@;	orientación 'ori'.
 @;	Restricciones:
-@;		* sï¿½lo se tendrï¿½n en cuenta los 3 bits de menor peso de los cï¿½digos
-@;			almacenados en las posiciones de la matriz, de modo que se ignorarï¿½n
+@;		* sólo se tendrán en cuenta los 3 bits de menor peso de los códigos
+@;			almacenados en las posiciones de la matriz, de modo que se ignorarán
 @;			las marcas de gelatina (+8, +16)
-@;		* la primera posiciï¿½n tambiï¿½n se tiene en cuenta, de modo que el nï¿½mero
-@;			mï¿½nimo de repeticiones serï¿½ 1, es decir, el propio elemento de la
-@;			posiciï¿½n inicial
-@;	Parï¿½metros:
-@;		R0 = direcciï¿½n base de la matriz
+@;		* la primera posición también se tiene en cuenta, de modo que el número
+@;			mínimo de repeticiones será 1, es decir, el propio elemento de la
+@;			posición inicial
+@;	Parámetros:
+@;		R0 = dirección base de la matriz
 @;		R1 = fila 'f'
 @;		R2 = columna 'c'
-@;		R3 = orientaciï¿½n 'ori' (0 -> Este, 1 -> Sur, 2 -> Oeste, 3 -> Norte)
+@;		R3 = orientación 'ori' (0 -> Este, 1 -> Sur, 2 -> Oeste, 3 -> Norte)
 @;	Resultado:
-@;		R0 = nï¿½mero de repeticiones detectadas (mï¿½nimo 1)
+@;		R0 = número de repeticiones detectadas (mínimo 1)
 	.global cuenta_repeticiones
 cuenta_repeticiones:
-
-
-		push {r1-r8, lr}
+		push {r1-r5, lr}
 		
-		mov r5, #COLUMNS
-		mla r6, r1, r5, r2		@;R6 = f * COLUMNS + c
-		add r4, r0, r6			@;R4 apunta al elemento (f,c) de 'mat'
+		mov r4, #COLUMNS
+		mla r5, r1, r4, r2		@;R6 = f * COLUMNS + c
+		add r4, r0, r5			@;R4 apunta al elemento (f,c) de 'mat'
 		ldrb r5, [r4]
 		
 		and r5, #7				@;R5 es el valor filtrado (sin marcas de gel.)
 		mov r0, #1				@;R0 = número de repeticiones
 		
-		@; r7 = # posiciones a comprovar  
-		@; r8 = posiciones a moverse hasta la siguiente casilla a evaluar
+		@; r1 = # posiciones a comprovar  
+		@; r2 = posiciones a moverse hasta la siguiente casilla a evaluar
 		@; Este
-
 		cmp r3, #0
-		rsb r7, r2, #COLUMNS 	
-		moveq r8, #1			
+		rsbeq r1, r2, #COLUMNS-1 	
+		moveq r2, #1			
 		@; Sur
 		cmp r3, #1
-		rsb r7, r1, #ROWS
-		moveq r8, #COLUMNS
+		rsbeq r1, r1, #ROWS-1
+		moveq r2, #COLUMNS
 		@; Oeste
 		cmp r3, #2
-		moveq r7, r2
-		moveq r8, #-1			
+		moveq r1, r2
+		moveq r2, #-1			
 		@;Norte
 		cmp r3, #3
-		moveq r7, r1
-		moveq r8, #-COLUMNS
-
+		moveq r1, r1
+		moveq r2, #-COLUMNS
+			
 	.LBucle:
 		@; (i != 0)
-		cmp r7, #0
+		cmp r1, #0
 		beq .LFinBucle
 		@; Obtener el siguiente valor
-
-
-		add r4, r8
+		add r4, r2
 		ldrb r3, [r4]
 		and r3, #7
 		@; Evaluar el siguiente valor
 		cmp r5, r3
-
 		addeq r0, #1
 		bne .LFinBucle
 		@; i--
-		sub r7, #1
+		sub r1, #1
 		b .LBucle
 	.LFinBucle:
-
-		pop {r1-r8, pc}
-
+		
+		pop {r1-r5, pc}
 
 
 
 @;TAREA 1F;
 @; baja_elementos(*matriz): rutina para bajar elementos hacia las posiciones
-@;	vacï¿½as, primero en vertical y despuï¿½s en sentido inclinado; cada llamada a
-@;	la funciï¿½n sï¿½lo baja elementos una posiciï¿½n y devuelve cierto (1) si se ha
-@;	realizado algï¿½n movimiento, o falso (0) si estï¿½ todo quieto.
+@;	vacías, primero en vertical y después en sentido inclinado; cada llamada a
+@;	la función sólo baja elementos una posición y devuelve cierto (1) si se ha
+@;	realizado algún movimiento, o falso (0) si está todo quieto.
 @;	Restricciones:
-@;		* para las casillas vacï¿½as de la primera fila se generarï¿½n nuevos
+@;		* para las casillas vacías de la primera fila se generarán nuevos
 @;			elementos, invocando la rutina 'mod_random' (ver fichero
 @;			"candy1_init.s")
-@;	Parï¿½metros:
-@;		R0 = direcciï¿½n base de la matriz de juego
+@;	Parámetros:
+@;		R0 = dirección base de la matriz de juego
 @;	Resultado:
-@;		R0 = 1 indica se ha realizado algï¿½n movimiento, de modo que puede que
+@;		R0 = 1 indica se ha realizado algún movimiento, de modo que puede que
 @;				queden movimientos pendientes. 
 	.global baja_elementos
 baja_elementos:
@@ -123,15 +116,13 @@ baja_elementos:
 
 @;:::RUTINAS DE SOPORTE:::
 
-
 @; baja_verticales(mat): rutina para bajar elementos hacia las posiciones vacías
 @;	en vertical; cada llamada a la función sólo baja elementos una posición y
 @;	devuelve cierto (1) si se ha realizado algún movimiento.
 @;	Parámetros:
 @;		R4 = dirección base de la matriz de juego
-
 @;	Resultado:
-@;		R0 = 1 indica que se ha realizado algï¿½n movimiento. 
+@;		R0 = 1 indica que se ha realizado algún movimiento. 
 baja_verticales:
 		push {r1-r11,lr}
 		mov r11, #0			@; r11 = false
@@ -178,27 +169,20 @@ baja_verticales:
 				.LFinBucleHueco:
 				
 				@; Si hay un elemento superior válido, entonces hay una bajada vertical
-				mvn r9, r7
 				.LSiElementoValido:
-					@; if (valorSup != elementoVacío && valorSup != bloqueSolido\hueco)
-					tst r7, #0x7
-					beq .LFinSiElementoValido
-					tst r9, #0x7
-					beq .LFinSiElementoValido
+					@; if (esValorValido(valorSup))
+					mov r0, r7
+					bl es_valor_valido
+					cmp r0, #1
+					bne .LFinSiElementoValido
 					
-					mov r10, r1
-					@; obtengo los 3 bits de menor peso
-					and r0, r5, #0x7
-					and r1, r7, #0x7
-					@; los intercambio
-					sub r5, r0
-					add r5, r1
-					sub r7, r1
-					add r7, r0
-		
+					@; Obtengo el valor del elemento
+					and r0, r7, #0x7
+					sub r7, r0
+					add r5, r0	@; r5 & 0x7 = 0 así que puedo añadir directamente el valor
+					@; Intercambio los elementos conservando gelatinas
 					strb r5, [r4, r6]
 					strb r7, [r4, r8]
-					mov r1, r10
 					
 					@; Ya que ha habido una bajada vertical r11 = true
 					mov r11, #1
@@ -212,22 +196,22 @@ baja_verticales:
 		sub r1, #1
 		b .LBucleFilas
 	.LFinBucleFilas:
-		cmp r11, #1
-		bleq genera_elementos
 		
-		mov r0, r11
+		bl genera_elementos
+		@; Si ha habido una bajada de elemento o se han generado elementos entonces retorna cierto
+		orr r0, r11
 		pop {r1-r11,pc}
 
 
 
 
-@; baja_laterales(mat): rutina para bajar elementos hacia las posiciones vacï¿½as
-@;	en diagonal; cada llamada a la funciï¿½n sï¿½lo baja elementos una posiciï¿½n y
-@;	devuelve cierto (1) si se ha realizado algï¿½n movimiento.
-@;	Parï¿½metros:
-@;		R4 = direcciï¿½n base de la matriz de juego
+@; baja_laterales(mat): rutina para bajar elementos hacia las posiciones vacías
+@;	en diagonal; cada llamada a la función sólo baja elementos una posición y
+@;	devuelve cierto (1) si se ha realizado algún movimiento.
+@;	Parámetros:
+@;		R4 = dirección base de la matriz de juego
 @;	Resultado:
-@;		R0 = 1 indica que se ha realizado algï¿½n movimiento. 
+@;		R0 = 1 indica que se ha realizado algún movimiento. 
 baja_laterales:
 		push {r1-r12,lr}
 		mov r11, #0			@; r11 = valor de retorno, por defecto es falso
@@ -252,6 +236,8 @@ baja_laterales:
 				tst r5, #0x7
 				bne .LFinSiCero3
 				
+				@; r0 = booleano indicando si el valor izquierdo es valido
+				@; r1 = booleano indicando si el valor derecho es valido
 				mov r0, #0
 				mov r1, #0
 				.LSiIzquierdoEsValido:
@@ -273,10 +259,6 @@ baja_laterales:
 					bl es_valor_valido
 				.LFinEsValido:
 				
-					
-				@; ValorIzquierdo: !limIzquierdo && (es_valor_valido(valorIzquierdo) && (limDerecho || random==0) )
-				@; ValorDerecho: !limDerecho && (es_valor_valido(valorDerecho) && (limIzquierdo || random==1) )
-				
 				tst r0, r1
 				bne .LAmbosValidos
 				cmp r0, #1
@@ -289,14 +271,14 @@ baja_laterales:
 					mov r0, #2
 					bl mod_random
 					cmp r0, #0
-					subeq r8, r6, #COLUMNS+1	@; r8 = *valorIzquierdo
-					subne r8, r6, #COLUMNS-1	@; r8 = *valorDerecho
+					subeq r8, r6, #COLUMNS+1	@; si r0 = 0 -> r8 = *valorIzquierdo
+					subne r8, r6, #COLUMNS-1	@; si r0 != 0 -> r8 = *valorDerecho
 					b .LFinValidos
 				.LIzquierdoValido:
 					sub r8, r6, #COLUMNS+1	@; r8 = *valorIzquierdo
 					b .LFinValidos
 				.LDerechoValido:
-					sub r8, r6, #COLUMNS-1	@; r8 = *valorIzquierdo
+					sub r8, r6, #COLUMNS-1	@; r8 = *valorDerecho
 					b .LFinValidos
 				.LFinValidos:
 					@; r7 = elemento seleccionado (Izquierdo o derecho)
@@ -307,7 +289,7 @@ baja_laterales:
 					add r5, r12
 					strb r5, [r4, r6]
 					strb r7, [r4, r8]
-					@; Exito
+					@; Exito, ha habido bajada
 					mov r11, #1
 				.LNoValidos:
 				
@@ -319,10 +301,9 @@ baja_laterales:
 		b .LBucleFilas3
 	.LFinBucleFilas3:
 		
-		cmp r11, #1
-		bleq genera_elementos
-		
-		mov r0, r11
+		bl genera_elementos
+		@; Si ha habido una bajada de elemento o se han generado elementos entonces retorna cierto
+		orr r0, r11
 		pop {r1-r12,pc}
 
 @; genera_elementos(mat): rutina para generar aleatoriamente el valor de los
