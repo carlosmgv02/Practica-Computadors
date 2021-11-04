@@ -58,7 +58,7 @@ short cori[] = {0, 1, 2, 3, 0, 1, 2, 0, 3, 0, 0, 1, 3, 0, 0};
 short resp[] = {1, 2, 1, 1, 2, 1, 1, 3, 1, 3, 5, 2, 4, 2, 4};
 int main(void)
 {
-	int ntest = 0;
+	int ntest = 14;
 	int result1E;
 
 	consoleDemoInit();			// inicialización de pantalla de texto

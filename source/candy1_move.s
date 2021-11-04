@@ -301,9 +301,7 @@ baja_laterales:
 		b .LBucleFilas3
 	.LFinBucleFilas3:
 		
-		bl genera_elementos
-		@; Si ha habido una bajada de elemento o se han generado elementos entonces retorna cierto
-		orr r0, r11
+		mov r0, r11
 		pop {r1-r12,pc}
 
 @; genera_elementos(mat): rutina para generar aleatoriamente el valor de los
