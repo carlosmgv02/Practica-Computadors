@@ -124,8 +124,8 @@ baja_elementos:
 @;	Resultado:
 @;		R0 = 1 indica que se ha realizado algún movimiento. 
 baja_verticales:
-		push {r1-r11,lr}
-		mov r11, #0			@; r11 = false
+		push {r1-r9,lr}
+		mov r9, #0			@; r9 = false
 		mov r1, #ROWS-1		@; r1 = i = ROWS-1
 		mov r2, #COLUMNS-1 	@; r2 = j = COLUMNS-1
 		mov r3, #COLUMNS	@; r3 = const
@@ -151,12 +151,12 @@ baja_verticales:
 				sub r8, r6, #COLUMNS
 				ldrb r7, [r4, r8]
 				
-				@; r10 = iTemp
-				mov r10, r1
+				@; r0 = iTemp
+				mov r0, r1
 				@; Pasar por los huecos superiores
 				.LBucleHueco:
 					@; while (iTemp>0 && valorSup==hueco)
-					cmp r10, #0
+					cmp r0, #0
 					ble .LFinBucleHueco
 					cmp r7, #0xF
 					bne .LFinBucleHueco
@@ -164,31 +164,29 @@ baja_verticales:
 					sub r8, #COLUMNS
 					ldrb r7, [r4, r8]
 					@; iTemp--
-					sub r10, #1
+					sub r0, #1
 					b .LBucleHueco
 				.LFinBucleHueco:
 				
 				@; Si hay un elemento superior válido, entonces hay una bajada vertical
 				.LSiElementoValido:
-					@; if (esValorValido(valorSup))
+					@; if (es_elemento_basico(valorSup))
 					mov r0, r7
-					bl es_valor_valido
+					bl es_elemento_basico
 					cmp r0, #1
 					bne .LFinSiElementoValido
 					
-					@; Obtengo el valor del elemento
+					@; Bajo el elemento
 					and r0, r7, #0x7
-					sub r7, r0
-					add r5, r0	@; r5 & 0x7 = 0 así que puedo añadir directamente el valor
-					@; Intercambio los elementos conservando gelatinas
+					bic r7, #0x7
+					add r5, r0
 					strb r5, [r4, r6]
 					strb r7, [r4, r8]
 					
 					@; Ya que ha habido una bajada vertical r11 = true
-					mov r11, #1
+					mov r9, #1
 				.LFinSiElementoValido:
 			.LFinSiCero:
-			
 			sub r2, #1
 			b .LBucleColumnas
 		.LFinBucleColumnas:
@@ -199,8 +197,8 @@ baja_verticales:
 		
 		bl genera_elementos
 		@; Si ha habido una bajada de elemento o se han generado elementos entonces retorna cierto
-		orr r0, r11
-		pop {r1-r11,pc}
+		orr r0, r9
+		pop {r1-r9,pc}
 
 
 
@@ -213,8 +211,8 @@ baja_verticales:
 @;	Resultado:
 @;		R0 = 1 indica que se ha realizado algún movimiento. 
 baja_laterales:
-		push {r1-r12,lr}
-		mov r11, #0			@; r11 = valor de retorno, por defecto es falso
+		push {r1-r9,lr}
+		mov r9, #0			@; r9 = valor de retorno, por defecto es falso
 		mov r2, #ROWS-1		@; r2 = i = ROWS-1
 		
 	.LBucleFilas3:
@@ -241,22 +239,22 @@ baja_laterales:
 				mov r0, #0
 				mov r1, #0
 				.LSiIzquierdoEsValido:
-					@; r1 = !limDerecho && esValorValido(valorDerecho)
+					@; r1 = !limDerecho && es_elemento_basico(valorDerecho)
 					cmp r3, #COLUMNS-1
 					bge .LSiDerechoEsValido
 					sub r8, r6, #COLUMNS-1
 					ldrb r7, [r4, r8]
 					mov r0, r7
-					bl es_valor_valido
+					bl es_elemento_basico
 					mov r1, r0
 				.LSiDerechoEsValido:
-					@; r0 = !limIzquierdo && esValorValido(valorIzquierdo)
+					@; r0 = !limIzquierdo && es_elemento_basico(valorIzquierdo)
 					cmp r3, #0
 					ble .LFinEsValido
 					sub r8, r6, #COLUMNS+1
 					ldrb r7, [r4, r8]
 					mov r0, r7
-					bl es_valor_valido
+					bl es_elemento_basico
 				.LFinEsValido:
 				
 				tst r0, r1
@@ -284,13 +282,13 @@ baja_laterales:
 					@; r7 = elemento seleccionado (Izquierdo o derecho)
 					ldrb r7, [r4, r8]
 					@; Bajo el elemento
-					and r12, r7, #0x7
-					sub r7, r12
-					add r5, r12
+					and r1, r7, #0x7
+					bic r7, #0x7
+					add r5, r1
 					strb r5, [r4, r6]
 					strb r7, [r4, r8]
 					@; Exito, ha habido bajada
-					mov r11, #1
+					mov r9, #1
 				.LNoValidos:
 				
 			.LFinSiCero3:
@@ -301,8 +299,8 @@ baja_laterales:
 		b .LBucleFilas3
 	.LFinBucleFilas3:
 		
-		mov r0, r11
-		pop {r1-r12,pc}
+		mov r0, r9
+		pop {r1-r9,pc}
 
 @; genera_elementos(mat): rutina para generar aleatoriamente el valor de los
 @;	elementos de las posiciones más altas de cada columna, sin tener en cuenta
@@ -356,9 +354,9 @@ genera_elementos:
 	.LFinBucleColumnasGeneraElementos:
 	mov r0, r6
 	pop {r1-r6,pc}
+	
 
-
-@; es_valor_valido(valor): rutina para comprovar si un elemento es valido.
+@; es_elemento_basico(valor): rutina para comprovar si un elemento es valido.
 @;	Un elemento es considerado valido si sus 3 bits de menor peso están
 @;	entre [001..110], es decir entre 1 y 6.
 @;	devuelve cierto (1) si el valor es valido o falso (0) si no lo es.
@@ -366,14 +364,14 @@ genera_elementos:
 @;		R0 = el valor a comprovar la validez
 @;	Resultado:
 @;		R0 = booleano indicando si el valor es o no valido. 
-es_valor_valido:
-		push {r1,lr}
-		mvn r1, r0
+es_elemento_basico:
+		push {lr}
 	.LSi:
 		@; if ((valor & 0x7 == 0) && (!valor & 0x7 == 0))
 		tst r0, #0x7
 		beq .LSino
-		tst r1, #0x7
+		mvn r0, r0
+		tst r0, #0x7
 		beq .LSino
 		@; el valor es valido
 		mov r0, #1
@@ -381,6 +379,6 @@ es_valor_valido:
 	.LSino:
 		mov r0, #0
 	.LFinSi:
-		pop {r1,pc}
+		pop {pc}
 
 .end

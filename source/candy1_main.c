@@ -84,15 +84,11 @@ int main(void)
 		} else if (ntest < NUMTESTS) {
 			printf("\x1b[39m\x1b[0;0HcandyNDS (prueba tarea 1F)\n");
 			printf("\x1b[39m\x1b[2;0H test %d:", ntest-NUMTESTS1E);
-			while(baja_elementos(matrix))
-			{
-				retardo(10);
-				escribe_matriz_debug(matrix);
-			}
+	
 			swiWaitForVBlank();
 			escribe_matriz_debug(matrix);
-			retardo(5);
-			printf("\x1b[38m\x1b[5;19H (pulse A/B)");
+			printf("\x1b[38m\x1b[3;10H (A >> Baja Elementos)");
+			printf("\x1b[38m\x1b[4;10H (B >> Repetir Mapa)");
 		}
 		
 		do
@@ -100,21 +96,25 @@ int main(void)
 			scanKeys();					// esperar pulsación tecla 'A' o 'B'
 		} while (!(keysHeld() & (KEY_A | KEY_B)));
 		
-		printf("\x1b[2;0H                               ");
-		printf("\x1b[3;0H                               ");
-		printf("\x1b[4;0H                               ");
+		printf("\x1b[2;0H                                ");
+		printf("\x1b[3;0H                                ");
+		printf("\x1b[4;0H                                ");
 		printf("\x1b[38m\x1b[5;19H            ");
 		retardo(5);
 		
+		
 		if (keysHeld() & KEY_A)		// si pulsa 'A',
 		{
-			ntest++;				// siguiente test
-			if ((ntest < NUMTESTS && nmap[ntest] != level)) //&& (nmap[ntest] != level))
-			{				// si número de mapa del siguiente test diferente
-				level = nmap[ntest];		// del número de mapa actual,
-				actualizar_contadores(1);		// cambiar el mapa actual
-				copia_mapa(matrix, level);
-				escribe_matriz_debug(matrix);
+			if (ntest < NUMTESTS1E || !baja_elementos(matrix)) 
+			{
+				ntest++;				// siguiente test
+				if ((ntest < NUMTESTS && nmap[ntest] != level)) //&& (nmap[ntest] != level))
+				{				// si número de mapa del siguiente test diferente
+					level = nmap[ntest];		// del número de mapa actual,
+					actualizar_contadores(1);		// cambiar el mapa actual
+					copia_mapa(matrix, level);
+					escribe_matriz_debug(matrix);
+				}
 			}
 		}
 		if (keysHeld() & KEY_B)
