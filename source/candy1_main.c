@@ -58,7 +58,7 @@ short cori[] = {0, 1, 2, 3, 0, 1, 2, 0, 3, 0, 0, 1, 3, 0, 0};
 short resp[] = {1, 2, 1, 1, 2, 1, 1, 3, 1, 3, 5, 2, 4, 2, 4};
 int main(void)
 {
-	int ntest = 14;
+	int ntest = NUMTESTS1E+1;
 	int result1E;
 
 	consoleDemoInit();			// inicialización de pantalla de texto
@@ -100,7 +100,6 @@ int main(void)
 		printf("\x1b[3;0H                                ");
 		printf("\x1b[4;0H                                ");
 		printf("\x1b[38m\x1b[5;19H            ");
-		retardo(5);
 		
 		
 		if (keysHeld() & KEY_A)		// si pulsa 'A',
