@@ -105,6 +105,7 @@ int main(void)
 				retardo(5);
 				muestra_elementos(matrix);
 				escribe_matriz(matrix);
+				
 			}
 		else
 			printf("\x1b[39m\x1b[3;0Hhay combinacion: NO");
