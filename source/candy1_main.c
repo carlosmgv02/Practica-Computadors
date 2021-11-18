@@ -51,7 +51,8 @@ void actualizar_contadores(int code)
 /* candy1_main.c : función principal main() para test de tarea 1G 	*/
 /*					(requiere tener implementada la tarea 1E)		*/
 /* ---------------------------------------------------------------- */
-/*
+/*    prog3: Creación de rutinas auxiliares distancia_siguiente_elemento y saltar_huecos, cambios en la implementación de la rutina auxiliar es_elemento_basico. Cambio de codigo en genera_elementos, utilizando la rutina auxiliar saltar_huecos. Creacion de constantes y uso en codigo de estas. Detección de un bug en baja_laterales, lectura invalida de los huecos, leyendo los huecos de la matriz como un 0x8 en vez de 0xF
+
 int main(void)
 {
 	consoleDemoInit();			// inicialización de pantalla de texto

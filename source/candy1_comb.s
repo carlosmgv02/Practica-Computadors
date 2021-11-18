@@ -297,6 +297,8 @@ sugiere_combinacion:
 		mvn r9,r7
 		tst r9, #7
 		beq .Lfinal
+		cmp r3, r7
+		beq .Lfinal
 
 		bl swapH
 
@@ -323,6 +325,8 @@ sugiere_combinacion:
 		beq .Lfinal
 		mvn r9,r7
 		tst r9, #7
+		beq .Lfinal
+		cmp r3, r7
 		beq .Lfinal
 
 		bl swapV
@@ -355,6 +359,9 @@ sugiere_combinacion:
 		mvn r9,r7
 		tst r9, #7
 		beq .Lfinal
+		cmp r3, r7
+		beq .Lfinal
+		
 
 		bl swapV
 
@@ -390,6 +397,8 @@ sugiere_combinacion:
 		mvn r9,r7
 		tst r9, #7
 		beq .Lfinal
+		cmp r3, r7
+		beq .Lfinal
 
 		bl swapH
 
@@ -410,12 +419,11 @@ sugiere_combinacion:
 
 	.Lfinal:
 
-		cmp r1, #ROWS
+		cmp r1, #ROWS-1
 		addhs r2, #1
 		movhs r1, #0
-		bhs .Lwhile
 	
-		cmp r2, #COLUMNS
+		cmp r2, #COLUMNS-1
 		addhs r1, #1
 		movhs r2, #0
 		bhs .Lwhile
@@ -430,7 +438,9 @@ sugiere_combinacion:
 		mov r12, r7
 		mov r7, r3
 		mov r3, r12
+		add r2, #-1
 		bl swapH
+		add r2, #1
 
 		b .Lsugerir
 
@@ -440,7 +450,9 @@ sugiere_combinacion:
 		mov r12, r7
 		mov r7, r3
 		mov r3, r12
+		add r1, #-1
 		bl swapV
+		add r1, #1
 
 	.Lsugerir:	
 
