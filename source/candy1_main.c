@@ -99,13 +99,16 @@ int main(void)
 		escribe_matriz_debug(matrix);
 		if (hay_combinacion(matrix))	{		// si hay combinaciones
 			printf("\x1b[39m\x1b[3;0Hhay combinacion: SI");
-				sugiere_combinacion(matrix, pos_sug);
-				borra_puntuaciones();
-				oculta_elementos(matrix);
-				escribe_matriz(matrix);
-				retardo(5);
-				muestra_elementos(matrix);
-				escribe_matriz(matrix);
+				
+			sugiere_combinacion(matrix, pos_sug);
+					
+			borra_puntuaciones();
+			oculta_elementos(matrix);
+			escribe_matriz(matrix);
+			retardo(5);
+			muestra_elementos(matrix);
+			escribe_matriz(matrix);
+					
 				
 			}
 		else

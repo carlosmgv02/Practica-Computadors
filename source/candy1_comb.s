@@ -309,18 +309,21 @@ sugiere_combinacion:
 		add r2, #1
 		mov r11, #1
 		bl detectar_orientacion
+		add r2, #-1
 		cmp r0, #6
 		blt .LfiHor
-		add r2, #-1
 		mov r12, r7
 		mov r7, r3
 		mov r3, r12
 		bl swapH
+		mov r3, r7
 
 			@;vertical
-		add r10, #COLUMNS
+		add r1, #1
+		mla r6, r1, r5, r2
+		add r1, #-1
+		add r10, r4, r6
 		ldrb r7, [r10]
-		sub r10, #COLUMNS
 		tst r7, #7
 		beq .Lfinal
 		mvn r9,r7
@@ -338,22 +341,25 @@ sugiere_combinacion:
 		add r1, #1
 		mov r11, #3
 		bl detectar_orientacion
+		add r1, #-1
 		cmp r0, #6
 		blt .LfiVer
-		add r1, #-1
 		mov r12, r7
 		mov r7, r3
 		mov r3, r12
 		bl swapV
+		mov r3, r7
 
 		b .Lfinal
 	
 		@;Ultima Columna
 	.LLastColumn:
 
-		add r10, #COLUMNS
+		add r1, #1
+		mla r6, r1, r5, r2
+		add r1, #-1
+		add r10, r4, r6
 		ldrb r7, [r10]
-		sub r10, #COLUMNS
 		tst r7, #7
 		beq .Lfinal
 		mvn r9,r7
@@ -372,13 +378,14 @@ sugiere_combinacion:
 		add r1, #1
 		mov r11, #3
 		bl detectar_orientacion
+		add r1, #-1
 		cmp r0, #6
 		blt .LfiVer
-		add r1, #-1
 		mov r12, r7
 		mov r7, r3
 		mov r3, r12
 		bl swapV
+		mov r3, r7
 
 		b .Lfinal
 		
@@ -409,13 +416,14 @@ sugiere_combinacion:
 		add r2, #1
 		mov r11, #1
 		bl detectar_orientacion
+		add r2, #-1
 		cmp r0, #6
 		blt .LfiHor
-		add r2, #-1
 		mov r12, r7
 		mov r7, r3
 		mov r3, r12
 		bl swapH
+		mov r3, r7
 
 	.Lfinal:
 
@@ -438,9 +446,7 @@ sugiere_combinacion:
 		mov r12, r7
 		mov r7, r3
 		mov r3, r12
-		add r2, #-1
 		bl swapH
-		add r2, #1
 
 		b .Lsugerir
 
@@ -450,12 +456,14 @@ sugiere_combinacion:
 		mov r12, r7
 		mov r7, r3
 		mov r3, r12
-		add r1, #-1
 		bl swapV
-		add r1, #1
 
 	.Lsugerir:	
-
+		cmp r11, #1
+		addeq r2, #1
+		cmp r11, #3
+		addeq r1, #11
+	
 		mov r3, r0
 		mov r0, r8
 		mov r4, r11
@@ -732,7 +740,7 @@ detectar_orientacion:
 		
 			mla r6, r1, r5, r2
 			strb r7,[r4,r6]
-			add r1, #-1
+			add r1, #1
 			mla r6, r1, r5, r2
 			strb r3,[r4,r6]
 		

@@ -96,26 +96,26 @@ recombina_elementos:
 mod_random:
 		push {r1-r4, lr}
 		
-		cmp r0, #2				@;compara el rango de entrada con el m�nimo
+		cmp r0, #2				@;compara el rango de entrada con el mínimo
 		bge .Lmodran_cont
-		mov r0, #2				@;si menor, fija el rango m�nimo
+		mov r0, #2				@;si menor, fija el rango mínimo
 	.Lmodran_cont:
 		and r0, #0xff			@;filtra los 8 bits de menos peso
-		sub r2, r0, #1			@;R2 = R0-1 (n�mero m�s alto permitido)
-		mov r3, #1				@;R3 = m�scara de bits
+		sub r2, r0, #1			@;R2 = R0-1 (número más alto permitido)
+		mov r3, #1				@;R3 = máscara de bits
 	.Lmodran_forbits:
-		cmp r3, r2				@;genera una m�scara superior al rango requerido
+		cmp r3, r2				@;genera una máscara superior al rango requerido
 		bhs .Lmodran_loop
 		mov r3, r3, lsl #1
 		orr r3, #1				@;inyecta otro bit
 		b .Lmodran_forbits
 		
 	.Lmodran_loop:
-		bl random				@;R0 = n�mero aleatorio de 32 bits
-		and r4, r0, r3			@;filtra los bits de menos peso seg�n m�scara
+		bl random				@;R0 = número aleatorio de 32 bits
+		and r4, r0, r3			@;filtra los bits de menos peso según máscara
 		cmp r4, r2				@;si resultado superior al permitido,
 		bhi .Lmodran_loop		@; repite el proceso
-		mov r0, r4			@; R0 devuelve n�mero aleatorio restringido a rango
+		mov r0, r4			@; R0 devuelve número aleatorio restringido a rango
 		
 		pop {r1-r4, pc}
 
