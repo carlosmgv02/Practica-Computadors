@@ -121,7 +121,7 @@ hay_combinacion:
 		mvn r7, r7
 		cmp r7, r3    @; r3 = num arriba  r7 = num abajo
 		beq .Lendiftotal
-
+	
 		bl swapH
 	
 		bl detectar_orientacion
@@ -427,16 +427,18 @@ sugiere_combinacion:
 
 	.Lfinal:
 
-		cmp r1, #ROWS-1
-		addhs r2, #1
-		movhs r1, #0
-	
-		cmp r2, #COLUMNS-1
+		add r2, #1
+
+		cmp r2, #COLUMNS
+		blo .Lfi
 		addhs r1, #1
 		movhs r2, #0
-		bhs .Lwhile
 
-		add r2, #1
+		cmp r1, #ROWS
+		movhs r1, #0
+		movhs r2, #0
+		bhs	.Lwhile
+	.Lfi:
 		b .Lwhile
 
 
@@ -460,9 +462,9 @@ sugiere_combinacion:
 
 	.Lsugerir:	
 		cmp r11, #1
-		addeq r2, #1
+		addeq r2, #1 @;como hacemos swap con el de abajo le sumamos 1
 		cmp r11, #3
-		addeq r1, #11
+		addeq r1, #1
 	
 		mov r3, r0
 		mov r0, r8

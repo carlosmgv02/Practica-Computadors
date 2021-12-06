@@ -101,7 +101,7 @@ int main(void)
 			printf("\x1b[39m\x1b[3;0Hhay combinacion: SI");
 				
 			sugiere_combinacion(matrix, pos_sug);
-					
+			printf("\n*Sug(x,y) =%d, %d, %d, %d, %d, %d*",pos_sug[0],pos_sug[1],pos_sug[2],pos_sug[3],pos_sug[4],pos_sug[5]);
 			borra_puntuaciones();
 			oculta_elementos(matrix);
 			escribe_matriz(matrix);
