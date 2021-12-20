@@ -27,7 +27,7 @@ int level = 0;					// nivel del juego (nivel inicial = 0)
 int points;						// contador global de puntos
 int movements;					// número de movimientos restantes
 int gelees;						// número de gelatinas restantes
-
+int numeros[3];
 
 
 /* actualizar_contadores(code): actualiza los contadores que se indican con el
