@@ -92,7 +92,6 @@ cuenta_repeticiones:
 		cmp r1, #0
 		beq .LFinBucle
 		@; Obtener el siguiente valor
-
 		add r4, r2
 		ldrb r3, [r4]
 		and r3, #MASC_3BITS_MENORES
@@ -106,7 +105,6 @@ cuenta_repeticiones:
 	.LFinBucle:
 		
 	pop {r1-r5, pc}
-
 
 
 
@@ -126,14 +124,12 @@ cuenta_repeticiones:
 @;				queden movimientos pendientes. 
 	.global baja_elementos
 baja_elementos:
-
 		push {r4,lr}
 		mov r4, r0
 		bl baja_verticales
 		cmp r0, #TRUE
 		blne baja_laterales
 		pop {r4,pc}
-
 
 
 
@@ -147,7 +143,6 @@ baja_elementos:
 @;	Resultado:
 @;		R0 = 1 indica que se ha realizado algún movimiento. 
 baja_verticales:
-
 	push {r1-r9,lr}
 		mov r9, #0			@; r9 = false
 		mov r1, #ROWS-1		@; r1 = i = ROWS-1

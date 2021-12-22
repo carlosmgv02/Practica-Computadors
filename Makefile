@@ -117,7 +117,7 @@ run : $(TARGET).nds
 #---------------------------------------------------------------------------------
 debug : $(TARGET).nds $(TARGET).elf
 	@echo "testing $(TARGET).nds/.elf with DeSmuME_dev/Insight (gdb) through TCP port=1000"
-	@$(DESMUME)/DeSmuME_dev.exe --arm9gdb=1000 $(TARGET).nds &
+	/c/URV/bmde/DeSmuME_0.9.11_dev/DeSmuME_dev.exe --arm9gdb=1000 $(TARGET).nds &
 	@$(DEVKITPRO)/insight/bin/arm-eabi-insight $(TARGET).elf &
 
 #---------------------------------------------------------------------------------

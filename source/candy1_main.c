@@ -21,16 +21,16 @@
 
 /* variables globales */
 char matrix[ROWS][COLUMNS];		// matriz global de juego
-int seed32;						// semilla de nï¿½meros aleatorios
+int seed32;						// semilla de números aleatorios
 int level = 0;					// nivel del juego (nivel inicial = 0)
 int points;						// contador global de puntos
-int movements;					// nï¿½mero de movimientos restantes
-int gelees;						// nï¿½mero de gelatinas restantes
+int movements;					// número de movimientos restantes
+int gelees;						// número de gelatinas restantes
 
 
 
 /* actualizar_contadores(code): actualiza los contadores que se indican con el
-	parï¿½metro 'code', que es una combinaciï¿½n binaria de booleanos, con el
+	parámetro 'code', que es una combinación binaria de booleanos, con el
 	siguiente significado para cada bit:
 		bit 0:	nivel
 		bit 1:	puntos
@@ -38,7 +38,7 @@ int gelees;						// nï¿½mero de gelatinas restantes
 		bit 3:	gelatinas  */
 void actualizar_contadores(int code)
 {
-	if (code & 1) printf("\x1b[38m\x1b[1;10H %d", level);
+	if (code & 1) printf("\x1b[38m\x1b[1;8H %d", level);
 	if (code & 2) printf("\x1b[39m\x1b[2;8H %d  ", points);
 	if (code & 4) printf("\x1b[38m\x1b[1;28H %d ", movements);
 	if (code & 8) printf("\x1b[37m\x1b[2;28H %d ", gelees);
@@ -46,31 +46,27 @@ void actualizar_contadores(int code)
 
 
 
-/* ---------------------------------------------------------------- */
-/* candy1_main.c : función principal main() para test de tarea 1A 	*/
-
-/*					(requiere tener implementada la tarea 1E)		*/
-/* ---------------------------------------------------------------- */
+/* Programa principal: control general del juego */
 int main(void)
 {
-
 	int lapse = 0;				// contador de tiempo sin actividad del usuario
 	int change = 0;				// =1 indica que ha habido cambios en la matriz
 	int falling = 0;			// =1 indica que los elementos estan bajando
 	int initializing = 1;		// =1 indica que hay que inicializar un juego
-	int mX, mY, dX, dY;			// variables de detecciï¿½n de pulsaciones
+	int mX, mY, dX, dY;			// variables de detección de pulsaciones
 
-	seed32 = time(NULL);		// fijar semilla de nï¿½meros aleatorios
-	consoleDemoInit();			// inicializaciï¿½n de pantalla de texto
+	seed32 = time(NULL);		// fijar semilla de números aleatorios
+	consoleDemoInit();			// inicialización de pantalla de texto
 	printf("candyNDS (version 1: texto)\n");
-
-
 	printf("\x1b[38m\x1b[1;0H  nivel:");
-	actualizar_contadores(1);
+	printf("\x1b[39m\x1b[2;0H puntos:");
+	printf("\x1b[38m\x1b[1;15H movimientos:");
+	printf("\x1b[37m\x1b[2;15H   gelatinas:");
+	actualizar_contadores(15);
 
-	do							// bucle principal de pruebas
+	do							// bucle principal del juego
 	{
-		if (initializing)		//////	SECCIï¿½N DE INICIALIZACIï¿½N	//////
+		if (initializing)		//////	SECCIÓN DE INICIALIZACIÓN	//////
 		{
 			inicializa_matriz(matrix, level);
 			//copia_mapa(matrix, 8);
@@ -93,11 +89,11 @@ int main(void)
 			gelees = contar_gelatinas(matrix);
 			actualizar_contadores(15);
 		}
-		else if (falling)		//////	SECCIï¿½N BAJADA DE ELEMENTOS	//////
+		else if (falling)		//////	SECCIÓN BAJADA DE ELEMENTOS	//////
 		{
 			falling = baja_elementos(matrix);	// realiza la siguiente bajada
 			retardo(4);
-			if (!falling)						// si no estï¿½ bajando
+			if (!falling)						// si no está bajando
 			{
 				if (hay_secuencia(matrix))		// si hay secuencias
 				{
@@ -111,7 +107,7 @@ int main(void)
 			}
 			escribe_matriz(matrix);			// visualiza bajadas o eliminaciones
 		}
-		else					//////	SECCIï¿½N DE JUGADAS	//////
+		else					//////	SECCIÓN DE JUGADAS	//////
 		{
 			if (procesar_touchscreen(matrix, &mX, &mY, &dX, &dY))
 			{
@@ -135,21 +131,30 @@ int main(void)
 				escribe_matriz(matrix);	// muetra las eliminaciones o el retorno
 			}
 			while (keysHeld() & KEY_TOUCH)		// esperar a liberar la
-			{	swiWaitForVBlank();				// pantalla tï¿½ctil
+			{	swiWaitForVBlank();				// pantalla táctil
 				scanKeys();
 			}
 		}
-		if (!falling)			//////	SECCIï¿½N DE DEPURACIï¿½N	//////
+		if (!falling)			//////	SECCIÓN DE DEPURACIÓN	//////
 		{
 			swiWaitForVBlank();
-			escribe_matriz_debug(matrix);
-			printf("\x1b[38m\x1b[3;10H (A >> Baja Elementos)");
-			printf("\x1b[38m\x1b[4;10H (B >> Repetir Mapa)");
+			scanKeys();
+			if (keysHeld() & KEY_B)		// forzar cambio de nivel
+			{	points = 0;
+				gelees = 0;					// superado
+				change = 1;
+			}
+			else if (keysHeld() & KEY_START)	
+			{	movements = 0;				// repetir
+				change = 1;
+			}
+			lapse++;
 		}
-
-		if (change)				//////	SECCIï¿½N CAMBIO DE NIVEL	//////
+		if (change)				//////	SECCIÓN CAMBIO DE NIVEL	//////
 		{
-			if (ntest < NUMTESTS1E || !baja_elementos(matrix)) 
+			change = 0;
+			if (((points >= 0) && (gelees == 0))
+					|| (movements == 0) || !hay_combinacion(matrix))
 			{
 				if ((points >= 0) && (gelees == 0))
 					printf("\x1b[39m\x1b[6;20H _SUPERADO_");
@@ -161,7 +166,7 @@ int main(void)
 				printf("\x1b[39m\x1b[8;20H (pulse A)");
 				do
 				{	swiWaitForVBlank();
-					scanKeys();					// esperar pulsaciï¿½n tecla 'A'
+					scanKeys();					// esperar pulsación tecla 'A'
 				} while (!(keysHeld() & KEY_A));
 				printf("\x1b[6;20H           ");
 				printf("\x1b[8;20H           ");	// borra mensajes
@@ -178,11 +183,13 @@ int main(void)
 				{
 					recombina_elementos(matrix);
 					escribe_matriz(matrix);
-					change = 1;					// forzar nueva verificaciï¿½n
+					change = 1;					// forzar nueva verificación
 				}								// de combinaciones
-				borra_puntuaciones();			}
+				borra_puntuaciones();
+			}
+			lapse = 0;
 		}
-		else if (lapse >= 192)	//////	SECCIï¿½N DE SUGERENCIAS	//////
+		else if (lapse >= 192)	//////	SECCIÓN DE SUGERENCIAS	//////
 		{
 			if (lapse == 192) 		// a los 8 segundos sin actividad (aprox.)
 			{
@@ -200,6 +207,5 @@ int main(void)
 		}
 	} while (1);				// bucle infinito
 	
-	return(0);					// nunca retornarï¿½ del main
-
+	return(0);					// nunca retornará del main
 }
