@@ -12,7 +12,6 @@
 	Programador 3: Joseluis.pueyo@estudiants.urv.cat
 	Programador 4: Carlos.martinezg@estudiants.urv.cat
 
-
 ------------------------------------------------------------------------------*/
 #include <nds.h>
 #include <stdio.h>
@@ -39,7 +38,7 @@ int gelees;						// nï¿½mero de gelatinas restantes
 		bit 3:	gelatinas  */
 void actualizar_contadores(int code)
 {
-	if (code & 1) printf("\x1b[38m\x1b[1;8H %d", level);
+	if (code & 1) printf("\x1b[38m\x1b[1;10H %d", level);
 	if (code & 2) printf("\x1b[39m\x1b[2;8H %d  ", points);
 	if (code & 4) printf("\x1b[38m\x1b[1;28H %d ", movements);
 	if (code & 8) printf("\x1b[37m\x1b[2;28H %d ", gelees);
@@ -49,6 +48,7 @@ void actualizar_contadores(int code)
 
 /* ---------------------------------------------------------------- */
 /* candy1_main.c : función principal main() para test de tarea 1A 	*/
+
 /*					(requiere tener implementada la tarea 1E)		*/
 /* ---------------------------------------------------------------- */
 int main(void)
@@ -63,6 +63,7 @@ int main(void)
 	seed32 = time(NULL);		// fijar semilla de nï¿½meros aleatorios
 	consoleDemoInit();			// inicializaciï¿½n de pantalla de texto
 	printf("candyNDS (version 1: texto)\n");
+
 
 	printf("\x1b[38m\x1b[1;0H  nivel:");
 	actualizar_contadores(1);
@@ -211,5 +212,5 @@ int main(void)
 	} while (1);				// bucle infinito
 	
 	return(0);					// nunca retornarï¿½ del main
-}
 
+}

@@ -40,61 +40,54 @@
 	.global cuenta_repeticiones
 cuenta_repeticiones:
 
-		push {r1-r10, lr}
+		push {r1-r5, lr}
 		
-		mov r5, #COLUMNS
-		mla r6, r1, r5, r2		@;R6 = f * COLUMNS + c
-		add r4, r0, r6			@;R4 apunta al elemento (f,c) de 'mat'
+		mov r4, #COLUMNS
+		mla r5, r1, r4, r2		@;R6 = f * COLUMNS + c
+		add r4, r0, r5			@;R4 apunta al elemento (f,c) de 'mat'
 		ldrb r5, [r4]
 		and r5, #7				@;R5 es el valor filtrado (sin marcas de gel.)
 		mov r0, #1				@;R0 = número de repeticiones
 		
-
-		@;Este
-
+		@; r1 = # posiciones a comprovar  
+		@; r2 = posiciones a moverse hasta la siguiente casilla a evaluar
+		@; Este
 		cmp r3, #0
-		moveq r7, #COLUMNS
-		subeq r7, r2			@; r7 = # posiciones a comprovar
-		moveq r8, #1			@; r8 = posiciones a moverse hasta la siguiente casilla a evaluar
-		
-		@;Sur
+		rsbeq r1, r2, #COLUMNS-1 	
+		moveq r2, #1			
+		@; Sur
 		cmp r3, #1
-		moveq r7, #ROWS
-		subeq r7, r1
-		moveq r8, #COLUMNS
-		
-		@;Oeste
+		rsbeq r1, r1, #ROWS-1
+		moveq r2, #COLUMNS
+		@; Oeste
 		cmp r3, #2
-		moveq r7, r2
-		moveq r8, #1
-		mvneq r8, r8			@; ca2(r8) -> -r8
-		addeq r8, #1			
-		
+		moveq r1, r2
+		moveq r2, #-1			
 		@;Norte
 		cmp r3, #3
-		moveq r7, r1
-		moveq r8, #COLUMNS
-		mvneq r8, r8
-		addeq r8, #1
+		moveq r1, r1
+		moveq r2, #-COLUMNS
 			
-		mov r9, r4
 	.LBucle:
 		@; (i != 0)
-		cmp r7, #0
+		cmp r1, #0
 		beq .LFinBucle
 		@; Obtener el siguiente valor
-		add r9, r8
-		ldrb r10, [r9]
-		and r10, #7
+
+		add r4, r2
+		ldrb r3, [r4]
+		and r3, #7
 		@; Evaluar el siguiente valor
-		cmp r5, r10
+		cmp r5, r3
 		addeq r0, #1
 		bne .LFinBucle
 		@; i--
-		sub r7, #1
+		sub r1, #1
 		b .LBucle
 	.LFinBucle:
-		pop {r1-r10, pc}
+		
+		pop {r1-r5, pc}
+
 
 
 @;TAREA 1F;
@@ -122,7 +115,6 @@ baja_elementos:
 
 @;:::RUTINAS DE SOPORTE:::
 
-
 @; baja_verticales(mat): rutina para bajar elementos hacia las posiciones vacías
 @;	en vertical; cada llamada a la función sólo baja elementos una posición y
 @;	devuelve cierto (1) si se ha realizado algún movimiento.
@@ -133,8 +125,77 @@ baja_elementos:
 baja_verticales:
 		push {lr}
 		
+	@; Recorrido de la matriz sin la primera fila buscando los valores 0
+	.LBucleFilas:
+		@; while (i>0)
+		cmp r1, #0
+		ble .LFinBucleFilas
+		mov r2, #COLUMNS-1
+		.LBucleColumnas:
+			@; while (j>=0)
+			cmp r2, #0
+			blt .LFinBucleColumnas
+			@; r5 = matriz[i][j]
+			mla r6, r1, r3, r2
+			ldrb r5, [r4, r6]
+			.LSiCero:
+				@; if (valorFiltrado == 0)
+				tst r5, #0x7
+				bne .LFinSiCero
+				@; r8 = valorSup = matriz[i-1][j]
+				sub r8, r6, #COLUMNS
+				ldrb r7, [r4, r8]
+				
+				@; r10 = iTemp
+				mov r10, r1
+				@; Pasar por los huecos superiores
+				.LBucleHueco:
+					@; while (iTemp>0 && valorSup==hueco)
+					cmp r10, #0
+					ble .LFinBucleHueco
+					cmp r7, #0xF
+					bne .LFinBucleHueco
+					@; Obtengo el siguiente valor superior
+					sub r8, #COLUMNS
+					ldrb r7, [r4, r8]
+					@; iTemp--
+					sub r10, #1
+					b .LBucleHueco
+				.LFinBucleHueco:
+				
+				@; Si hay un elemento superior válido, entonces hay una bajada vertical
+				.LSiElementoValido:
+					@; if (esValorValido(valorSup))
+					mov r0, r7
+					bl es_valor_valido
+					cmp r0, #1
+					bne .LFinSiElementoValido
+					
+					@; Obtengo el valor del elemento
+					and r0, r7, #0x7
+					sub r7, r0
+					add r5, r0	@; r5 & 0x7 = 0 así que puedo añadir directamente el valor
+					@; Intercambio los elementos conservando gelatinas
+					strb r5, [r4, r6]
+					strb r7, [r4, r8]
+					
+					@; Ya que ha habido una bajada vertical r11 = true
+					mov r11, #1
+				.LFinSiElementoValido:
+			.LFinSiCero:
+			
+			sub r2, #1
+			b .LBucleColumnas
+		.LFinBucleColumnas:
 		
-		pop {pc}
+		sub r1, #1
+		b .LBucleFilas
+	.LFinBucleFilas:
+		
+		bl genera_elementos
+		@; Si ha habido una bajada de elemento o se han generado elementos entonces retorna cierto
+		orr r0, r11
+		pop {r1-r11,pc}
 
 
 
@@ -148,10 +209,151 @@ baja_verticales:
 @;		R0 = 1 indica que se ha realizado algún movimiento. 
 baja_laterales:
 
-		push {lr}
+		push {r1-r12,lr}
+		mov r11, #0			@; r11 = valor de retorno, por defecto es falso
+		mov r2, #ROWS-1		@; r2 = i = ROWS-1
 		
+	.LBucleFilas3:
+		@; while (i>0)
+		cmp r2, #0
+		ble .LFinBucleFilas3
+		@; r3 = j = COLUMNS-1
+		mov r3, #COLUMNS-1
+		.LBucleColumnas3:
+			@; while (j>=0)
+			cmp r3, #0
+			blt .LFinBucleColumnas3
+			@; r5 = matriz[i][j], r6 = *matriz[i][j]
+			mov r6, #COLUMNS
+			mla r6, r2, r6, r3
+			ldrb r5, [r4, r6]
+			.LSiCero3:
+				@; if (matriz[i][j] == 0)
+				tst r5, #0x7
+				bne .LFinSiCero3
+				
+				@; r0 = booleano indicando si el valor izquierdo es valido
+				@; r1 = booleano indicando si el valor derecho es valido
+				mov r0, #0
+				mov r1, #0
+				.LSiIzquierdoEsValido:
+					@; r1 = !limDerecho && esValorValido(valorDerecho)
+					cmp r3, #COLUMNS-1
+					bge .LSiDerechoEsValido
+					sub r8, r6, #COLUMNS-1
+					ldrb r7, [r4, r8]
+					mov r0, r7
+					bl es_valor_valido
+					mov r1, r0
+				.LSiDerechoEsValido:
+					@; r0 = !limIzquierdo && esValorValido(valorIzquierdo)
+					cmp r3, #0
+					ble .LFinEsValido
+					sub r8, r6, #COLUMNS+1
+					ldrb r7, [r4, r8]
+					mov r0, r7
+					bl es_valor_valido
+				.LFinEsValido:
+				
+				tst r0, r1
+				bne .LAmbosValidos
+				cmp r0, #1
+				beq .LIzquierdoValido
+				cmp r1, #1
+				beq .LDerechoValido
+				b .LNoValidos
+				
+				.LAmbosValidos:
+					mov r0, #2
+					bl mod_random
+					cmp r0, #0
+					subeq r8, r6, #COLUMNS+1	@; si r0 = 0 -> r8 = *valorIzquierdo
+					subne r8, r6, #COLUMNS-1	@; si r0 != 0 -> r8 = *valorDerecho
+					b .LFinValidos
+				.LIzquierdoValido:
+					sub r8, r6, #COLUMNS+1	@; r8 = *valorIzquierdo
+					b .LFinValidos
+				.LDerechoValido:
+					sub r8, r6, #COLUMNS-1	@; r8 = *valorDerecho
+					b .LFinValidos
+				.LFinValidos:
+					@; r7 = elemento seleccionado (Izquierdo o derecho)
+					ldrb r7, [r4, r8]
+					@; Bajo el elemento
+					and r12, r7, #0x7
+					sub r7, r12
+					add r5, r12
+					strb r5, [r4, r6]
+					strb r7, [r4, r8]
+					@; Exito, ha habido bajada
+					mov r11, #1
+				.LNoValidos:
+				
+			.LFinSiCero3:
+			sub r3, #1
+			b .LBucleColumnas3
+		.LFinBucleColumnas3:
+		sub r2, #1
+		b .LBucleFilas3
+	.LFinBucleFilas3:
 		
-		pop {pc}
+		bl genera_elementos
+		@; Si ha habido una bajada de elemento o se han generado elementos entonces retorna cierto
+		orr r0, r11
+		pop {r1-r12,pc}
+
+@; genera_elementos(mat): rutina para generar aleatoriamente el valor de los
+@;	elementos de las posiciones más altas de cada columna, sin tener en cuenta
+@;	los huecos, siempre y cuando sea un elemento vacío
+@;	Parámetros:
+@;		R4 = dirección base de la matriz de juego
+@;	Resultado:
+@;		R0 = 1 indica si ha generado algún valor. 
+genera_elementos:
+	push {r1-r6,lr}
+	mov r6, #0
+	mov r1, #0
+	mov r2, #0
+	.LBucleColumnasGeneraElementos:
+		@; while (r1<COLUMNS-1)
+		cmp r1, #COLUMNS
+		bge .LFinBucleColumnasGeneraElementos
+		@; Obtener el primer elemento de la columna
+		mov r3, #COLUMNS
+		mla r5, r2, r3, r1
+		ldrb r3, [r4, r5]
+		@; No tengo en cuenta los huecos
+		.LBuclePasaHueco:
+			cmp r2, #ROWS
+			bge .LFinBuclePasaHueco
+			cmp r3, #0xF
+			bne .LFinBuclePasaHueco
+			@; En caso de hueco obtengo el siguiente valor
+			add r5, #COLUMNS
+			ldrb r3, [r4, r5]
+			add r2, #1
+			b .LBuclePasaHueco
+		.LFinBuclePasaHueco:
+		@; Si es un elemento vacío lo cambio por un numero aleatorio
+		.LSiElementoVacio:
+			tst r3, #0x7
+			bne .LFinSiElementoVacio
+			@; Generar elemento random
+			mov r0, #6
+			bl mod_random
+			add r0, #1
+			@; Añado el elemento a la casilla, como es 0 solo tengo que sumarlo
+			add r3, r0
+			strb r3, [r4, r5]
+			@; Generado con exito
+			mov r6, #1
+		.LFinSiElementoVacio:
+		mov r2, #0
+		add r1, #1
+		b .LBucleColumnasGeneraElementos
+	.LFinBucleColumnasGeneraElementos:
+	mov r0, r6
+	pop {r1-r6,pc}
 
 
 
