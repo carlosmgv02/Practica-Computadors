@@ -142,23 +142,14 @@ int main(void)
 		if (!falling)			//////	SECCI�N DE DEPURACI�N	//////
 		{
 			swiWaitForVBlank();
-			scanKeys();
-			if (keysHeld() & KEY_B)		// forzar cambio de nivel
-			{	points = 0;
-				gelees = 0;					// superado
-				change = 1;
-			}
-			else if (keysHeld() & KEY_START)	
-			{	movements = 0;				// repetir
-				change = 1;
-			}
-			lapse++;
+			escribe_matriz_debug(matrix);
+			printf("\x1b[38m\x1b[3;10H (A >> Baja Elementos)");
+			printf("\x1b[38m\x1b[4;10H (B >> Repetir Mapa)");
 		}
+
 		if (change)				//////	SECCI�N CAMBIO DE NIVEL	//////
 		{
-			change = 0;
-			if (((points >= 0) && (gelees == 0))
-					|| (movements == 0) || !hay_combinacion(matrix))
+			if (ntest < NUMTESTS1E || !baja_elementos(matrix)) 
 			{
 				if ((points >= 0) && (gelees == 0))
 					printf("\x1b[39m\x1b[6;20H _SUPERADO_");
@@ -189,9 +180,7 @@ int main(void)
 					escribe_matriz(matrix);
 					change = 1;					// forzar nueva verificaci�n
 				}								// de combinaciones
-				borra_puntuaciones();
-			}
-			lapse = 0;
+				borra_puntuaciones();			}
 		}
 		else if (lapse >= 192)	//////	SECCI�N DE SUGERENCIAS	//////
 		{
