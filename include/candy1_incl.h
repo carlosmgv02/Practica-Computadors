@@ -14,7 +14,7 @@
 
 
 
-#define MAXLEVEL	8					// nivel màximo (niveles 0..MAXLEVEL-1)
+#define MAXLEVEL	15					// nivel màximo (niveles 0..MAXLEVEL-1)
 
 
 #define PUNT_SEC3	30					// puntos secuencia de 3 elementos

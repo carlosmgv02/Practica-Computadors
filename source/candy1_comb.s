@@ -385,7 +385,8 @@ sugiere_combinacion:
 			mov r2, #0
 			b .Lwhile
 
-.Lfinal:
+
+
 
 		pop {r2-r12,pc}
 
@@ -415,6 +416,7 @@ sugiere_combinacion:
 @;	Resultado:
 @;		vector de posiciones (x1,y1,x2,y2,x3,y3), devuelto por referencia
 generar_posiciones:
+
 		push {r0-r10,lr}
 			cmp r4,#0
 			bne .Next
@@ -624,6 +626,7 @@ detectar_orientacion:
 		
 		pop {r1-r7,pc}
 
+
 		@; r3 = num izquierda  r7 = num derecha
 		@; r4 = direccion de la matriz r5 = Columnas
 		@; r1 = i  r2 = j
@@ -651,5 +654,6 @@ detectar_orientacion:
 			strb r3,[r4,r6]
 		
 		pop {r1-r7,pc}
+
 
 .end

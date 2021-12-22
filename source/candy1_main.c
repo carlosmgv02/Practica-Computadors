@@ -6,10 +6,12 @@
 	(2ï¿½ curso de Grado de Ingenierï¿½a Informï¿½tica - ETSE - URV)
 	
 	Analista-programador: santiago.romani@urv.cat
+
 	Programador 1: Jialiang.chen@estudiants.urv.cat
 	Programador 2: Ismael.ruiz@estudiants.urv.cat
 	Programador 3: Joseluis.pueyo@estudiants.urv.cat
 	Programador 4: Carlos.martinezg@estudiants.urv.cat
+
 
 ------------------------------------------------------------------------------*/
 #include <nds.h>
@@ -45,9 +47,13 @@ void actualizar_contadores(int code)
 
 
 
-/* Programa principal: control general del juego */
+/* ---------------------------------------------------------------- */
+/* candy1_main.c : función principal main() para test de tarea 1A 	*/
+/*					(requiere tener implementada la tarea 1E)		*/
+/* ---------------------------------------------------------------- */
 int main(void)
 {
+
 	int lapse = 0;				// contador de tiempo sin actividad del usuario
 	int change = 0;				// =1 indica que ha habido cambios en la matriz
 	int falling = 0;			// =1 indica que los elementos estan bajando
@@ -57,13 +63,11 @@ int main(void)
 	seed32 = time(NULL);		// fijar semilla de nï¿½meros aleatorios
 	consoleDemoInit();			// inicializaciï¿½n de pantalla de texto
 	printf("candyNDS (version 1: texto)\n");
-	printf("\x1b[38m\x1b[1;0H  nivel:");
-	printf("\x1b[39m\x1b[2;0H puntos:");
-	printf("\x1b[38m\x1b[1;15H movimientos:");
-	printf("\x1b[37m\x1b[2;15H   gelatinas:");
-	actualizar_contadores(15);
 
-	do							// bucle principal del juego
+	printf("\x1b[38m\x1b[1;0H  nivel:");
+	actualizar_contadores(1);
+
+	do							// bucle principal de pruebas
 	{
 		if (initializing)		//////	SECCIï¿½N DE INICIALIZACIï¿½N	//////
 		{
@@ -188,7 +192,7 @@ int main(void)
 			}
 			lapse = 0;
 		}
-		/*else if (lapse >= 192)	//////	SECCIï¿½N DE SUGERENCIAS	//////
+		else if (lapse >= 192)	//////	SECCIï¿½N DE SUGERENCIAS	//////
 		{
 			if (lapse == 192) 		// a los 8 segundos sin actividad (aprox.)
 			{
@@ -203,7 +207,7 @@ int main(void)
 				muestra_elementos(matrix);
 				escribe_matriz(matrix);
 			}
-		}*/
+		}
 	} while (1);				// bucle infinito
 	
 	return(0);					// nunca retornarï¿½ del main
