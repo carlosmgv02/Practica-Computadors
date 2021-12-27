@@ -1,0 +1,30 @@
+// GRIT:  Fondo //
+
+gfx: bitmap (NDS), 16bpp, cprs: lz77
+area: (0,0)-(512,256)   [512, 256]
+obj: -
+map: -
+pal: -
+files:  Fondo.h   Fondo.s
+
+
+
+// GRIT:  Baldosas //
+
+gfx: tile, 8bpp, cprs: lz77
+area: (0,0)-(256,96)   [256, 96]
+meta: 4x4 tiles (32x32 px)
+map: -
+pal: 0-82 [82]					// color transparente: 52
+files:  Baldosas.h   Baldosas.s   
+
+
+
+// GRIT:  Sprites //
+
+gfx: tile, 8bpp, cprs: off
+area: (0,0)-(192,32)   [192, 32]
+meta: 4x4 tiles (32x32 px)
+map: -
+pal: 0-32 [32]					// color transparente: 31
+files:  Sprites.h   Sprites.s   
