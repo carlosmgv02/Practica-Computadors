@@ -164,15 +164,14 @@ elimina_secuencias:
 	.Lelisec_for1:
 		ldrb r6, [r1,r8]
 		cmp r6, #0
-		addls r8, #1
-		bls .Lelisec_for1
+		bls .Lelisec_for1aux
 		
 		
 		ldrb r7, [r0,r8]
 		mov r7, r7, lsr #1
 		and r7, r9, r7
 		strb r7,[r0,r8]
-		
+	.Lelisec_for1aux:
 		add r8, #1
 		cmp r8, #ROWS*COLUMNS
 		blo .Lelisec_for1
