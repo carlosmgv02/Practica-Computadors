@@ -313,8 +313,8 @@
 			cmp r0, #6
 			blt .LfiHor
 			mov r12, r7
-			mov r7, r3
-			mov r3, r12
+			mov r7, r9
+			mov r9, r12
 			bl swapH
 			mov r3, r7
 
@@ -345,6 +345,7 @@
 			cmp r0, #6
 			blt .LfiVer
 			mov r12, r7
+
 			mov r7, r3
 			mov r3, r12
 			@; r3=r7 i r7=r3
@@ -357,6 +358,7 @@
 		.LLastColumn:
 
 			add r1, #1		@;dir mem i+1
+
 			mla r6, r1, r5, r2
 			add r1, #-1		@;restauro valor i
 			add r10, r4, r6
@@ -383,13 +385,14 @@
 			cmp r0, #6
 			blt .LfiVer
 			mov r12, r7
-			mov r7, r3
-			mov r3, r12
+			mov r7, r9
+			mov r9, r12
 			bl swapV
+
 			mov r3, r7
 
 			b .Lfinal
-			
+
 			@;Última fila, zona naranja, solo swap horiz
 		.LLastRow:
 			cmp r2, #COLUMNS-1
@@ -421,6 +424,7 @@
 			cmp r0, #6
 			blt .LfiHor
 			mov r12, r7
+
 			mov r7, r3
 			mov r3, r12
 			bl swapH
@@ -450,6 +454,7 @@
 			bl swapH
 
 			b .Lsugerir
+
 
 		.LfiVer:		@;primer restauro les posicions de cada número
 
@@ -746,4 +751,6 @@
 			
 			pop {r1-r7,pc}
 
+
 	.end
+

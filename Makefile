@@ -5,10 +5,12 @@
 ifeq ($(strip $(DEVKITARM)),)
 $(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>devkitARM")
 endif
+export PATH	:=	$(DEVKITARM)/bin:$(PATH)
 
 ifeq ($(strip $(DEVKITPRO)),)
 $(error "Please set DEVKITPRO in your environment. export DEVKITPRO=<path to>devkitPRO")
 endif
+export PATH	:=	$(DEVKITPRO)/Insight/bin:$(PATH)
 
 ifeq ($(strip $(DESMUME)),)
 $(error "Please set DESMUME in your environment. export DESMUME=<path to>DeSmuME")
@@ -25,7 +27,7 @@ include $(DEVKITARM)/ds_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(shell basename $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	source  
+SOURCES		:=	source graphics
 INCLUDES	:=	include
 DATA		:=	data
 
@@ -34,7 +36,7 @@ DATA		:=	data
 #---------------------------------------------------------------------------------
 ARCH	:=	 -march=armv5te -mlittle-endian
 
-CFLAGS	:=	-Wall -O0 -gdwarf-3 \
+CFLAGS	:=	-Wall -g -O2 \
 			$(ARCH) -mtune=arm946e-s -fomit-frame-pointer -ffast-math
 				# -Wall						: enable all warnings
 				# -g						: enable debug info generation
@@ -115,7 +117,7 @@ run : $(TARGET).nds
 #---------------------------------------------------------------------------------
 debug : $(TARGET).nds $(TARGET).elf
 	@echo "testing $(TARGET).nds/.elf with DeSmuME_dev/Insight (gdb) through TCP port=1000"
-	/c/URV/bmde/DeSmuME_0.9.11_dev/DeSmuME_dev.exe --arm9gdb=1000 $(TARGET).nds &
+	@$(DESMUME)/DeSmuME_dev.exe --arm9gdb=1000 $(TARGET).nds &
 	@$(DEVKITPRO)/insight/bin/arm-eabi-insight $(TARGET).elf &
 
 #---------------------------------------------------------------------------------
