@@ -14,11 +14,11 @@
 	update_gel:	.hword	0			@;1 -> actualizar gelatinas
 		.global timer2_on
 	timer2_on:	.hword	0 			@;1 -> timer2 en marcha, 0 -> apagado
-	divFreq2: .hword	?			@;divisor de frecuencia para timer 2
+	divFreq2: .hword	@;?			@;divisor de frecuencia para timer 2
 
 
 
-@;-- .text. código de las rutinas ---
+@;-- .text. cï¿½digo de las rutinas ---
 .text	
 		.align 2
 		.arm
@@ -47,12 +47,12 @@ desactiva_timer2:
 
 @;TAREA 2Gd;
 @;rsi_timer2(); rutina de Servicio de Interrupciones del timer 2: recorre todas
-@;	las posiciones de la matriz 'mat_gel' y, en el caso que el código de
-@;	activación (ii) sea mayor que 0, decrementa dicho código en una unidad y
-@;	pasa a analizar la siguiente posición de la matriz 'mat_gel';
-@;	en el caso que ii sea igual a 0, incrementa su código de metabaldosa y
+@;	las posiciones de la matriz 'mat_gel' y, en el caso que el cï¿½digo de
+@;	activaciï¿½n (ii) sea mayor que 0, decrementa dicho cï¿½digo en una unidad y
+@;	pasa a analizar la siguiente posiciï¿½n de la matriz 'mat_gel';
+@;	en el caso que ii sea igual a 0, incrementa su cï¿½digo de metabaldosa y
 @;	activa una variable global 'update_gel' para que la RSI de VBlank actualize
-@;	la visualización de dicha metabaldosa.
+@;	la visualizaciï¿½n de dicha metabaldosa.
 	.global rsi_timer2
 rsi_timer2:
 		push {lr}

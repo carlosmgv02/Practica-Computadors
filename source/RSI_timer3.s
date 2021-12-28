@@ -17,11 +17,11 @@
 		.global offsetBG3X
 	offsetBG3X: .hword	0			@;desplazamiento vertical fondo 3
 	sentidBG3X:	.hword	0			@;sentido desplazamiento (0-> inc / 1-> dec)
-	divFreq3: .hword	?			@;divisor de frecuencia para timer 3
+	divFreq3: .hword	@;?			@;divisor de frecuencia para timer 3
 	
 
 
-@;-- .text. código de las rutinas ---
+@;-- .text. cï¿½digo de las rutinas ---
 .text	
 		.align 2
 		.arm
@@ -51,9 +51,9 @@ desactiva_timer3:
 @;TAREA 2Hd;
 @;rsi_timer3(); rutina de Servicio de Interrupciones del timer 3: incrementa o
 @;	decrementa el desplazamiento X del fondo 3 (sobre la variable global
-@;	'offsetBG3X'), según el sentido de desplazamiento actual; cuando el
-@;	desplazamiento llega a su límite, se cambia el sentido; además, se avisa
-@;	a la RSI de retroceso vertical para que realice la actualización del
+@;	'offsetBG3X'), segï¿½n el sentido de desplazamiento actual; cuando el
+@;	desplazamiento llega a su lï¿½mite, se cambia el sentido; ademï¿½s, se avisa
+@;	a la RSI de retroceso vertical para que realice la actualizaciï¿½n del
 @;	registro de control del fondo correspondiente.
 	.global rsi_timer3
 rsi_timer3:
