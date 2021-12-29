@@ -2,7 +2,7 @@
 
 	$ candy2_graf.c $
 
-	Funciones de inicialización de gráficos (ver "candy2_main.c")
+	Funciones de inicializaciï¿½n de grï¿½ficos (ver "candy2_main.c")
 
 	Analista-programador: santiago.romani@urv.cat
 	Programador tarea 2A: xxx.xxx@estudiants.urv.cat
@@ -18,7 +18,7 @@
 
 
 /* variables globales */
-int n_sprites = 0;					// número total de sprites creados
+int n_sprites = 0;					// nï¿½mero total de sprites creados
 elemento vect_elem[ROWS*COLUMNS];	// vector de elementos
 gelatina mat_gel[ROWS][COLUMNS];	// matriz de gelatinas
 
@@ -27,8 +27,8 @@ gelatina mat_gel[ROWS][COLUMNS];	// matriz de gelatinas
 // TAREA 2Ab
 /* genera_sprites(): inicializar los sprites con prioridad 1, creando la
 	estructura de datos y las entradas OAM de los sprites correspondiente a la
-	representación de los elementos de las casillas de la matriz que se pasa
-	por parámetro (independientemente de los códigos de gelatinas).*/
+	representaciï¿½n de los elementos de las casillas de la matriz que se pasa
+	por parï¿½metro (independientemente de los cï¿½digos de gelatinas).*/
 void genera_sprites(char mat[][COLUMNS])
 {
 
@@ -39,9 +39,9 @@ void genera_sprites(char mat[][COLUMNS])
 
 // TAREA 2Bb
 /* genera_mapa2(*mat): generar un mapa de baldosas como un tablero ajedrezado
-	de metabaldosas de 32x32 píxeles (4x4 baldosas), en las posiciones de la
+	de metabaldosas de 32x32 pï¿½xeles (4x4 baldosas), en las posiciones de la
 	matriz donde haya que visualizar elementos con o sin gelatina, bloques
-	sólidos o espacios vacíos sin elementos, excluyendo solo los huecos.*/
+	sï¿½lidos o espacios vacï¿½os sin elementos, excluyendo solo los huecos.*/
 void genera_mapa2(char mat[][COLUMNS])
 {
 
@@ -52,12 +52,12 @@ void genera_mapa2(char mat[][COLUMNS])
 
 // TAREA 2Cb
 /* genera_mapa1(*mat): generar un mapa de baldosas correspondiente a la
-	representación de las casillas de la matriz que se pasa por parámetro,
-	utilizando metabaldosas de 32x32 píxeles (4x4 baldosas), visualizando
-	las gelatinas simples y dobles y los bloques sólidos con las metabaldosas
+	representaciï¿½n de las casillas de la matriz que se pasa por parï¿½metro,
+	utilizando metabaldosas de 32x32 pï¿½xeles (4x4 baldosas), visualizando
+	las gelatinas simples y dobles y los bloques sï¿½lidos con las metabaldosas
 	correspondientes, (para las gelatinas, basta con utilizar la primera
-	metabaldosa de la animación); además, hay que inicializar la matriz de
-	control de la animación de las gelatinas mat_gel[][COLUMNS]. */
+	metabaldosa de la animaciï¿½n); ademï¿½s, hay que inicializar la matriz de
+	control de la animaciï¿½n de las gelatinas mat_gel[][COLUMNS]. */
 void genera_mapa1(char mat[][COLUMNS])
 {
 
@@ -68,9 +68,9 @@ void genera_mapa1(char mat[][COLUMNS])
 
 // TAREA 2Db
 /* ajusta_imagen3(int ibg): rotar 90 grados a la derecha la imagen del fondo
-	cuyo identificador se pasa por parámetro (fondo 3 del procesador gráfico
+	cuyo identificador se pasa por parï¿½metro (fondo 3 del procesador grï¿½fico
 	principal), y desplazarla para que se visualice en vertical a partir del
-	primer píxel de la pantalla. */
+	primer pï¿½xel de la pantalla. */
 void ajusta_imagen3(int ibg)
 {
 
@@ -81,8 +81,8 @@ void ajusta_imagen3(int ibg)
 
 
 // TAREAS 2Aa,2Ba,2Ca,2Da
-/* init_grafA(): inicializaciones generales del procesador gráfico principal,
-				reserva de bancos de memoria y carga de información gráfica,
+/* init_grafA(): inicializaciones generales del procesador grï¿½fico principal,
+				reserva de bancos de memoria y carga de informaciï¿½n grï¿½fica,
 				generando el fondo 3 y fijando la transparencia entre fondos.*/
 void init_grafA()
 {
@@ -104,7 +104,7 @@ void init_grafA()
 
 // Tarea 2Aa:
 	// cargar las baldosas de la variable SpritesTiles[] a partir de la
-	// dirección virtual de memoria gráfica para sprites, y cargar los colores
+	// direcciï¿½n virtual de memoria grï¿½fica para sprites, y cargar los colores
 	// de paleta asociados contenidos en la variable SpritesPal[]
 
 
@@ -121,7 +121,7 @@ void init_grafA()
 
 // Tareas 2Ba y 2Ca:
 	// descomprimir (y cargar) las baldosas de la variable BaldosasTiles[] a
-	// partir de la dirección de memoria correspondiente a los gráficos de
+	// partir de la direcciï¿½n de memoria correspondiente a los grï¿½ficos de
 	// las baldosas para los fondos 1 y 2, cargar los colores de paleta
 	// correspondientes contenidos en la variable BaldosasPal[]
 
@@ -132,11 +132,11 @@ void init_grafA()
 
 
 	// descomprimir (y cargar) la imagen de la variable FondoBitmap[] a partir
-	// de la dirección virtual de vídeo reservada para dicha imagen
+	// de la direcciï¿½n virtual de vï¿½deo reservada para dicha imagen
 
 
 
-	// fijar display A en pantalla inferior (táctil)
+	// fijar display A en pantalla inferior (tï¿½ctil)
 	lcdMainOnBottom();
 
 	/* transparencia fondos:
