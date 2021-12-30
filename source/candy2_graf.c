@@ -44,7 +44,24 @@ void genera_sprites(char mat[][COLUMNS])
 	sólidos o espacios vacíos sin elementos, excluyendo solo los huecos.*/
 void genera_mapa2(char mat[][COLUMNS])
 {
-
+	int i, j;
+	for ( i = 0; i < ROWS; i++) {
+	    for (j = 0; j < COLUMNS; j++) {
+		    
+			if (mat[i][j]!=15) {
+			    if((i+j)%2==0){
+					fija_metabaldosa((u16 *) 0x06000800,i,j,17);
+				}else{
+					fija_metabaldosa((u16 *) 0x06000800,i,j,18);
+				}
+			}else{
+				fija_metabaldosa((u16 *) 0x06000800,i,j,19);
+			}
+			
+		}
+		
+	}
+	
 
 }
 
@@ -60,6 +77,7 @@ void genera_mapa2(char mat[][COLUMNS])
 	control de la animación de las gelatinas mat_gel[][COLUMNS]. */
 void genera_mapa1(char mat[][COLUMNS])
 {
+
 
 
 }
@@ -95,7 +113,7 @@ void init_grafA()
 
 // Tareas 2Ba y 2Ca:
 	// reservar banco E para fondos 1 y 2, a partir de 0x06000000
-
+	vramSetBankE(VRAM_E_MAIN_BG);
 // Tarea 2Da:
 	// reservar bancos A y B para fondo 3, a partir de 0x06020000
 
@@ -111,12 +129,18 @@ void init_grafA()
 
 // Tarea 2Ba:
 	// inicializar el fondo 2 con prioridad 2
-
+	//inicializar el fondo 1 en modo Text (8bpp), con un tamaño del mapa de 32x32 baldosas, fijando la base de los gráficos de las baldosas y del mapa de baldosas donde se considere oportuno (pero sin colisiones con otros programadores/as),
+	bg2A = bgInit(2, BgType_Text8bpp, BgSize_T_256x256, 1, 1);
+	//fijar la prioridad del fondo 1 al nivel 0
+	bgSetPriority(bg2A, 2);
 
 
 // Tarea 2Ca:
 	//inicializar el fondo 1 con prioridad 0
-
+	//inicializar el fondo 1 en modo Text (8bpp), con un tamaño del mapa de 32x32 baldosas, fijando la base de los gráficos de las baldosas y del mapa de baldosas donde se considere oportuno (pero sin colisiones con otros programadores/as),
+	//bg1A = bgInit(1, BgType_Text8bpp, BgSize_T_256x256, 0, 1);
+	//fijar la prioridad del fondo 1 al nivel 0
+	//bgSetPriority(bg1A, 0);
 
 
 // Tareas 2Ba y 2Ca:
@@ -124,6 +148,10 @@ void init_grafA()
 	// partir de la dirección de memoria correspondiente a los gráficos de
 	// las baldosas para los fondos 1 y 2, cargar los colores de paleta
 	// correspondientes contenidos en la variable BaldosasPal[]
+	decompress(BaldosasTiles,bgGetGfxPtr(bg2A),LZ77Vram);
+	//decompress(BaldosasTiles,bgGetGfxPtr(bg1A),LZ77Vram);
+	dmaCopy(BaldosasPal, BG_PALETTE, sizeof(BaldosasPal));
+	
 
 
 	
