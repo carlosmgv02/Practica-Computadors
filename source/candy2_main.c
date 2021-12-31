@@ -8,7 +8,7 @@
 	Analista-programador principal: santiago.romani@urv.cat
 	Analista-programador auxiliar:  pere.millan@urv.cat
 	Programador 1: xxx.xxx@estudiants.urv.cat
-	Programador 2: yyy.yyy@estudiants.urv.cat
+	Programador 2: ismael.ruiz@estudiants.urv.cat
 	Programador 3: zzz.zzz@estudiants.urv.cat
 	Programador 4: uuu.uuu@estudiants.urv.cat
 
@@ -95,7 +95,7 @@ int main(void)
 	{
 		if (initializing)		//////	SECCIÓN DE INICIALIZACIÓN	//////
 		{
-			inicializa_matriz(matrix, 2);
+			inicializa_matriz(matrix, level);
 			genera_sprites(matrix);
 			genera_mapa1(matrix);
 			genera_mapa2(matrix);
@@ -236,7 +236,7 @@ int main(void)
 			}
 			lapse = 0;
 		}
-		else if (lapse >= 192)	//////	SECCIÓN DE SUGERENCIAS	//////
+		/*else if (lapse >= 192)	//////	SECCIÓN DE SUGERENCIAS	//////
 		{
 			if (lapse == 192) 		// a los 8 segundos sin actividad (aprox.)
 			{
@@ -248,7 +248,7 @@ int main(void)
 				reduce_elementos(matrix);
 				aumenta_elementos(matrix);
 			}
-		}
+		}*/
 	} while (1);				// bucle infinito
 	
 	return(0);					// nunca retornará del main

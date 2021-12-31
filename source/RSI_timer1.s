@@ -42,21 +42,21 @@ activa_timer1:
 		ldr r1, =escSen
 		strh r0, [r1]
 
-		cmp r0, #0
+		cmp r0, #0									@;si escSen es 0,  fijar la variable escFac  a 1,0 
 		bne .LFinal_activar_timer1
 		ldr r2, =escFac
 		mov r1, #1
-		mov r1, lsl #8
+		mov r1, r1, lsl #8							@; formato decimal de coma fija 0.8.8
 		strh r1, [r2]
 		mov r2, r1
-		bl SPR_fijarEscalado
-	.LFinal_activar_timer1:
+		bl SPR_fijarEscalado						@; actualizar el factor de escalado actual 
+	.LFinal_activar_timer1:							@; sobre los parámetros PA y PD del grupo 0
 		
-		mov r0, #0
+		mov r0, #0									@;  fijar la variable escNum a 0
 		ldr r1, =escNum
 		strh r0, [r1]
 		mov r0, #1
-		ldr r1, =timer1_on
+		ldr r1, =timer1_on							@; poner a 1  la variable  timer1_on
 		strh r0,[r1]
 		ldr r1, =divFreq1
 		ldrh r0, [r1]
@@ -78,10 +78,10 @@ desactiva_timer1:
 		
 		ldr r1, =0x04000106
 		ldrh r0, [r1]
-		bic r0, #0x80
+		bic r0, #0x80					@; desactivar el timer 1 a través de su registro E/S de control
 		strh r0, [r1]
 		mov r0, #0
-		ldr r1, =timer1_on
+		ldr r1, =timer1_on				@; poner a 0 la variable timer1_on.
 		strh r0, [r1]
 		
 		pop {r0-r1,pc}
@@ -95,10 +95,38 @@ desactiva_timer1:
 @;	se desactiva el timer1.
 	.global rsi_timer1
 rsi_timer1:
-		push {lr}
+		push {r0-r3,lr}
 		
+		ldr r1, =escNum
+		ldrh r0, [r1]
+		add r0, #1						@; incrementar la variable escNum
+		strh r0, [r1]
+		cmp r0, #32						@; si llega a 32  invocar a desactivar_timer1()
+		blhs desactiva_timer1
+		bhs .Lfin_timer1
 		
-		pop {pc}
+		ldr r1, =escSen
+		ldr r3, =escFac
+		ldrh r2, [r3]
+		ldrh r0, [r1]
+		
+		cmp r0, #0						@; incrementar o decrementar el factor de escalado
+		mov r3, #1
+		subeq r2, r3, lsl #8
+		addne r2, r3, lsl #8
+		
+		strh r2, [r3]
+		
+		mov r0, #0
+		mov r1, r2
+										@; actualizar el factor de escalado actual 
+		bl SPR_fijarEscalado			@; sobre los parámetros PA y PD del grupo 0
+		
+		ldr r1, =update_spr				@; activar la variable update_spr
+		mov r0, #1
+		strh r0, [r1]
+	.Lfin_timer1:	
+		pop {r0-r3,pc}
 
 
 
