@@ -16,7 +16,7 @@
 	update_spr:	.hword	0			@;1 -> actualizar sprites
 		.global timer0_on
 	timer0_on:	.hword	0 			@;1 -> timer0 en marcha, 0 -> apagado
-	divFreq0: .hword	@;?			@;divisor de frecuencia inicial para timer 0
+	divFreq0: .hword -9000			@;divisor de frecuencia inicial para timer 0
 
 
 @;-- .bss. variables globales no inicializadas ---
@@ -37,18 +37,49 @@
 @;Tarea 2H: actualiza el desplazamiento del fondo 3
 	.global rsi_vblank
 rsi_vblank:
-		push {lr}
+		push {r0-r7,lr}
 		
 @;Tareas 2Ea
 
 
 @;Tarea 2Ga
+	ldr r4,=update_gel
+	ldrh r5,[r4]
+	cmp r5,#0
+	beq .Lfin
+	mov r1,#0
+	ldr r7,=mat_gel
+	.LforCol:
+	mov r2,#0		@;r2=j(cols)
+	
+	.LforFil:
+	ldsb r3, [r7,#GEL_II]
+	cmp r3, #0
+	bne .LfiforCol
+	ldrb r3,[r7,#GEL_IM]
+	
+	mov r0,#0x06000000
+	bl fija_metabaldosa
+	
+	mov r6,#10
+	strb r6,[r7,#GEL_II]
 
+	.LfiforCol:
+	add r7,#GEL_TAM
+	add r2,#1
+	cmp r2,#COLUMNS
+	blt .LforFil
 
-@;Tarea 2Ha
-
-		
-		pop {pc}
+	.LfiforFil:
+	add r1,#1
+	cmp r1,#ROWS
+	blt .LforCol
+	mov r5,#0
+	strh r5,[r4]
+	
+	.Lfin:
+@;Tarea 2Ha		
+		pop {r0-r7,pc}
 
 
 

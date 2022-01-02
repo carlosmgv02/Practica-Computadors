@@ -29,17 +29,16 @@
 	.global activa_timer2
 activa_timer2:
 		push {r0-r2,lr}
-		ldr,=timer2_on
+		ldr r0,=timer2_on
 		mov r1, #1
 		strh r1, [r0]
 		ldr r0, =0x04000108
 		ldr r1,=divFreq2
 		ldrh r1,[r1]
 		strh r1,[r0]
-		@;ldr r2,=0x0400010A 	@;reg de control timer
-		@;ldr r3,[r2]
-		@;orr r3,r3,#0x80		@;activar bit 7 (start/stop)
-		@;strh r3,[r2]			@;actualizo valores
+		ldr r2,=0x0400010A 	@;reg de control timer
+		mov r1,#0x0C1		@;los otros bits no importan
+		strh r1, [r2]			
 		pop {r0-r2,pc}
 		
 
@@ -49,15 +48,13 @@ activa_timer2:
 	.global desactiva_timer2
 desactiva_timer2:
 		push {r0-r3,lr}
-		ldr,=timer2_on
+		ldr r0,=timer2_on
 		mov r1, #0
 		strh r1, [r0]
 		ldr r2,=0x0400010A 
-		mov r3, #0x00
+		mov r3, #0x0
 		strh r3,[r2]
 		pop {r0-r3,pc}
-
-
 
 @;TAREA 2Gd;
 @;rsi_timer2(); rutina de Servicio de Interrupciones del timer 2: recorre todas
@@ -69,10 +66,59 @@ desactiva_timer2:
 @;	la visualizaci�n de dicha metabaldosa.
 	.global rsi_timer2
 rsi_timer2:
-		push {lr}
+		push {r0-r6, lr}
 		
+		ldr r0, =mat_gel				
+		mov r1, #0						@; r1=filas
 		
-		pop {pc}
+	.LforFil:								
+		mov r2, #0						@; r2=cols
+		
+	.LforCol:								
+		ldsb r3, [r0, #GEL_II]			
+		cmp r3, #0						
+		blt .LfiForCol
+		bne .Ldecrease
+		ldrb r4, [r0, #GEL_IM]		
+		cmp r4, #7						
+		bls .LGelsimple
+		b .LGeldoble
+
+		.Ldecrease:
+		sub r3, #1						
+		strb r3, [r0, #GEL_II]		
+		b .LfiForCol						
+	
+	.LGeldoble:
+		cmp r4, #15						
+		moveq r4, #8					
+		addne r4, #1
+		b .Lupdate_gel	
+
+	.LGelsimple:
+		cmp r4, #7						
+		addne r4, #1					
+		moveq r4, #0
+					
+	.Lupdate_gel:
+		ldr r5, =update_gel
+		mov r6, #1
+		strh r6, [r5]			       
+		strb r4, [r0, #GEL_IM]			
+		
+	.LfiForCol:
+		add r0, #GEL_TAM
+		add r2, #1
+		cmp r2, #COLUMNS
+		bne .LforCol
+		
+	.LfiForFil:
+		add r1, #1	
+		cmp r1, #ROWS
+		bne .LforFil
+		
+	.Lfi:	
+		pop {r0-r6, pc}
 
 
 

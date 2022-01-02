@@ -60,7 +60,42 @@ void genera_mapa2(char mat[][COLUMNS])
 	control de la animaci�n de las gelatinas mat_gel[][COLUMNS]. */
 void genera_mapa1(char mat[][COLUMNS])
 {
+	int ii=0, im=0;
+	int i,j;
+	/**
+	 * Inicializamos todos los índices ii a -1 para que estén desactivados 
+	 * 
+	 */
+    for(i=0;i<ROWS;i++){
+        for(j=0;j<COLUMNS;j++){
+            mat_gel[i][j].ii=-1;
+        }
+    }
 
+    for(i=0; i<ROWS; i++){
+        for(j=0; j<COLUMNS; j++){
+            if(mat[i][j]!= 7|| mat[i][j]==15){
+                fija_metabaldosa((u16 *)0x06000000, i, j, 19);
+            }
+            if(mat[i][j]==7){
+                fija_metabaldosa((u16 *)0x06000000, i, j, 16);
+            }
+            if(mat[i][j]>=9 && mat[i][j]<=22 && mat[i][j]!=15){
+                if(mat[i][j]>=9&&mat[i][j]<=14){
+                    im=mod_random(7);
+                    fija_metabaldosa((u16 *)0x06000000, i, j, im);
+                }else{
+                    while(im<8){
+                        im=mod_random(15);	//im de gelatina doble >=8 && <=15
+                    }
+                    fija_metabaldosa((u16 *)0x06000000, i, j, im);
+                }
+                ii=mod_random(10);
+                mat_gel[i][j].ii=ii;
+                mat_gel[i][j].im=im;
+            }
+        }
+    }
 
 }
 
@@ -95,6 +130,7 @@ void init_grafA()
 
 // Tareas 2Ba y 2Ca:
 	// reservar banco E para fondos 1 y 2, a partir de 0x06000000
+	vramSetBankE(VRAM_E_MAIN_BG);
 
 // Tarea 2Da:
 	// reservar bancos A y B para fondo 3, a partir de 0x06020000
@@ -112,11 +148,12 @@ void init_grafA()
 // Tarea 2Ba:
 	// inicializar el fondo 2 con prioridad 2
 
-
+	
 
 // Tarea 2Ca:
 	//inicializar el fondo 1 con prioridad 0
-
+	bg1A = bgInit(1, BgType_Text8bpp, BgSize_T_256x256,0, 1);
+	bgSetPriority(bg1A,0);
 
 
 // Tareas 2Ba y 2Ca:
@@ -125,7 +162,8 @@ void init_grafA()
 	// las baldosas para los fondos 1 y 2, cargar los colores de paleta
 	// correspondientes contenidos en la variable BaldosasPal[]
 
-
+	decompress(BaldosasTiles,bgGetGfxPtr(bg1A), LZ77Vram);
+	dmaCopy(BaldosasPal, BG_PALETTE, sizeof(BaldosasPal));
 	
 // Tarea 2Da:
 	// inicializar el fondo 3 con prioridad 3
