@@ -1,9 +1,9 @@
 @;=                                                          	     	=
 @;=== RSI_timer0.s: rutinas para mover los elementos (sprites)		  ===
 @;=                                                           	    	=
-@;=== Programador tarea 2E: xxx.xxx@estudiants.urv.cat				  ===
-@;=== Programador tarea 2G: yyy.yyy@estudiants.urv.cat				  ===
-@;=== Programador tarea 2H: zzz.zzz@estudiants.urv.cat				  ===
+@;=== Programador tarea 2E: jialiang.chen@estudiants.urv.cat		  ===
+@;=== Programador tarea 2G: xxx.xxx@estudiants.urv.cat		  		  ===
+@;=== Programador tarea 2H: xxx.xxx@estudiants.urv.cat		 		  ===
 @;=                                                       	        	=
 
 .include "../include/candy2_incl.i"
@@ -16,7 +16,7 @@
 	update_spr:	.hword	0			@;1 -> actualizar sprites
 		.global timer0_on
 	timer0_on:	.hword	0 			@;1 -> timer0 en marcha, 0 -> apagado
-	divFreq0: .hword	?			@;divisor de frecuencia inicial para timer 0
+	divFreq0: .hword	0			@;divisor de frecuencia inicial para timer 0
 
 
 @;-- .bss. variables globales no inicializadas ---

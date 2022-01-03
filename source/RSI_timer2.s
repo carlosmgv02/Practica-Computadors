@@ -14,7 +14,7 @@
 	update_gel:	.hword	0			@;1 -> actualizar gelatinas
 		.global timer2_on
 	timer2_on:	.hword	0 			@;1 -> timer2 en marcha, 0 -> apagado
-	divFreq2: .hword	?			@;divisor de frecuencia para timer 2
+	divFreq2: .hword	0			@;divisor de frecuencia para timer 2
 
 
 
