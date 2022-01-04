@@ -31,25 +31,28 @@ gelatina mat_gel[ROWS][COLUMNS];	// matriz de gelatinas
 	por parámetro (independientemente de los códigos de gelatinas).*/
 void genera_sprites(char mat[][COLUMNS])
 {
-	SPR_ocultarSprites(128);
-	for (int i=0;i<ROWS*COLUMNS;i++){
-		vect_elem[i].ii=-1;							//desactivar sprites
-	}
-	n_sprites=0;
-	for (int i=0; i<ROWS;i++){
-		for (int j=0; j<COLUMNS;j++){
-			if (!((mat[i][j]==0)||(mat[i][j]==8)||(mat[i][j]==15)||(mat[i][j]==16))){ //asegurar que no es bloque vacio, hueco o bloques solidos
-				crea_elemento(mat[i][j], i, j);		//llamar la funcion
-				n_sprites++;						//actualizar numero de sprites
-			}
-		}
-	}
-	for (int i=0; i<n_sprites;i++){
-		SPR_fijarPrioridad(i, 1);					//fijar la prioridad de todos los sprites
-	}
-	//swiWaitForVBlank();
-	SPR_actualizarSprites(OAM, n_sprites);			//actualizar OAM con el num de sprites creados
-	
+    SPR_ocultarSprites(128);
+    for (int i=0;i<ROWS*COLUMNS;i++){
+        vect_elem[i].ii=-1;                            //desactivar sprites
+    }
+
+    for (int i=0; i<n_sprites;i++){
+        SPR_fijarPrioridad(i, 1);                    //fijar la prioridad de todos los sprites
+    }
+
+    n_sprites=0;
+    for (int i=0; i<ROWS;i++){
+        for (int j=0; j<COLUMNS;j++){
+            if (!((mat[i][j]==0)||(mat[i][j]==8)||(mat[i][j]==15)||(mat[i][j]==16))){ //asegurar que no es bloque vacio, hueco o bloques solidos
+                crea_elemento(mat[i][j], i, j);        //llamar la funcion
+                n_sprites++;                        //actualizar numero de sprites
+            }
+        }
+    }
+
+    swiWaitForVBlank();
+    SPR_actualizarSprites(OAM, 128);            //actualizar OAM con el num de sprites creados
+
 }
 
 
