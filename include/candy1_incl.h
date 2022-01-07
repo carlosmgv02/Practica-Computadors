@@ -18,6 +18,7 @@
 
 
 
+
 #define PUNT_SEC3	30					// puntos secuencia de 3 elementos
 #define PUNT_SEC4	60					// puntos secuencia de 4 elementos
 #define PUNT_SEC5	120					// puntos secuencia de 5 elementos

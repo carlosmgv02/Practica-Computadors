@@ -21,10 +21,10 @@
 		.align 2
 	escSen: .space	2				@;sentido de escalado (0-> dec, 1-> inc)
 	escFac: .space	2				@;factor actual de escalado
-	escNum: .space	2				@;número de variaciones del factor
+	escNum: .space	2				@;nï¿½mero de variaciones del factor
 
 
-@;-- .text. código de las rutinas ---
+@;-- .text. cï¿½digo de las rutinas ---
 .text	
 		.align 2
 		.arm
@@ -32,8 +32,8 @@
 
 @;TAREA 2Fb;
 @;activa_timer1(init); rutina para activar el timer 1, inicializando el sentido
-@;	de escalado según el parámetro init.
-@;	Parámetros:
+@;	de escalado segï¿½n el parï¿½metro init.
+@;	Parï¿½metros:
 @;		R0 = init;  valor a trasladar a la variable 'escSen' (0/1)
 	.global activa_timer1
 activa_timer1:
@@ -90,8 +90,8 @@ desactiva_timer1:
 
 @;TAREA 2Fd;
 @;rsi_timer1(); rutina de Servicio de Interrupciones del timer 1: incrementa el
-@;	número de escalados y, si es inferior a 32, actualiza factor de escalado
-@;	actual según el código de la variable 'escSen'; cuando se llega al máximo,
+@;	nï¿½mero de escalados y, si es inferior a 32, actualiza factor de escalado
+@;	actual segï¿½n el cï¿½digo de la variable 'escSen'; cuando se llega al mï¿½ximo,
 @;	se desactiva el timer1.
 	.global rsi_timer1
 rsi_timer1:

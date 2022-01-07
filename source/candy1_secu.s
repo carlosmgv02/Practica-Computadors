@@ -186,7 +186,7 @@ elimina_secuencias:
 		tst r4, r9
 		beq .LnoGelatina
 		
-		ldr r0, =0x06400000		
+		ldr r0, =0x06000000		
 		bl elimina_gelatina
 	.LnoGelatina:
 		mov r0, r1
