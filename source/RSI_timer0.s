@@ -57,7 +57,7 @@ rsi_vblank:
 @;Tarea 2Ha
 
 		
-		pop {pc}
+		pop {r0-r3, pc}
 
 
 
@@ -100,8 +100,7 @@ desactiva_timer0:
 		ldr r0, =timer0_on	
 		mov r1, #0x0	
 		strh r1, [r0]			@;guardar 0 en la var timer._on
-		
-		pop {r0, r1pc}
+		pop {r0-r1, pc}
 
 
 
@@ -116,21 +115,59 @@ desactiva_timer0:
 @;  el efecto de aceleración (con un límite).
 	.global rsi_timer0
 rsi_timer0:
-		push {lr}
-		ldr r3, =elemento
-		ldrh r2, [r3]
-		cmp r2, #0
-		ble .LfiServicioInterrupcionesTimer0
-		sub r2, #0x01
-		strh r2, [r3]			@; guardar ii
+		push {r0-r12, lr}
+		mov r0, #0			@;r0=i
+		ldr r4, =n_sprites
+		ldr r3, [r4]		@;r3=n_sprites (32bits)
+		ldr r4, =vect_elem	@;elemento actual (Direccion actual)
+		.LwhileRSITimer0:
+		cmp r0, r3			@;comparar 
+		bhs .LfiBucleWhileRSI0
+		ldrh r12, [r4]		@;r12=vect_elem (valor actual (16bits))
+		cmp r12, #-1
+		beq .LsiguientePosicion
+		cmp r12, #0
+		beq .LsiguientePosicion
+		sub r12, #1
+		strh r12, [r4]		@;decrementar y guardar ii
+		ldrh r1, [r4,#1]	@;r1=px
+		ldrh r2, [r4,#2]	@;r2=py
+		ldrh r5, [r4,#3]	@;r5=vx
+		ldrh r6, [r4,#4]	@;r6=vy
 		
-		add r3, #0x06
-		ldrh r2, [r3]
+		cmp r5, #0
+		addne r1, r5		@;px=px+vx
+		strneh r1, [r4,#1]	@;actualizar valor px
+		cmp r6, #0
+		addne r2, r6		@;py=py+vy
+		strneh r2, [r4,#2]	@;actualizar valor py
 		
+		bl SPR_moverSprite	@;actualizar sprites
 		
+		cmp r5,#0
+		bne .LseHaMovidoElemento
+		cmp r6, #0
+		beq .LnoSeHaMovidoElemento
+		.LseHaMovidoElemento:
+		ldr r7, =update_spr
+		ldrh r8, [r7]		@;valor de update_spr
+		mov r8, #0x01
+		strh r8, [r7]		@;activar update_spr
+		ldr r7, =divFreq0	
+		ldrh r9, [r7]		@;r9=divFreq0
+		add r9, #2000
+		strh r9, [r7]
+		b .LsiguientePosicion
+		.LnoSeHaMovidoElemento:
+		bl desactiva_timer0
 		
-		..LfiServicioInterrupcionesTimer0:
-		pop {pc}
+		.LsiguientePosicion:
+		add r4, #5			@;saltar al siguiente elemento
+		add r0, #1			@;i++
+		b .LwhileRSITimer0
+		.LfiBucleWhileRSI0:
+		.LfiServicioInterrupcionesTimer0:
+		pop {r0-r12, lr}
 
 
 
