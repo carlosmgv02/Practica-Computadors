@@ -174,9 +174,9 @@ elimina_secuencias:
 		bhs .Lfi_Elisec_for2
 		
 		mla r5, r1, r8, r2
-		ldrb r3, [r0,r5]
+		ldrb r3, [r7,r5]
 		cmp r3, #0
-		blo .Lelisec_foraux
+		beq .Lelisec_foraux
 		
 		ldrb r4, [r6,r5]
 		mov r10, r4, lsr #1
@@ -186,15 +186,15 @@ elimina_secuencias:
 		tst r4, r9
 		beq .LnoGelatina
 		
-		ldr r0, =0x06000800
+		ldr r0, =0x06400000		
 		bl elimina_gelatina
 	.LnoGelatina:
 		mov r0, r1
+		mov r3, r1
 		mov r1, r2
 		bl elimina_elemento
 		mov r2, r1
-		mov r1, r0
-
+		mov r1, r3
 	.Lelisec_foraux:
 		add r2, #1
 		b .Lelisec_for2
