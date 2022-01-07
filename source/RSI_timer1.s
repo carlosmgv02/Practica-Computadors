@@ -75,7 +75,6 @@ activa_timer1:
 desactiva_timer1:
 		push {r0-r1,lr}
 		
-		
 		ldr r1, =0x04000106
 		ldrh r0, [r1]
 		bic r0, #0x80					@; desactivar el timer 1 a través de su registro E/S de control
@@ -95,7 +94,7 @@ desactiva_timer1:
 @;	se desactiva el timer1.
 	.global rsi_timer1
 rsi_timer1:
-		push {r0-r3,lr}
+		push {r0-r4,lr}
 		
 		ldr r1, =escNum
 		ldrh r0, [r1]
@@ -111,9 +110,9 @@ rsi_timer1:
 		ldrh r0, [r1]
 		
 		cmp r0, #0						@; incrementar o decrementar el factor de escalado
-		mov r3, #1
-		subeq r2, r3, lsl #8
-		addne r2, r3, lsl #8
+		mov r4, #10
+		subne r2, r4
+		addeq r2, r4
 		
 		strh r2, [r3]
 		
@@ -126,7 +125,7 @@ rsi_timer1:
 		mov r0, #1
 		strh r0, [r1]
 	.Lfin_timer1:	
-		pop {r0-r3,pc}
+		pop {r0-r4,pc}
 
 
 

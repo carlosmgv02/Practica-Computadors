@@ -16,7 +16,7 @@
 	update_spr:	.hword	0			@;1 -> actualizar sprites
 		.global timer0_on
 	timer0_on:	.hword	0 			@;1 -> timer0 en marcha, 0 -> apagado
-	divFreq0: .hword -9000			@;divisor de frecuencia inicial para timer 0
+	divFreq0: .hword 	0			@;divisor de frecuencia inicial para timer 0
 
 
 @;-- .bss. variables globales no inicializadas ---

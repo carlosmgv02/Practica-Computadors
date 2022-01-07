@@ -31,7 +31,7 @@ gelatina mat_gel[ROWS][COLUMNS];	// matriz de gelatinas
 	por par�metro (independientemente de los c�digos de gelatinas).*/
 void genera_sprites(char mat[][COLUMNS])
 {
-	
+
 }
 
 
@@ -153,13 +153,10 @@ void init_grafA()
 	// reservar bancos A y B para fondo 3, a partir de 0x06020000
 
 
-
-
 // Tarea 2Aa:
 	// cargar las baldosas de la variable SpritesTiles[] a partir de la
 	// direcci�n virtual de memoria gr�fica para sprites, y cargar los colores
 	// de paleta asociados contenidos en la variable SpritesPal[]
-
 
 // Tarea 2Ba:
 	// inicializar el fondo 2 con prioridad 2
