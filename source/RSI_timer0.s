@@ -117,6 +117,7 @@ desactiva_timer0:
 rsi_timer0:
 		push {r0-r12, lr}
 		mov r0, #0			@;r0=i
+		mov r10, #0			@;booleano
 		ldr r4, =n_sprites
 		ldr r3, [r4]		@;r3=n_sprites (32bits)
 		ldr r4, =vect_elem	@;elemento actual (Direccion actual)
@@ -124,51 +125,40 @@ rsi_timer0:
 		cmp r0, r3			@;comparar 
 		bhs .LfiBucleWhileRSI0
 		ldrh r12, [r4]		@;r12=vect_elem (valor actual (16bits))
-		cmp r12, #-1
-		beq .LsiguientePosicion
 		cmp r12, #0
-		beq .LsiguientePosicion
+		ble .LsiguientePosicion
 		sub r12, #1
 		strh r12, [r4]		@;decrementar y guardar ii
-		ldrh r1, [r4,#1]	@;r1=px
-		ldrh r2, [r4,#2]	@;r2=py
-		ldrh r5, [r4,#3]	@;r5=vx
-		ldrh r6, [r4,#4]	@;r6=vy
-		
+		ldrh r1, [r4,#2]	@;r1=px
+		ldrh r2, [r4,#4]	@;r2=py
+		ldrh r5, [r4,#6]	@;r5=vx
+		ldrh r6, [r4,#8]	@;r6=vy
+
 		cmp r5, #0
 		addne r1, r5		@;px=px+vx
-		strneh r1, [r4,#1]	@;actualizar valor px
+		addne r10, #1		@;se ha movido
+		strneh r1, [r4,#2]	@;actualizar valor px
 		cmp r6, #0
 		addne r2, r6		@;py=py+vy
-		strneh r2, [r4,#2]	@;actualizar valor py
-		
+		addne r10, #1		@;se ha movido
+		strneh r2, [r4,#4]	@;actualizar valor py
 		bl SPR_moverSprite	@;actualizar sprites
-		
-		cmp r5,#0
-		bne .LseHaMovidoElemento
-		cmp r6, #0
-		beq .LnoSeHaMovidoElemento
-		.LseHaMovidoElemento:
-		ldr r7, =update_spr
-		ldrh r8, [r7]		@;valor de update_spr
-		mov r8, #0x01
-		strh r8, [r7]		@;activar update_spr
-		ldr r7, =divFreq0	
-		ldrh r9, [r7]		@;r9=divFreq0
-		add r9, #2000
-		strh r9, [r7]
-		b .LsiguientePosicion
-		.LnoSeHaMovidoElemento:
-		bl desactiva_timer0
-		
 		.LsiguientePosicion:
-		add r4, #5			@;saltar al siguiente elemento
+		add r4, #10			@;saltar al siguiente elemento
 		add r0, #1			@;i++
 		b .LwhileRSITimer0
 		.LfiBucleWhileRSI0:
+		cmp r10, #0
+		bleq desactiva_timer0
+		beq .LfiServicioInterrupcionesTimer0
 		.LfiServicioInterrupcionesTimer0:
+		ldr r0, =update_spr
+		ldrh r1, [r0]
+		mov r1, #1
+		strh r1, [r0]
+		ldr r0, =divFreq0
+		ldrh r1, [r0]
+		cmp r1, #-300
+		addle r1, #256		strleh r1, [r0]
 		pop {r0-r12, lr}
-
-
-
 .end
