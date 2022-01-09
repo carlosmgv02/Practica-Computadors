@@ -73,8 +73,10 @@ void genera_mapa1(char mat[][COLUMNS])
 	primer píxel de la pantalla. */
 void ajusta_imagen3(int ibg)
 {
-
-
+	bgSetCenter(ibg, 0, 0);
+	bgSetRotate(ibg, degreesToAngle(90));
+	bgScroll(ibg, 0, 0);
+	bgUpdate();
 }
 
 
@@ -98,8 +100,8 @@ void init_grafA()
 
 // Tarea 2Da:
 	// reservar bancos A y B para fondo 3, a partir de 0x06020000
-
-
+	vramSetBankA(VRAM_A_MAIN_BG_0x06020000);
+	vramSetBankB(VRAM_B_MAIN_BG_0x06040000);
 
 
 // Tarea 2Aa:
@@ -129,12 +131,13 @@ void init_grafA()
 	
 // Tarea 2Da:
 	// inicializar el fondo 3 con prioridad 3
-
-
+	bg3A = bgInit(3, BgType_Bmp16, BgSize_B16_512x256, 8, 0);
+	bgSetPriority(bg3A, 3);
+	
 	// descomprimir (y cargar) la imagen de la variable FondoBitmap[] a partir
 	// de la dirección virtual de vídeo reservada para dicha imagen
-
-
+	decompress(FondoBitmap, bgGetGfxPtr(bg3A), LZ77Vram);
+	//ajusta_imagen3(bg3A);
 
 	// fijar display A en pantalla inferior (táctil)
 	lcdMainOnBottom();
