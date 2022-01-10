@@ -22,28 +22,28 @@
 @;	Variables globales involucradas:
 @;		n_sprites :	n�mero de sprites creados
 @;		vect_elem :	vector de elementos (sprites)
-@;	Par�metros:
+@;	Parámetros:
 @;		R0 :	fila del elemento
 @;		R1 :	columna del elemento
 @;	Resultado:
-@;		R0 :	�ndice del elemento encontrado, o ROWS*COLUMNS 
+@;		R0 :	Índice del elemento encontrado, o ROWS*COLUMNS 
 	.global busca_elemento
 busca_elemento:
 		push {r2-r6,lr}
 		
 		ldr r6, =n_sprites
-		ldr r6, [r6]			@;R6 = n�mero de sprites creados
+		ldr r6, [r6]			@;R6 = número de sprites creados
 		mov r2, r1, lsl #5		@;R2 = px (columna * 32)
 		mov r3, r0, lsl #5		@;R3 = py (fila * 32)
-		mov r0, #0				@;R0 es �ndice de elementos
-		ldr r4, =vect_elem		@;R4 es direcci�n base del vector elementos
+		mov r0, #0				@;R0 es Índice de elementos
+		ldr r4, =vect_elem		@;R4 es dirección base del vector elementos
 	.Lbe_bucle:
 		ldsh r5, [r4, #ELE_II]
 		cmp r5, #-1
 		beq .Lbe_cont			@;continuar si vect_elem[i].ii == -1
 		ldsh r5, [r4, #ELE_PX]
 		cmp r5, r2
-		bne .Lbe_cont			@;continuar si vect_elem[i].px != posici�n px
+		bne .Lbe_cont			@;continuar si vect_elem[i].px != posición px
 		ldsh r5, [r4, #ELE_PY]
 		cmp r5, r3
 		beq .Lbe_finbucle		@;salir si vect_elem[i].py == posici�n py
@@ -53,7 +53,7 @@ busca_elemento:
 		add r0, #1				@;repetir para todos los sprites creados
 		cmp r0, r6
 		blo .Lbe_bucle
-		mov r0, #ROWS*COLUMNS	@;c�digo de no encontrado (>= n_sprites)
+		mov r0, #ROWS*COLUMNS	@;código de no encontrado (>= n_sprites)
 		
 	.Lbe_finbucle:
 		
@@ -62,12 +62,12 @@ busca_elemento:
 	
 @;crea_elemento(int tipo, int fil, int col);
 @;Rutina para crear un nuevo elemento de juego, buscando un sprite libre
-@;	(ii = -1) y asignandole el �ndice de baldosa correspondiente al tipo del
-@;	elemento que se pasa por par�metro, adem�s de la posici�n inicial seg�n la
+@;	(ii = -1) y asignandole el índice de baldosa correspondiente al tipo del
+@;	elemento que se pasa por parámetro, además de la posición inicial según la
 @;	fila y columna en la matriz de juego;
-@;	la rutina devuelve como resultado el �ndice del sprite/elemento que se ha
+@;	la rutina devuelve como resultado el índice del sprite/elemento que se ha
 @;	reservado, o bien el total de posiciones del tablero de juego (ROWS*COLUMNS)
-@;	si no ha encontrado ning�n espacio libre.
+@;	si no ha encontrado ningún espacio libre.
 @;	Variables globales involucradas:
 @;		vect_elem :	vector de elementos (sprites)
 @;	Par�metros:
@@ -75,18 +75,18 @@ busca_elemento:
 @;		R1 :	fila del elemento
 @;		R2 :	columna del elemento
 @;	Resultado:
-@;		R0 :	�ndice del elemento encontrado, o ROWS*COLUMNS 
+@;		R0 :	índice del elemento encontrado, o ROWS*COLUMNS 
 	.global crea_elemento
 crea_elemento:
 		push {r1-r5,lr}
 		
 		mov r3, r0					@;R3 = tipo de elemento
 	@;	int i = 0;
-		mov r0, #0					@;R0 es �ndice de elementos (i)
+		mov r0, #0					@;R0 es índice de elementos (i)
 		
 	@;	while ((vect_elem[i].ii != -1) && (i < ROWS*COLUMNS))
 	@;		i++;
-		ldr r4, =vect_elem			@;R4 es direcci�n base del vector elementos
+		ldr r4, =vect_elem			@;R4 es dirección base del vector elementos
 	.Lce_bucle:
 		ldsh r5, [r4, #ELE_II]
 		cmp r5, #-1
@@ -132,14 +132,14 @@ crea_elemento:
 
 @;elimina_elemento(int fil, int col);
 @;Rutina para eliminar un elemento de juego, a partir de sus coordenadas fila
-@;	y columna actuales; si se encuentra dicho elemento, se libera la posici�n
+@;	y columna actuales; si se encuentra dicho elemento, se libera la posición
 @;	del vector y se oculta el sprite asociado;
-@;	la rutina devuelve el �ndice del elemento eliminado, o bien el total de
+@;	la rutina devuelve el índice del elemento eliminado, o bien el total de
 @;	posiciones del tablero de juego (ROWS*COLUMNS) si no lo ha encontrado.
 @;	Variables globales involucradas:
-@;		n_sprites :	n�mero de sprites creados
+@;		n_sprites :	número de sprites creados
 @;		vect_elem :	vector de elementos (sprites)
-@;	Par�metros:
+@;	Parámetros:
 @;		R0 :	fila del elemento
 @;		R1 :	columna del elemento
 @;	Resultado:
@@ -170,21 +170,21 @@ elimina_elemento:
 
 
 @;activa_elemento(int fil, int col, int f2, int c2);
-@;Rutina para activar la animaci�n del movimiento de un elemento/sprite
-@;	a partir de sus coordenadas fila y columna actuales, as� como la posici�n
+@;Rutina para activar la animación del movimiento de un elemento/sprite
+@;	a partir de sus coordenadas fila y columna actuales, así como la posición
 @;	del tablero donde se tiene que mover dicho elemento;
-@;	la rutina devuelve el �ndice del elemento activado, o bien el total de
+@;	la rutina devuelve el índice del elemento activado, o bien el total de
 @;	posiciones del tablero de juego (ROWS*COLUMNS) si no lo ha encontrado.
 @;	Variables globales involucradas:
-@;		n_sprites :	n�mero de sprites creados
+@;		n_sprites :	número de sprites creados
 @;		vect_elem :	vector de elementos (sprites)
-@;	Par�metros:
+@;	Parámetros:
 @;		R0 :	fila del elemento
 @;		R1 :	columna del elemento
 @;		R2 :	fila destino
 @;		R3 :	columna destino
 @;	Resultado:
-@;		R0 :	�ndice del elemento encontrado, o ROWS*COLUMNS
+@;		R0 :	índice del elemento encontrado, o ROWS*COLUMNS
 	.global activa_elemento
 activa_elemento:
 		push {r1-r6,lr}
@@ -216,14 +216,14 @@ activa_elemento:
 
 
 @;activa_escalado(int fil, int col);
-@;Rutina para activar la animaci�n de escalado de un elemento/sprite
+@;Rutina para activar la animación de escalado de un elemento/sprite
 @;	a partir de sus coordenadas fila y columna actuales;
-@;	la rutina devuelve el �ndice del elemento activado, o bien el total de
+@;	la rutina devuelve el índice del elemento activado, o bien el total de
 @;	posiciones del tablero (ROWS*COLUMNS) si no lo ha encontrado.
 @;	Variables globales involucradas:
-@;		n_sprites :	n�mero de sprites creados
+@;		n_sprites :	número de sprites creados
 @;		vect_elem :	vector de elementos (sprites)
-@;	Par�metros:
+@;	Parámetros:
 @;		R0 :	fila del elemento
 @;		R1 :	columna del elemento
 @;	Resultado:
@@ -249,18 +249,18 @@ activa_escalado:
 
 
 @;desactiva_escalado(int fil, int col);
-@;Rutina para desactivar la animaci�n de escalado de un elemento/sprite
+@;Rutina para desactivar la animación de escalado de un elemento/sprite
 @;	a partir de sus coordenadas fila y columna actuales;
-@;	la rutina devuelve el �ndice del elemento activado, o bien el total de
+@;	la rutina devuelve elíndice del elemento activado, o bien el total de
 @;	posiciones del tablero (ROWS*COLUMNS) si no lo ha encontrado.
 @;	Variables globales involucradas:
-@;		n_sprites :	n�mero de sprites creados
+@;		n_sprites :	número de sprites creados
 @;		vect_elem :	vector de elementos (sprites)
-@;	Par�metros:
+@;	Parámetros:
 @;		R0 :	fila del elemento
 @;		R1 :	columna del elemento
 @;	Resultado:
-@;		R0 :	�ndice del elemento encontrado, o ROWS*COLUMNS
+@;		R0 :	índice del elemento encontrado, o ROWS*COLUMNS
 	.global desactiva_escalado
 desactiva_escalado:
 		push {lr}
@@ -282,15 +282,15 @@ desactiva_escalado:
 
 
 @;fija_metabaldosa(u16 * mapaddr, int fil, int col, int imeta);
-@;Rutina para guardar, en el mapa de baldosas cuya direcci�n base se pasa por
-@;	par�metro, los �ndices de las baldosas correspondientes a una metabaldosa
-@;	de MTROWS x MTCOLS (MTWIDTH x MTHEIGHT p�xeles), a partir de la posici�n
-@;	(fil, col) del espacio de juego y del �ndice de la metabaldosa.
-@;	Par�metros:
+@;Rutina para guardar, en el mapa de baldosas cuya dirección base se pasa por
+@;	parámetro, los índices de las baldosas correspondientes a una metabaldosa
+@;	de MTROWS x MTCOLS (MTWIDTH x MTHEIGHT p�xeles), a partir de la posición
+@;	(fil, col) del espacio de juego y del índice de la metabaldosa.
+@;	Parámetros:
 @;		R0 :	direcci�n base del mapa de baldosas
 @;		R1 :	fila del elemento
 @;		R2 :	columna del elemento
-@;		R3 :	�ndice de metabaldosa (imeta)
+@;		R3 :	índice de metabaldosa (imeta)
 	.global fija_metabaldosa
 fija_metabaldosa:
 		push {r1-r10, lr}
@@ -298,7 +298,7 @@ fija_metabaldosa:
 		mov r4, #MTOTAL
 		mul r5, r3, r4
 	@;	i_baldosa = imeta*MTOTAL;
-		mov r3, r5					@;R3 = �ndice inicial de baldosas simples
+		mov r3, r5					@;R3 = índice inicial de baldosas simples
 		mov r4, #MTROWS
 		mul r5, r1, r4
 		mov r1, r5					@;R1 = i*MTROWS
@@ -320,7 +320,7 @@ fija_metabaldosa:
 	@;			*(mapaddr + base_fila + j*MTCOLS + dc) = i_baldosa;
 		add r8, r2, r9				@;R8 = despl. de columna actual
 		add r8, r10					@;R8 = despl. de (fil,col) actual
-		mov r8, r8, lsl #1			@; 		* 2 bytes/posici�n
+		mov r8, r8, lsl #1			@; 		* 2 bytes/posición
 		strh r3, [r0, r8]			@;actualizar mapa de baldosas
 	@;			i_baldosa++;	
 		add r3, #1					@;aumentar �ndice de baldosa simple
@@ -337,7 +337,7 @@ fija_metabaldosa:
 
 @;elimina_gelatina(u16 * mapaddr, int fil, int col);
 @;Rutina para eliminar una gelatina del tablero de juego, a partir de la
-@;	direcci�n base del mapa de baldosas con el dibujo de las gelatinas, y
+@;	dirección base del mapa de baldosas con el dibujo de las gelatinas, y
 @;	de las coordenadas de fila y columna de la gelatina en la matriz de juego.
 @;	Variables globales involucradas:
 @;		mat_gel :	matriz de gelatinas

@@ -15,25 +15,25 @@
 
 /* variables globales */
 char mat_mar[ROWS][COLUMNS];	// matriz de marcas
-char pos_sug[6];				// posiciones sugerencia de combinaciÛn
+char pos_sug[6];				// posiciones sugerencia de combinaci√≥n
 char ele_sug[3];				// elementos de las posiciones sugeridas
 char texto[12];					// texto de puntuaciones
-int ult_tex = 0;				// ˙ltimo n˙mero de textos de puntuaciÛn
-int num_pun = 0;				// n˙mero de puntuaciones
+int ult_tex = 0;				// √∫ltimo n√∫mero de textos de puntuaci√≥n
+int num_pun = 0;				// n√∫mero de puntuaciones
 
 
 
 /* escribe_matriz_h(*mat, debug): escribe por pantalla el contenido de la matriz
 	usando secuencias 'escape' ("\x1b") de posicionamiento en fila y columna
 	"\x1b['fila';'columna'H", donde 'fila' es una coordenada entre 0 y 23,
-	y columna es una coordenada entre 0 y 31, y la posiciÛn (0,0) corresponde
-	a la casilla superior izquierda; adem·s, se usa la secuencia 'escape'
-	para cambiar el color del texto "\x1b['color'm", donde 'color' es un cÛdigo
-	de color de la librerÌa NDS;
+	y columna es una coordenada entre 0 y 31, y la posici√≥n (0,0) corresponde
+	a la casilla superior izquierda; adem√°s, se usa la secuencia 'escape'
+	para cambiar el color del texto "\x1b['color'm", donde 'color' es un c√≥digo
+	de color de la librer√≠a NDS;
  
-	Oct/2020: versiÛ adaptada per a debug/test *** pere.millan@urv.cat ***
-	Jul/2021: versiÛ hÌbrida -> amb par‡metre debug=0, visualitzaciÛ normal,
-						amb par‡metre debug=1, visualitzaciÛ per a depuraciÛ.
+	Oct/2020: versi√≥ adaptada per a debug/test *** pere.millan@urv.cat ***
+	Jul/2021: versi√≥ h√≠brida -> amb par√†metre debug=0, visualitzaci√≥ normal,
+						amb par√†metre debug=1, visualitzaci√≥ per a depuraci√≥.
 */
 void escribe_matriz_h(char mat[][COLUMNS], int debug)
 {
@@ -46,7 +46,7 @@ void escribe_matriz_h(char mat[][COLUMNS], int debug)
 			value = mat[i][j];				// obtiene el valor del elemento (i,j)
 			
 			if ((value == 0) || ((value & 7) == 7))
-				color = 39;						// color del "hueco", bloc sÚlid o buit (light white)
+				color = 39;						// color del "hueco", bloc s√≤lid o buit (light white)
 			else if (value >= 16)
 				color = 38;						// el color de la gelatina doble (dark grey)
 			else if (value >= 8)
@@ -60,7 +60,7 @@ void escribe_matriz_h(char mat[][COLUMNS], int debug)
 			if (value == 255)
 				printf("_ ");					// sugerir
 			else if ((value == 7) && debug)
-				printf("# ");					// bloc sÚlid en mode debug
+				printf("# ");					// bloc s√≤lid en mode debug
 			else if ((value == 15) && debug)
 				printf(": ");					// hueco en mode debug
 			else if (value != 15)
@@ -71,15 +71,15 @@ void escribe_matriz_h(char mat[][COLUMNS], int debug)
 	}
 }
 
-/* escribe_matriz(*mat): llama a escribe_matriz_h() con visualizaciÛn normal
+/* escribe_matriz(*mat): llama a escribe_matriz_h() con visualizaci√≥n normal
 */
 void escribe_matriz(char mat[][COLUMNS])
 {
 	escribe_matriz_h(mat, 0);
 }
 
-/* escribe_matriz_debug(*mat): llama a escribe_matriz_h() con visualizaciÛn
-	para depuraciÛn de errores
+/* escribe_matriz_debug(*mat): llama a escribe_matriz_h() con visualizaci√≥n
+	para depuraci√≥n de errores
 */
 void escribe_matriz_debug(char mat[][COLUMNS])
 {
@@ -111,13 +111,13 @@ int contar_gelatinas(char mat[][COLUMNS])
 }
 
 
-/* retardo(dsecs): pone el programa en pausa durante el n˙mero de dÈcimas de
-	segundo que indica el par·metro */
+/* retardo(dsecs): pone el programa en pausa durante el n√∫mero de d√©cimas de
+	segundo que indica el par√°metro */
 void retardo(int dsecs)
 {	
 	int i, j;
 	
-	for (i = 0; i < dsecs; i++)		// por cada dÈcima de segundo
+	for (i = 0; i < dsecs; i++)		// por cada d√©cima de segundo
 		for (j = 0; j < 6; j++)		// esperar 6 retrocesos verticales
 			swiWaitForVBlank();
 }
@@ -125,32 +125,32 @@ void retardo(int dsecs)
 
 
 /* procesar_touchscreen(*mat, *p1X, *p1Y, *p2X, *p2Y): procesa la entrada de la
-	pantalla t·ctil esperando a que el usuario realice un movimiento de
-	intercambio v·lido, desde una posiciÛn de la matriz (p1X,p1Y) hasta otra
-	posiciÛn (p2X,p2Y), que deber· ser contig¸a en horizontal y en vertical,
-	y deber· contener elementos (con o sin gelatinas), por lo tanto, se
-	excluyen las posiciones vacÌas, los bloques sÛlidos y los huecos;
+	pantalla t√°ctil esperando a que el usuario realice un movimiento de
+	intercambio v√°lido, desde una posici√≥n de la matriz (p1X,p1Y) hasta otra
+	posici√≥n (p2X,p2Y), que deber√° ser contig√ºa en horizontal y en vertical,
+	y deber√° contener elementos (con o sin gelatinas), por lo tanto, se
+	excluyen las posiciones vac√≠as, los bloques s√≥lidos y los huecos;
 	devuele cierto (1) si el movimiento es posible, o falso (0) si no lo es,
-	adem·s de cargar las coordenadas en las variables que se han pasado por
+	adem√°s de cargar las coordenadas en las variables que se han pasado por
 	referencia */
 int procesar_touchscreen(char mat[][COLUMNS],
 									int *p1X, int *p1Y, int *p2X, int *p2Y)
 {
-	touchPosition	posXY;			// variables de detecciÛn de pulsaciones
+	touchPosition	posXY;			// variables de detecci√≥n de pulsaciones
 	int v1X, v1Y, v2X, v2Y;
 	char temp1, temp2;
 
 	swiWaitForVBlank();			
 	scanKeys();
-	if (keysHeld() & KEY_TOUCH)			// detecta pulsaciÛn en pantalla
+	if (keysHeld() & KEY_TOUCH)			// detecta pulsaci√≥n en pantalla
 	{
-		touchRead(&posXY);					// capta posiciÛn (x,y), en pÌxeles
-		v1X = posXY.px / MTWIDTH;			// convierte a posiciÛn matriz
+		touchRead(&posXY);					// capta posici√≥n (x,y), en p√≠xeles
+		v1X = posXY.px / MTWIDTH;			// convierte a posici√≥n matriz
 		v1Y = posXY.py / MTHEIGHT;
 		v2X = v1X;							// igualar coordenadas segunda pos.
 		v2Y = v1Y;
-		while ((keysHeld() & KEY_TOUCH) &&		// mientras se estÈ tocando
-				(v2X == v1X) && (v2Y == v1Y))	// y no hay nueva posiciÛn
+		while ((keysHeld() & KEY_TOUCH) &&		// mientras se est√© tocando
+				(v2X == v1X) && (v2Y == v1Y))	// y no hay nueva posici√≥n
 		{
 			touchRead(&posXY);					// capta nuevas posiciones
 			v2X = posXY.px / MTWIDTH;
@@ -158,7 +158,7 @@ int procesar_touchscreen(char mat[][COLUMNS],
 			swiWaitForVBlank();
 			scanKeys();
 		}
-		if ((v2X != v1X) || (v2Y != v1Y))		// si tenemos nueva posiciÛn
+		if ((v2X != v1X) || (v2Y != v1Y))		// si tenemos nueva posici√≥n
 		{
 			if (v2X > v1X) v2X = v1X + 1;		// limitar rango movimientos
 			else if (v2X < v1X) v2X = v1X - 1;
@@ -181,11 +181,11 @@ int procesar_touchscreen(char mat[][COLUMNS],
 }
 
 
-/* oculta_elementos(*mat): almacena los cÛdigos de los 3 elementos contenidos
+/* oculta_elementos(*mat): almacena los c√≥digos de los 3 elementos contenidos
 	en las posiciones de la matriz de juego indicadas en el vector 'pos_sug[6]'
-	dentro del vector 'ele_sug[3]', para luego colocar un cÛdigo -1 en dichas
-	posiciones, lo cual provocar· que la funciÛn escribe_matriz_h() muestre
-	un car·cter '_' (elemento oculto) */
+	dentro del vector 'ele_sug[3]', para luego colocar un c√≥digo -1 en dichas
+	posiciones, lo cual provocar√° que la funci√≥n escribe_matriz_h() muestre
+	un car√°cter '_' (elemento oculto) */
 void oculta_elementos(char mat[][COLUMNS])
 {
 	int i,x,y;
@@ -200,9 +200,9 @@ void oculta_elementos(char mat[][COLUMNS])
 }
 
 
-/* muestra_elementos(*mat): restablece los cÛdigos de los 3 elementos contenidos
+/* muestra_elementos(*mat): restablece los c√≥digos de los 3 elementos contenidos
 	en las posiciones de la matriz de juego indicadas en el vector 'pos_sug[6]',
-	seg˙n el contenido del vector 'ele_sug[3]' */
+	seg√∫n el contenido del vector 'ele_sug[3]' */
 void muestra_elementos(char mat[][COLUMNS])
 {
 	int i,x,y;
@@ -217,11 +217,11 @@ void muestra_elementos(char mat[][COLUMNS])
 
 
 
-/* reduce_elementos(*mat): almacena los cÛdigos de los 3 elementos contenidos
+/* reduce_elementos(*mat): almacena los c√≥digos de los 3 elementos contenidos
 	en las posiciones de la matriz de juego indicadas en el vector 'pos_sug[6]'
-	dentro del vector 'ele_sug[3]', para luego colocar un cÛdigo -1 en dichas
-	posiciones, lo cual provocar· que la funciÛn escribe_matriz_h() muestre
-	un car·cter '_' (elemento oculto);
+	dentro del vector 'ele_sug[3]', para luego colocar un c√≥digo -1 en dichas
+	posiciones, lo cual provocar√° que la funci√≥n escribe_matriz_h() muestre
+	un car√°cter '_' (elemento oculto);
 	inicia el timer 1 para reproducir el efecto de escalado de los sprites. */
 void reduce_elementos(char mat[][COLUMNS])
 {
@@ -241,9 +241,9 @@ void reduce_elementos(char mat[][COLUMNS])
 }
 
 
-/* aumenta_elementos(*mat): restablece los cÛdigos de los 3 elementos contenidos
+/* aumenta_elementos(*mat): restablece los c√≥digos de los 3 elementos contenidos
 	en las posiciones de la matriz de juego indicadas en el vector 'pos_sug[6]',
-	seg˙n el contenido del vector 'ele_sug[3]';
+	seg√∫n el contenido del vector 'ele_sug[3]';
 	inicia el timer 1 para reproducir el efecto de escalado de los sprites. */
 void aumenta_elementos(char mat[][COLUMNS])
 {
@@ -264,8 +264,8 @@ void aumenta_elementos(char mat[][COLUMNS])
 
 
 /* intercambia_posiciones(*mat, p1X, p1Y, p2X, p2Y): intercambia los
-	elementos de las dos posiciones de la matriz que indican los par·metros,
-	conservando las caracterÌsticas de gelatina en las posiciones originales;
+	elementos de las dos posiciones de la matriz que indican los par√°metros,
+	conservando las caracter√≠sticas de gelatina en las posiciones originales;
 	inicia el timer 0 para reproducir el movimiento de los sprites.*/
 void intercambia_posiciones(char mat[][COLUMNS],
 											int p1X, int p1Y, int p2X, int p2Y)
@@ -284,12 +284,12 @@ void intercambia_posiciones(char mat[][COLUMNS],
 
 
 
-/* detectar_combo(nhor,nver,mensaje): funciÛn auxiliar para detectar el tipo
-	de combinaciÛn de secuencias hallado con la funciÛn marca_combos(), a partir
-	de las longitudes m·ximas de secuencia horizontal 'nhor' y vertical 'nver',
+/* detectar_combo(nhor,nver,mensaje): funci√≥n auxiliar para detectar el tipo
+	de combinaci√≥n de secuencias hallado con la funci√≥n marca_combos(), a partir
+	de las longitudes m√°ximas de secuencia horizontal 'nhor' y vertical 'nver',
 	generando el mensaje correspondiente sobre el string pasado por referencia
 	'mensaje' y devolviendo como resultado los puntos correspondientes a la
-	combinaciÛn. */
+	combinaci√≥n. */
 int detectar_combo(int nhor, int nver, char mensaje[])
 {
 	int combi = 0;
@@ -331,7 +331,7 @@ int detectar_combo(int nhor, int nver, char mensaje[])
 			puntos = PUNT_SEC5;
 		}
 	}
-	else					// en caso de combinaciÛn de secuencias,
+	else					// en caso de combinaci√≥n de secuencias,
 	{						// calcular la suma de sec. horizontal y vertical
 		combi = nhor + nver - 1;	// restando 1 por la casilla de coincidencia
 		if (combi == 5)
@@ -355,12 +355,12 @@ int detectar_combo(int nhor, int nver, char mensaje[])
 
 
 /* calcula_puntuaciones(*mar): detecta los conjuntos de secuencias indicados en
-	la matriz que se pasa por par·metro, donde cada conjunto se marca con un
-	identificador ˙nico, y obtiene el tipo de combinaciÛn (combo) que corres-
-	ponde a la longitud m·xima de secuencias en horizontal y en vertical; dicho
+	la matriz que se pasa por par√°metro, donde cada conjunto se marca con un
+	identificador √∫nico, y obtiene el tipo de combinaci√≥n (combo) que corres-
+	ponde a la longitud m√°xima de secuencias en horizontal y en vertical; dicho
 	tipo se muestra por pantalla (para cada conjunto) y se devuelve el total
-	de puntos acumulados como resultado de la funciÛn.
- ATENCI”N:	esta funciÛn requiere de la correcta implementaciÛn de la rutina
+	de puntos acumulados como resultado de la funci√≥n.
+ ATENCI√ìN:	esta funci√≥n requiere de la correcta implementaci√≥n de la rutina
 			cuenta_repeticiones(), ubicada en el fichero "candy1_move.s" */
 int calcula_puntuaciones(char mar[][COLUMNS])
 {
@@ -381,7 +381,7 @@ int calcula_puntuaciones(char mar[][COLUMNS])
 					do
 					{						// busca combinaciones verticales
 						m = cuenta_repeticiones(mar, i, j+k, 1);
-						if (m > nv) nv = m;			// actualizar m·ximo vert.
+						if (m > nv) nv = m;			// actualizar m√°ximo vert.
 						for (n=0; n<m; n++)
 							mar[i+n][j+k] = 0;		// eliminar marca
 						k++;
@@ -394,10 +394,10 @@ int calcula_puntuaciones(char mar[][COLUMNS])
 					do
 					{			// busca combinaciones horizontales 
 						m = cuenta_repeticiones(mar, i+k, j, 0);
-							// tambiÈn hacia atr·s (Oeste), para comb. cruzadas
+							// tambi√©n hacia atr√°s (Oeste), para comb. cruzadas
 						m2 = cuenta_repeticiones(mar, i+k, j, 2) - 1;
 						m += m2;					// m = longitud total sec.
-						if (m > nh) nh = m;			// actualizar m·ximo hor.
+						if (m > nh) nh = m;			// actualizar m√°ximo hor.
 						for (n=0; n<m; n++)
 							mar[i+k][j+n-m2] = 0;	// eliminar marca
 						k++;
@@ -416,7 +416,7 @@ int calcula_puntuaciones(char mar[][COLUMNS])
 
 
 /* borra_puntuaciones(): permite eliminar los textos de puntuaciones anteriores,
-	adem·s de poner el contador 'ult_tex' a cero e incrementar el contador
+	adem√°s de poner el contador 'ult_tex' a cero e incrementar el contador
 	'num_pun' */
 void borra_puntuaciones()
 {
@@ -431,7 +431,7 @@ void borra_puntuaciones()
 
 
 /* copia_mapa(*mat, num_map): copia directamente el contenido del mapa de
-	configuraciÛn 'num_map' (almacenado en la variable global 'mapas') dentro
+	configuraci√≥n 'num_map' (almacenado en la variable global 'mapas') dentro
 	de la matriz de juego 'mat', que se pasa por referencia */
 void copia_mapa(char mat[][COLUMNS], int num_map)
 {
