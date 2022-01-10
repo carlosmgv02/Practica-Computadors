@@ -236,6 +236,7 @@ push {r0-r12, lr}
 	mov r0, r12
 @;	carregar mat_recomb[x][y]
 	mov r5, #COLUMNS
+	push {r9, r10}			@;guardar valores de rand_i y rand_j
 	mla r11, r9, r5, r10	@;r11=(rand_i * COLUMNS)+rand_j
 	ldrb r9, [r7, r11]		@;r9=mat_recomb1[x][y]
 @;	comprovar que mat_recomb1[x][y] no sigui 0
@@ -245,6 +246,7 @@ push {r0-r12, lr}
 	ldrb r10, [r8, r4]		@;r10=mat_recomb2[i][j]
 	orr r5, r9, r10			@;r5= mat_recomb1[x][y] or mat_recomb2[i][j]
 	strb r5, [r8, r4]		@;guardar recomb1 en recomb2
+	pop {r9, r10}			@;restaurar valores de rand_i y rand_j
 @;-------------------------------------------------------
 @; CUENTA REPETICIONES
 @;-------------------------------------------------------
@@ -267,6 +269,14 @@ push {r0-r12, lr}
 @;-------------------------------------------------------
 @; FI CUENTA REPETICIONES
 @;-------------------------------------------------------
+push {r0-r3}				@;funcion 2Ia
+	mov r0, r1
+	mov r1, r2
+	mov r2, r9
+	mov r3, r10				@;cargar parametros.
+	bl activa_elemento
+pop {r0-r4}					@;devolver los valores iniciales
+
 	mov r5, #0x00
 	strb r5, [r7, r11]		@;posar a 0 el lloc d'on hem tret el valor
 .Lendif2:
