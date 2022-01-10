@@ -5,10 +5,10 @@
 	Funciones de inicializaciï¿½n de grï¿½ficos (ver "candy2_main.c")
 
 	Analista-programador: santiago.romani@urv.cat
-	Programador tarea 2A: xxx.xxx@estudiants.urv.cat
-	Programador tarea 2B: yyy.yyy@estudiants.urv.cat
+	Programador tarea 2A: jialiang.chen@estudiants.urv.cat
+	Programador tarea 2B: ismael.ruiz@estudiants.urv.cat
 	Programador tarea 2C: zzz.zzz@estudiants.urv.cat
-	Programador tarea 2D: uuu.uuu@estudiants.urv.cat
+	Programador tarea 2D: ismael.ruiz@estudiants.urv.cat
 
 ------------------------------------------------------------------------------*/
 #include <nds.h>
@@ -31,8 +31,27 @@ gelatina mat_gel[ROWS][COLUMNS];	// matriz de gelatinas
 	por parï¿½metro (independientemente de los cï¿½digos de gelatinas).*/
 void genera_sprites(char mat[][COLUMNS])
 {
+    SPR_ocultarSprites(128);
+    for (int i=0;i<ROWS*COLUMNS;i++){
+        vect_elem[i].ii=-1;                            //desactivar sprites
+    }
 
+    for (int i=0; i<n_sprites;i++){
+        SPR_fijarPrioridad(i, 1);                    //fijar la prioridad de todos los sprites
+    }
 
+    n_sprites=0;
+    for (int i=0; i<ROWS;i++){
+        for (int j=0; j<COLUMNS;j++){
+            if (!((mat[i][j]==0)||(mat[i][j]==8)||(mat[i][j]==15)||(mat[i][j]==16))){ //asegurar que no es bloque vacio, hueco o bloques solidos
+                crea_elemento(mat[i][j]&0x7, i, j);        //llamar la funcion
+                n_sprites++;                        //actualizar numero de sprites
+            }
+        }
+    }
+
+    swiWaitForVBlank();
+    SPR_actualizarSprites(OAM, 128);            //actualizar OAM con el num de sprites creados
 }
 
 
@@ -44,7 +63,24 @@ void genera_sprites(char mat[][COLUMNS])
 	sï¿½lidos o espacios vacï¿½os sin elementos, excluyendo solo los huecos.*/
 void genera_mapa2(char mat[][COLUMNS])
 {
-
+	int i, j;
+	for ( i = 0; i < ROWS; i++) {
+	    for (j = 0; j < COLUMNS; j++) {
+		    
+			if (mat[i][j]!=15) {
+			    if((i+j)%2==0){
+					fija_metabaldosa((u16 *) 0x06000800,i,j,17);
+				}else{
+					fija_metabaldosa((u16 *) 0x06000800,i,j,18);
+				}
+			}else{
+				fija_metabaldosa((u16 *) 0x06000800,i,j,19);
+			}
+			
+		}
+		
+	}
+	
 
 }
 
@@ -97,6 +133,7 @@ void genera_mapa1(char mat[][COLUMNS])
         }
     }
 
+
 }
 
 
@@ -108,8 +145,10 @@ void genera_mapa1(char mat[][COLUMNS])
 	primer pï¿½xel de la pantalla. */
 void ajusta_imagen3(int ibg)
 {
-
-
+	bgSetCenter(ibg,255,128);
+	bgSetRotate(ibg,degreesToAngle(-90));
+	bgSetScroll(ibg,128,0);
+	bgUpdate();
 }
 
 
@@ -119,6 +158,7 @@ void ajusta_imagen3(int ibg)
 /* init_grafA(): inicializaciones generales del procesador grï¿½fico principal,
 				reserva de bancos de memoria y carga de informaciï¿½n grï¿½fica,
 				generando el fondo 3 y fijando la transparencia entre fondos.*/
+				
 void init_grafA()
 {
 	int bg1A, bg2A, bg3A;
@@ -127,33 +167,39 @@ void init_grafA()
 	
 // Tarea 2Aa:
 	// reservar banco F para sprites, a partir de 0x06400000
-
+	vramSetBankF(VRAM_F_MAIN_SPRITE_0x06400000);				
 // Tareas 2Ba y 2Ca:
 	// reservar banco E para fondos 1 y 2, a partir de 0x06000000
 	vramSetBankE(VRAM_E_MAIN_BG);
-
+	
 // Tarea 2Da:
 	// reservar bancos A y B para fondo 3, a partir de 0x06020000
-
-
-
+	vramSetBankA(VRAM_A_MAIN_BG_0x06020000);
+	vramSetBankB(VRAM_B_MAIN_BG_0x06040000);
 
 // Tarea 2Aa:
 	// cargar las baldosas de la variable SpritesTiles[] a partir de la
 	// direcciï¿½n virtual de memoria grï¿½fica para sprites, y cargar los colores
 	// de paleta asociados contenidos en la variable SpritesPal[]
-
-
+	dmaCopy(SpritesTiles, SPRITE_GFX, sizeof(SpritesTiles));	//SpriteTiles es la variable, y para el tamaño se usa sizeof
+	dmaCopy(SpritesPal, SPRITE_PALETTE, sizeof(SpritesPal));	
+	
 
 // Tarea 2Ba:
 	// inicializar el fondo 2 con prioridad 2
 
-	
+	//inicializar el fondo 1 en modo Text (8bpp), con un tamaño del mapa de 32x32 baldosas, fijando la base de los gráficos de las baldosas y del mapa de baldosas donde se considere oportuno (pero sin colisiones con otros programadores/as),
+	bg2A = bgInit(2, BgType_Text8bpp, BgSize_T_256x256, 1, 1);
+	//fijar la prioridad del fondo 1 al nivel 0
+	bgSetPriority(bg2A, 2);
+
 
 // Tarea 2Ca:
 	//inicializar el fondo 1 con prioridad 0
+	//inicializar el fondo 1 en modo Text (8bpp), con un tamaño del mapa de 32x32 baldosas, fijando la base de los gráficos de las baldosas y del mapa de baldosas donde se considere oportuno (pero sin colisiones con otros programadores/as),
 	bg1A = bgInit(1, BgType_Text8bpp, BgSize_T_256x256,0, 1);
 	bgSetPriority(bg1A,0);
+
 
 
 // Tareas 2Ba y 2Ca:
@@ -161,17 +207,20 @@ void init_grafA()
 	// partir de la direcciï¿½n de memoria correspondiente a los grï¿½ficos de
 	// las baldosas para los fondos 1 y 2, cargar los colores de paleta
 	// correspondientes contenidos en la variable BaldosasPal[]
-
+	decompress(BaldosasTiles,bgGetGfxPtr(bg2A),LZ77Vram);
 	decompress(BaldosasTiles,bgGetGfxPtr(bg1A), LZ77Vram);
 	dmaCopy(BaldosasPal, BG_PALETTE, sizeof(BaldosasPal));
+
 	
 // Tarea 2Da:
 	// inicializar el fondo 3 con prioridad 3
-
+	bg3A = bgInit(3, BgType_Bmp16 ,BgSize_B16_512x256,8,0);
+	bgSetPriority(bg3A,3);
 
 	// descomprimir (y cargar) la imagen de la variable FondoBitmap[] a partir
 	// de la direcciï¿½n virtual de vï¿½deo reservada para dicha imagen
-
+	decompress(FondoBitmap,bgGetGfxPtr(bg3A),LZ77Vram);
+	ajusta_imagen3(3);
 
 
 	// fijar display A en pantalla inferior (tï¿½ctil)
