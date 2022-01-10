@@ -14,7 +14,8 @@
 
 
 
-#define MAXLEVEL	8					// nivel màximo (niveles 0..MAXLEVEL-1)
+#define MAXLEVEL	9					// nivel màximo (niveles 0..MAXLEVEL-1)
+
 
 
 
