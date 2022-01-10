@@ -1,9 +1,9 @@
 @;=                                                          	     	=
 @;=== RSI_timer0.s: rutinas para mover los elementos (sprites)		  ===
 @;=                                                           	    	=
-@;=== Programador tarea 2E: xxx.xxx@estudiants.urv.cat				  ===
-@;=== Programador tarea 2G: yyy.yyy@estudiants.urv.cat				  ===
-@;=== Programador tarea 2H: zzz.zzz@estudiants.urv.cat				  ===
+@;=== Programador tarea 2E: jialiang.chen@estudiants.urv.cat		  ===
+@;=== Programador tarea 2G: xxx.xxx@estudiants.urv.cat		  		  ===
+@;=== Programador tarea 2H: xxx.xxx@estudiants.urv.cat		 		  ===
 @;=                                                       	        	=
 
 .include "../include/candy2_incl.i"
@@ -16,8 +16,8 @@
 	update_spr:	.hword	0			@;1 -> actualizar sprites
 		.global timer0_on
 	timer0_on:	.hword	0 			@;1 -> timer0 en marcha, 0 -> apagado
-	divFreq0: .hword	?			@;divisor de frecuencia inicial para timer 0
-
+	divFreq0: .hword	-5727		@;divisor de frecuencia inicial para timer 0
+									@;pdf pág 35
 
 @;-- .bss. variables globales no inicializadas ---
 .bss
@@ -37,18 +37,27 @@
 @;Tarea 2H: actualiza el desplazamiento del fondo 3
 	.global rsi_vblank
 rsi_vblank:
-		push {lr}
+		push {r0-r3, lr}
 		
 @;Tareas 2Ea
-
-
+	ldr r3, =update_spr 
+	ldrh r1, [r3]			@;r1= update_spr
+	cmp r1, #0x01
+	bne .LfinalRSI
+	mov r0, #0x07000000		@;parámetro base , es decir, el OAM(PDF pág 30)
+	ldr r2, =n_sprites		@;Límite de sprites
+	ldr r1, [r2]
+	bl SPR_actualizarSprites@;Llamada a la funcion
+	mov r0, #0x00
+	strh r0, [r3]			@;guardar 0 en update_spr
+	.LfinalRSI:
 @;Tarea 2Ga
 
 
 @;Tarea 2Ha
 
 		
-		pop {pc}
+		pop {r0-r3, pc}
 
 
 
@@ -60,20 +69,38 @@ rsi_vblank:
 @;		R0 = init; si 1, restablecer divisor de frecuencia original 'divFreq0'
 	.global activa_timer0
 activa_timer0:
-		push {lr}
+		push {r0-r3, lr}
+		cmp r0, #0x00
+		beq .LfinalActivarTimer0 @; ignorar si init=0
+		ldr r0, =divFreq0		@;cargar var
+		ldrh r1, [r0]
+		ldr r2, =divF0
+		strh r1, [r2]			@;copiar divFreq0 a divF0
+		ldr r3, =0x04000100		@;cargar reg de data de timer0PDF pag 37)
+		strh r1, [r3]
+		.LfinalActivarTimer0:	@;llamada a funcion
+		ldr r0, =timer0_on		
+		mov r1, #0x01
+		strh r1, [r0]
+		ldr r0, =0x04000102		@;cargar reg de control de timer0
+		mov r1, #0b11000001		@;definir los bits (pág 37)
+		strh r1, [r0]			@;activar el timer e interrupciones
 		
 		
-		pop {pc}
-
+		pop {r0-r3, pc}
 
 @;TAREA 2Ec;
 @;desactiva_timer0(); rutina para desactivar el timer 0.
 	.global desactiva_timer0
 desactiva_timer0:
-		push {lr}
-		
-		
-		pop {pc}
+		push {r0-r1, lr}
+		ldr r0, =0x04000102		@;cargar reg de control
+		mov r1, #0b01000001		@;poner el bit 7 a 0 (desactivar)
+		strh r1, [r0]			@;guardar el registro
+		ldr r0, =timer0_on	
+		mov r1, #0x0	
+		strh r1, [r0]			@;guardar 0 en la var timer._on
+		pop {r0-r1, pc}
 
 
 
@@ -88,11 +115,50 @@ desactiva_timer0:
 @;  el efecto de aceleración (con un límite).
 	.global rsi_timer0
 rsi_timer0:
-		push {lr}
-		
-		
-		pop {pc}
+		push {r0-r12, lr}
+		mov r0, #0			@;r0=i
+		mov r10, #0			@;booleano
+		ldr r4, =n_sprites
+		ldr r3, [r4]		@;r3=n_sprites (32bits)
+		ldr r4, =vect_elem	@;elemento actual (Direccion actual)
+		.LwhileRSITimer0:
+		cmp r0, r3			@;comparar 
+		bhs .LfiBucleWhileRSI0
+		ldrh r12, [r4]		@;r12=vect_elem (valor actual (16bits))
+		cmp r12, #0
+		ble .LsiguientePosicion
+		sub r12, #1
+		strh r12, [r4]		@;decrementar y guardar ii
+		ldrh r1, [r4,#2]	@;r1=px
+		ldrh r2, [r4,#4]	@;r2=py
+		ldrh r5, [r4,#6]	@;r5=vx
+		ldrh r6, [r4,#8]	@;r6=vy
 
-
-
+		cmp r5, #0
+		addne r1, r5		@;px=px+vx
+		addne r10, #1		@;se ha movido
+		strneh r1, [r4,#2]	@;actualizar valor px
+		cmp r6, #0
+		addne r2, r6		@;py=py+vy
+		addne r10, #1		@;se ha movido
+		strneh r2, [r4,#4]	@;actualizar valor py
+		bl SPR_moverSprite	@;actualizar sprites
+		.LsiguientePosicion:
+		add r4, #10			@;saltar al siguiente elemento
+		add r0, #1			@;i++
+		b .LwhileRSITimer0
+		.LfiBucleWhileRSI0:
+		cmp r10, #0
+		bleq desactiva_timer0
+		beq .LfiServicioInterrupcionesTimer0
+		.LfiServicioInterrupcionesTimer0:
+		ldr r0, =update_spr
+		ldrh r1, [r0]
+		mov r1, #1
+		strh r1, [r0]
+		ldr r0, =divFreq0
+		ldrh r1, [r0]
+		cmp r1, #-300
+		addle r1, #256		strleh r1, [r0]
+		pop {r0-r12, lr}
 .end
