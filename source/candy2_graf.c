@@ -125,7 +125,12 @@ void genera_mapa1(char mat[][COLUMNS])
 	primer p�xel de la pantalla. */
 void ajusta_imagen3(int ibg)
 {
-
+	
+	bgSetCenter(ibg,255,128);
+	bgSetRotate(ibg,degreesToAngle(-90));
+	bgSetScroll(ibg,128,0);
+	bgUpdate();
+	
 
 }
 
@@ -151,7 +156,8 @@ void init_grafA()
 	
 // Tarea 2Da:
 	// reservar bancos A y B para fondo 3, a partir de 0x06020000
-
+	vramSetBankA(VRAM_A_MAIN_BG_0x06020000);
+	vramSetBankB(VRAM_B_MAIN_BG_0x06040000);
 
 // Tarea 2Aa:
 	// cargar las baldosas de la variable SpritesTiles[] a partir de la
@@ -183,18 +189,17 @@ void init_grafA()
 	decompress(BaldosasTiles,bgGetGfxPtr(bg2A),LZ77Vram);
 	decompress(BaldosasTiles,bgGetGfxPtr(bg1A), LZ77Vram);
 	dmaCopy(BaldosasPal, BG_PALETTE, sizeof(BaldosasPal));
-	
-
-	decompress(BaldosasTiles,bgGetGfxPtr(bg1A), LZ77Vram);
 
 	
 // Tarea 2Da:
 	// inicializar el fondo 3 con prioridad 3
-
+	bg3A = bgInit(3, BgType_Bmp16 ,BgSize_B16_512x256,8,0);
+	bgSetPriority(bg3A,3);
 
 	// descomprimir (y cargar) la imagen de la variable FondoBitmap[] a partir
 	// de la direcci�n virtual de v�deo reservada para dicha imagen
-
+	decompress(FondoBitmap,bgGetGfxPtr(bg3A),LZ77Vram);
+	ajusta_imagen3(3);
 
 
 	// fijar display A en pantalla inferior (t�ctil)

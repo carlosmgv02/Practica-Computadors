@@ -3,7 +3,7 @@
 @;=                                                           	    	=
 @;=== Programador tarea 2E: xxx.xxx@estudiants.urv.cat				  ===
 @;=== Programador tarea 2G: yyy.yyy@estudiants.urv.cat				  ===
-@;=== Programador tarea 2H: zzz.zzz@estudiants.urv.cat				  ===
+@;=== Programador tarea 2H: ismael.ruiz@estudiants.urv.cat				  ===
 @;=                                                       	        	=
 
 .include "../include/candy2_incl.i"
@@ -16,7 +16,7 @@
 	update_spr:	.hword	0			@;1 -> actualizar sprites
 		.global timer0_on
 	timer0_on:	.hword	0 			@;1 -> timer0 en marcha, 0 -> apagado
-	divFreq0: .hword 	0			@;divisor de frecuencia inicial para timer 0
+	divFreq0: .hword 	-5728			@;divisor de frecuencia inicial para timer 0
 
 
 @;-- .bss. variables globales no inicializadas ---
@@ -78,7 +78,24 @@ rsi_vblank:
 	strh r5,[r4]
 	
 	.Lfin:
-@;Tarea 2Ha		
+@;Tarea 2Ha	
+	
+	ldr r1, =update_bg3
+	ldrh r0, [r1]
+	cmp r0, #0
+	beq .Lfinal_vBlank3
+	
+	ldr r2, =offsetBG3X
+	ldrh r0, [r2]
+	mov r0, r0, lsl #8
+	ldr r2, =0x04000038
+	str r0, [r2]
+	mov r0, #0
+	strh r0, [r1]
+	
+	.Lfinal_vBlank3:
+
+	
 		pop {r0-r7,pc}
 
 
