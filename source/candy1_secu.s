@@ -145,7 +145,7 @@ hay_secuencia:
 @;		R1 = dirección de la matriz de marcas
 	.global elimina_secuencias
 elimina_secuencias:
-		push {r6-r9, lr}
+		push {r0-r9, lr}
 		
 		mov r6, #0
 		mov r8, #0				@;R8 es desplazamiento posiciones matriz
@@ -160,31 +160,51 @@ elimina_secuencias:
 		
 		mov r9, #0x18   @;mascara
 		
-		mov r8, #0
+		mov r6, r0
+		mov r7, r1
+		mov r1, #0
+		mov r8, #COLUMNS
+		
 	.Lelisec_for1:
-		ldrb r6, [r1,r8]
-		cmp r6, #0
-		bls .Lelisec_for1aux
+		cmp r1, #ROWS
+		bhs .Lfi_Elisec_for1
+		mov r2, #0
+	.Lelisec_for2:
+		cmp r2, #COLUMNS
+		bhs .Lfi_Elisec_for2
+		
+		mla r5, r1, r8, r2
+		ldrb r3, [r7,r5]
+		cmp r3, #0
+		beq .Lelisec_foraux
+		
+		ldrb r4, [r6,r5]
+		mov r10, r4, lsr #1
+		and r10, r9, r10
+		strb r10,[r6,r5]
+		
+		tst r4, r9
+		beq .LnoGelatina
+		
+		ldr r0, =0x06000000		
+		bl elimina_gelatina
+	.LnoGelatina:
+		mov r0, r1
+		mov r3, r1
+		mov r1, r2
+		bl elimina_elemento
+		mov r2, r1
+		mov r1, r3
+	.Lelisec_foraux:
+		add r2, #1
+		b .Lelisec_for2
+	.Lfi_Elisec_for2:
+		add r1, #1
+		b .Lelisec_for1
+	.Lfi_Elisec_for1:
 		
 		
-		ldrb r7, [r0,r8]
-		mov r7, r7, lsr #1
-		and r7, r9, r7
-		strb r7,[r0,r8]
-	.Lelisec_for1aux:
-		add r8, #1
-		cmp r8, #ROWS*COLUMNS
-		blo .Lelisec_for1
-		
-	
-
-@; ATENCIÓN: FALTA CÓDIGO PARA ELIMINAR SECUENCIAS MARCADAS Y GELATINAS
-
-
-	
-
-		
-		pop {r6-r9, pc}
+		pop {r0-r9, pc}
 
 	
 @;:::RUTINAS DE SOPORTE:::
