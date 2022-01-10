@@ -5,10 +5,10 @@
 	Funciones de inicializaciï¿½n de grï¿½ficos (ver "candy2_main.c")
 
 	Analista-programador: santiago.romani@urv.cat
-	Programador tarea 2A: xxx.xxx@estudiants.urv.cat
+	Programador tarea 2A: jialiang.chen@estudiants.urv.cat
 	Programador tarea 2B: ismael.ruiz@estudiants.urv.cat
 	Programador tarea 2C: zzz.zzz@estudiants.urv.cat
-	Programador tarea 2D: uuu.uuu@estudiants.urv.cat
+	Programador tarea 2D: ismael.ruiz@estudiants.urv.cat
 
 ------------------------------------------------------------------------------*/
 #include <nds.h>
@@ -31,7 +31,27 @@ gelatina mat_gel[ROWS][COLUMNS];	// matriz de gelatinas
 	por parï¿½metro (independientemente de los cï¿½digos de gelatinas).*/
 void genera_sprites(char mat[][COLUMNS])
 {
+    SPR_ocultarSprites(128);
+    for (int i=0;i<ROWS*COLUMNS;i++){
+        vect_elem[i].ii=-1;                            //desactivar sprites
+    }
 
+    for (int i=0; i<n_sprites;i++){
+        SPR_fijarPrioridad(i, 1);                    //fijar la prioridad de todos los sprites
+    }
+
+    n_sprites=0;
+    for (int i=0; i<ROWS;i++){
+        for (int j=0; j<COLUMNS;j++){
+            if (!((mat[i][j]==0)||(mat[i][j]==8)||(mat[i][j]==15)||(mat[i][j]==16))){ //asegurar que no es bloque vacio, hueco o bloques solidos
+                crea_elemento(mat[i][j]&0x7, i, j);        //llamar la funcion
+                n_sprites++;                        //actualizar numero de sprites
+            }
+        }
+    }
+
+    swiWaitForVBlank();
+    SPR_actualizarSprites(OAM, 128);            //actualizar OAM con el num de sprites creados
 }
 
 
@@ -125,13 +145,10 @@ void genera_mapa1(char mat[][COLUMNS])
 	primer pï¿½xel de la pantalla. */
 void ajusta_imagen3(int ibg)
 {
-	
 	bgSetCenter(ibg,255,128);
 	bgSetRotate(ibg,degreesToAngle(-90));
 	bgSetScroll(ibg,128,0);
 	bgUpdate();
-	
-
 }
 
 
@@ -141,6 +158,7 @@ void ajusta_imagen3(int ibg)
 /* init_grafA(): inicializaciones generales del procesador grï¿½fico principal,
 				reserva de bancos de memoria y carga de informaciï¿½n grï¿½fica,
 				generando el fondo 3 y fijando la transparencia entre fondos.*/
+				
 void init_grafA()
 {
 	int bg1A, bg2A, bg3A;
@@ -149,7 +167,7 @@ void init_grafA()
 	
 // Tarea 2Aa:
 	// reservar banco F para sprites, a partir de 0x06400000
-
+	vramSetBankF(VRAM_F_MAIN_SPRITE_0x06400000);				
 // Tareas 2Ba y 2Ca:
 	// reservar banco E para fondos 1 y 2, a partir de 0x06000000
 	vramSetBankE(VRAM_E_MAIN_BG);
@@ -163,6 +181,9 @@ void init_grafA()
 	// cargar las baldosas de la variable SpritesTiles[] a partir de la
 	// direcciï¿½n virtual de memoria grï¿½fica para sprites, y cargar los colores
 	// de paleta asociados contenidos en la variable SpritesPal[]
+	dmaCopy(SpritesTiles, SPRITE_GFX, sizeof(SpritesTiles));	//SpriteTiles es la variable, y para el tamaño se usa sizeof
+	dmaCopy(SpritesPal, SPRITE_PALETTE, sizeof(SpritesPal));	
+	
 
 // Tarea 2Ba:
 	// inicializar el fondo 2 con prioridad 2

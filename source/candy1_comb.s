@@ -22,8 +22,7 @@
 	@;		R0 = direcci�n base de la matriz de juego
 	@;	Resultado:
 	@;		R0 = 1 si hay una secuencia, 0 en otro caso
-	@; USO DE REGISTROS
-	@;		R1 = i
+	@; USO DE REGISTROSº
 	@;		R2 = j
 	@;		R3 = matriz[i][j]
 	@;		R4 = posicion actual
