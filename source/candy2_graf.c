@@ -44,7 +44,7 @@ void genera_sprites(char mat[][COLUMNS])
     for (int i=0; i<ROWS;i++){
         for (int j=0; j<COLUMNS;j++){
             if (!((mat[i][j]==0)||(mat[i][j]==8)||(mat[i][j]==15)||(mat[i][j]==16))){ //asegurar que no es bloque vacio, hueco o bloques solidos
-                crea_elemento(mat[i][j], i, j);        //llamar la funcion
+                crea_elemento(mat[i][j]&0x7, i, j);        //llamar la funcion
                 n_sprites++;                        //actualizar numero de sprites
             }
         }
