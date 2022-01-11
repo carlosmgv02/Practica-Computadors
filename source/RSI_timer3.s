@@ -1,7 +1,7 @@
 @;=                                                          	     	=
 @;=== RSI_timer3.s: rutinas para desplazar el fondo 3 (imagen bitmap) ===
 @;=                                                           	    	=
-@;=== Programador tarea 2H: xxx.xxx@estudiants.urv.cat				  ===
+@;=== Programador tarea 2H: joseluis.pueyo@estudiants.urv.cat				  ===
 @;=                                                       	        	=
 
 .include "../include/candy2_incl.i"
