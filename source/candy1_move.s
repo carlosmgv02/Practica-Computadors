@@ -381,19 +381,19 @@ genera_elementos:
 				strb r3, [r5]
 				@; Generado con exito
 				
-				push {r0,r1}
-				mov r0, r3
-				mov r1, #-1
-				@; r2 -> columna
-				bl crea_elemento
-				pop {r0,r1}
+				;push {r0,r1}
+				;mov r0, r3
+				;mov r1, #-1
+				;@; r2 -> columna
+				;bl crea_elemento
+				;pop {r0,r1}
 				
-				push {r0-r1,r4}
-				sub r0, r4, #COLUMNS
-				mov r1, r5
-				sub r4, r2
-				bl animar_cambio
-				pop {r0-r1,r4}
+				;push {r0-r1,r4}
+				;sub r0, r4, #COLUMNS
+				;mov r1, r5
+				;sub r4, r2
+				;bl animar_cambio
+				;pop {r0-r1,r4}
 				
 				mov r6, #TRUE
 			.LFinSiElementoVacio:
