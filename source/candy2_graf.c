@@ -33,7 +33,7 @@ void genera_sprites(char mat[][COLUMNS])
 {
     SPR_ocultarSprites(128);
     for (int i=0;i<ROWS*COLUMNS;i++){
-        vect_elem[i].ii=-1;                            //desactivar sprites
+        vect_elem[i].ii=-1;                            //desactivar sprites (pdf pág 26)
     }
 
     for (int i=0; i<n_sprites;i++){
@@ -51,7 +51,7 @@ void genera_sprites(char mat[][COLUMNS])
     }
 
     swiWaitForVBlank();
-    SPR_actualizarSprites(OAM, 128);            //actualizar OAM con el num de sprites creados
+    SPR_actualizarSprites(OAM, n_sprites);            //actualizar OAM con el num de sprites creados
 }
 
 
@@ -181,7 +181,7 @@ void init_grafA()
 	// cargar las baldosas de la variable SpritesTiles[] a partir de la
 	// direcciï¿½n virtual de memoria grï¿½fica para sprites, y cargar los colores
 	// de paleta asociados contenidos en la variable SpritesPal[]
-	dmaCopy(SpritesTiles, SPRITE_GFX, sizeof(SpritesTiles));	//SpriteTiles es la variable, y para el tamaño se usa sizeof
+	dmaCopy(SpritesTiles, SPRITE_GFX, sizeof(SpritesTiles));	//SpriteTiles es la variable, y para el tamaño se usa sizeof, pdf pág 66
 	dmaCopy(SpritesPal, SPRITE_PALETTE, sizeof(SpritesPal));	
 	
 

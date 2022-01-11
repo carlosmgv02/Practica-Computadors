@@ -124,9 +124,9 @@ activa_timer0:
 		ldrh r1, [r0]
 		ldr r2, =divF0
 		strh r1, [r2]			@;copiar divFreq0 a divF0
-		ldr r3, =0x04000100		@;cargar reg de data de timer0PDF pag 37)
+		ldr r3, =0x04000100		@;cargar reg de data de timer0 PDF pag 37)
 		strh r1, [r3]
-		.LfinalActivarTimer0:	@;llamada a funcion
+		.LfinalActivarTimer0:
 		ldr r0, =timer0_on		
 		mov r1, #0x01
 		strh r1, [r0]
@@ -143,7 +143,7 @@ activa_timer0:
 desactiva_timer0:
 		push {r0-r1, lr}
 		ldr r0, =0x04000102		@;cargar reg de control
-		mov r1, #0b01000001		@;poner el bit 7 a 0 (desactivar)
+		mov r1, #0b00000000		@;poner el bit 7 a 0 (desactivar)
 		strh r1, [r0]			@;guardar el registro
 		ldr r0, =timer0_on	
 		mov r1, #0x0	
@@ -174,7 +174,9 @@ rsi_timer0:
 		bhs .LfiBucleWhileRSI0
 		ldrh r12, [r4]		@;r12=vect_elem (valor actual (16bits))
 		cmp r12, #0
-		ble .LsiguientePosicion
+		beq .LsiguientePosicion
+		cmp r12, #-1
+		beq .LsiguientePosicion
 		sub r12, #1
 		strh r12, [r4]		@;decrementar y guardar ii
 		ldrh r1, [r4,#2]	@;r1=px
@@ -198,7 +200,6 @@ rsi_timer0:
 		.LfiBucleWhileRSI0:
 		cmp r10, #0
 		bleq desactiva_timer0
-		beq .LfiServicioInterrupcionesTimer0
 		.LfiServicioInterrupcionesTimer0:
 		ldr r0, =update_spr
 		ldrh r1, [r0]
