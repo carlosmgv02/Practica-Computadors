@@ -515,7 +515,7 @@ animar_cambio:
 		
 		b activa_elemento
 		
-	pop {r0-r4,pc}
+	pop {r0-r3,pc}
 
 
 

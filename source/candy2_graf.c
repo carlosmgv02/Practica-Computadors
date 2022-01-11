@@ -73,10 +73,10 @@ void genera_mapa1(char mat[][COLUMNS])
 	primer píxel de la pantalla. */
 void ajusta_imagen3(int ibg)
 {
-	//bgSetCenter(ibg, 0, 0);
-	//bgSetRotate(ibg, degreesToAngle(90));
-	//bgScroll(ibg, 0, 0);
-	//bgUpdate();
+	bgSetCenter(ibg, 255, 128);
+	bgSetRotate(ibg, degreesToAngle(270));
+	bgScroll(ibg, 128, 0);
+	bgUpdate();
 }
 
 
@@ -137,7 +137,7 @@ void init_grafA()
 	// descomprimir (y cargar) la imagen de la variable FondoBitmap[] a partir
 	// de la dirección virtual de vídeo reservada para dicha imagen
 	decompress(FondoBitmap, bgGetGfxPtr(bg3A), LZ77Vram);
-	//ajusta_imagen3(bg3A);
+	ajusta_imagen3(bg3A);
 
 	// fijar display A en pantalla inferior (táctil)
 	lcdMainOnBottom();

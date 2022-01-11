@@ -3,7 +3,7 @@
 @;=                                                           	    	=
 @;=== Programador tarea 2E: xxx.xxx@estudiants.urv.cat				  ===
 @;=== Programador tarea 2G: yyy.yyy@estudiants.urv.cat				  ===
-@;=== Programador tarea 2H: zzz.zzz@estudiants.urv.cat				  ===
+@;=== Programador tarea 2H: joseluis.pueyo@estudiants.urv.cat				  ===
 @;=                                                       	        	=
 
 .include "../include/candy2_incl.i"

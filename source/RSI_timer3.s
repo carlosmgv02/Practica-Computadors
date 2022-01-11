@@ -17,7 +17,7 @@
 		.global offsetBG3X
 	offsetBG3X: .hword	0			@;desplazamiento vertical fondo 3
 	sentidBG3X:	.hword	0			@;sentido desplazamiento (0-> inc / 1-> dec)
-	divFreq3: .hword	-52365,597	@;divisor de frecuencia para timer 3, resultado de calcular Frec_Entrada / -Div_Frec = -(523.655,97/10) = -52365,597 < 65.536
+	divFreq3: .hword	52365	@;divisor de frecuencia para timer 3, resultado de calcular Frec_Entrada / -Frec_Salida = -(523655,97/10) = -52365.597, en valor absoluto -> |-52365.597| < 65.536
 	
 
 
