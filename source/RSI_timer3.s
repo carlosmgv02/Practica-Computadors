@@ -35,7 +35,7 @@ activa_timer3:
 		@; Cargar un 1 a la variable timer_on
 		ldr r0, =timer3_on
 		mov r1, #1
-		strb r1, [r0]
+		strh r1, [r0]
 		@; Activar el timer3
 		ldr r0, =0x0400010E		@;TIMER3_CR
 		ldrh r1, [r0]
@@ -62,7 +62,7 @@ desactiva_timer3:
 		@; Cargar un 0 a la variable timer_on
 		ldr r0, =timer3_on
 		mov r1, #0
-		strb r1, [r0]
+		strh r1, [r0]
 		@; Desactivar el timer3
 		ldr r0, =0x0400010E		@;TIMER3_CR
 		ldrh r1, [r0]
@@ -96,11 +96,11 @@ rsi_timer3:
 		subne r3, #1
 		@; Limite superior
 		cmp r3, #320
-		subeq r1, #1
+		moveq r1, #1
 		streqh r1, [r0]
 		@; Limite inferior
 		cmp r3, #0
-		addeq r1, #1
+		moveq r1, #0
 		streqh r1, [r0]
 		@; Activar la variable update_bg3
 		mov r1, #1
