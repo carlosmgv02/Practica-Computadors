@@ -195,6 +195,13 @@ baja_verticales:
 						cmp r0, #1
 						bne .LFinSiElementoValido
 						
+						push {r0,r1}
+						mov r0, r6
+						mov r1, r8
+						@; r4 -> *base
+						bl animar_cambio
+						pop {r0,r1}
+						
 						@; Bajo el elemento
 						and r0, r7, #0x7
 						bic r7, #0x7
@@ -303,8 +310,24 @@ baja_laterales:
 						and r1, r7, #0x7
 						bic r7, #0x7
 						add r5, r1
+						
+						push {r0,r1}
+						mov r0, r6
+						mov r1, r8
+						@; r4 -> *base
+						bl animar_cambio
+						pop {r0,r1}
+						
 						strb r5, [r4, r6]
 						strb r7, [r4, r8]
+						
+						push {r0,r1}
+						mov r0, r6
+						mov r1, r8
+						@; r4 -> *base
+						bl animar_cambio
+						pop {r0,r1}
+						
 						@; Exito, ha habido bajada
 						mov r9, #1
 					.LNoValidos:
@@ -357,6 +380,21 @@ genera_elementos:
 				add r3, r0
 				strb r3, [r5]
 				@; Generado con exito
+				
+				push {r0,r1}
+				mov r0, r3
+				mov r1, #-1
+				@; r2 -> columna
+				bl crea_elemento
+				pop {r0,r1}
+				
+				push {r0-r1,r4}
+				sub r0, r4, #COLUMNS
+				mov r1, r5
+				sub r4, r2
+				bl animar_cambio
+				pop {r0-r1,r4}
+				
 				mov r6, #TRUE
 			.LFinSiElementoVacio:
 			
@@ -445,5 +483,40 @@ es_elemento_basico:
 		movne r0, #TRUE
 		moveq r0, #FALSE
 	pop {pc}
+
+
+@; animar_cambio(*elem1, *elem2, *base): rutina para animar el intercambio de 2 elementos
+@;	Parámetros:
+@;		R0 = dirección del primer elemento
+@;		R1 = dirección del segundo elemento
+@;		R4 = dirección base de la matriz
+animar_cambio:
+	push {r0-r3,lr}
+		sub r0, r4
+		mov r1, #0
+		sub r2, r4
+		mov r3, #0
+		
+	.LBucleCalculaY1:
+		cmp r0, #COLUMNS
+		ble .LFiBucleCalculaY2
+			sub r0, #COLUMNS
+			add r1, #1
+		b .LBucleCalculaY1
+	.LFiBucleCalculaY1:
+		
+	.LBucleCalculaY2:
+		cmp r2, #COLUMNS
+		ble .LFiBucleCalculaY2
+			sub r2, #COLUMNS
+			add r3, #1
+		b .LBucleCalculaY2
+	.LFiBucleCalculaY2:
+		
+		b activa_elemento
+		
+	pop {r0-r4,pc}
+
+
 
 .end

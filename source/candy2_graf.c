@@ -73,10 +73,10 @@ void genera_mapa1(char mat[][COLUMNS])
 	primer píxel de la pantalla. */
 void ajusta_imagen3(int ibg)
 {
-	bgSetCenter(ibg, 0, 0);
-	bgSetRotate(ibg, degreesToAngle(90));
-	bgScroll(ibg, 0, 0);
-	bgUpdate();
+	//bgSetCenter(ibg, 0, 0);
+	//bgSetRotate(ibg, degreesToAngle(90));
+	//bgScroll(ibg, 0, 0);
+	//bgUpdate();
 }
 
 
