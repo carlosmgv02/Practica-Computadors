@@ -15,6 +15,8 @@
 		.global timer2_on
 	timer2_on:	.hword	0 			@;1 -> timer2 en marcha, 0 -> apagado
 	divFreq2: .hword	-5236		@;divisor de frecuencia para timer 2
+	@;GEL_II puede ser 10 max y tienen q haber 10 refrescos por baldosa/s
+	@;523655,96/10*10
 
 
 
@@ -32,7 +34,7 @@ activa_timer2:
 		ldr r0,=timer2_on
 		mov r1, #1
 		strh r1, [r0]
-		ldr r0, =0x04000108
+		ldr r0, =0x04000108		@;Dir mem timer2
 		ldr r1,=divFreq2
 		ldrh r1,[r1]
 		strh r1,[r0]
@@ -52,7 +54,7 @@ desactiva_timer2:
 		mov r1, #0
 		strh r1, [r0]
 		ldr r2,=0x0400010A 
-		mov r3, #0x0
+		mov r3, #0x0	@;todos bits desactiv
 		strh r3,[r2]
 		pop {r0-r3,pc}
 

@@ -290,7 +290,7 @@ desactiva_escalado:
 @;		R0 :	direcciï¿½n base del mapa de baldosas
 @;		R1 :	fila del elemento
 @;		R2 :	columna del elemento
-@;		R3 :	Ã­ndice de metabaldosa (imeta)
+@;		R3 :	índice de metabaldosa (imeta)
 	.global fija_metabaldosa
 fija_metabaldosa:
 		push {r1-r10, lr}

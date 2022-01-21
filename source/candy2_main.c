@@ -8,7 +8,7 @@
 	Analista-programador principal: santiago.romani@urv.cat
 	Analista-programador auxiliar:  pere.millan@urv.cat
 	Programador 1: xxx.xxx@estudiants.urv.cat
-	Programador 2: yyy.yyy@estudiants.urv.cat
+	Programador 2: ismael.ruiz@estudiants.urv.cat
 	Programador 3: zzz.zzz@estudiants.urv.cat
 	Programador 4: uuu.uuu@estudiants.urv.cat
 
@@ -236,7 +236,7 @@ int main(void)
 			}
 			lapse = 0;
 		}
-		else if (lapse >= 192)	//////	SECCIÃ“N DE SUGERENCIAS	//////
+		else if (lapse >= 192)	//////	SECCIÓN DE SUGERENCIAS	//////
 		{
 			if (lapse == 192) 		// a los 8 segundos sin actividad (aprox.)
 			{

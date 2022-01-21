@@ -94,7 +94,8 @@ void genera_mapa1(char mat[][COLUMNS])
                     fija_metabaldosa((u16 *)0x06000000, i, j, im);
                 }
                 ii=mod_random(10);
-                mat_gel[i][j].ii=ii;
+				
+                mat_gel[i][j].ii=ii;//Actualitzem els índexs
                 mat_gel[i][j].im=im;
             }
         }
