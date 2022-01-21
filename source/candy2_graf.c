@@ -58,6 +58,8 @@ void genera_mapa2(char mat[][COLUMNS])
 	correspondientes, (para las gelatinas, basta con utilizar la primera
 	metabaldosa de la animaci�n); adem�s, hay que inicializar la matriz de
 	control de la animaci�n de las gelatinas mat_gel[][COLUMNS]. */
+
+
 void genera_mapa1(char mat[][COLUMNS])
 {
 	int ii=0, im=0;
@@ -74,13 +76,14 @@ void genera_mapa1(char mat[][COLUMNS])
 
     for(i=0; i<ROWS; i++){
         for(j=0; j<COLUMNS; j++){
-            if(mat[i][j]!= 7|| mat[i][j]==15){
-                fija_metabaldosa((u16 *)0x06000000, i, j, 19);
+            if(mat[i][j]!= 7|| mat[i][j]==15){//ni bloq solid ni gelatina
+				//hacemos cast del formato u16 necesario para poder operar con la direccion de memoria
+                fija_metabaldosa((u16 *)0x06000000, i, j, 19);	//19 metabaldosa transparente
             }
-            if(mat[i][j]==7){
-                fija_metabaldosa((u16 *)0x06000000, i, j, 16);
+            if(mat[i][j]==7){//bloq solid
+                fija_metabaldosa((u16 *)0x06000000, i, j, 16);	//verja
             }
-            if(mat[i][j]>=9 && mat[i][j]<=22 && mat[i][j]!=15){
+            if(mat[i][j]>=9 && mat[i][j]<=22 && mat[i][j]!=15){//gelatina simple o dobl
                 if(mat[i][j]>=9&&mat[i][j]<=14){
                     im=mod_random(7);
                     fija_metabaldosa((u16 *)0x06000000, i, j, im);
@@ -130,7 +133,7 @@ void init_grafA()
 
 // Tareas 2Ba y 2Ca:
 	// reservar banco E para fondos 1 y 2, a partir de 0x06000000
-	vramSetBankE(VRAM_E_MAIN_BG);
+	vramSetBankE(VRAM_E_MAIN_BG);		//banco de memoria principal para los fondos
 
 // Tarea 2Da:
 	// reservar bancos A y B para fondo 3, a partir de 0x06020000
@@ -152,7 +155,8 @@ void init_grafA()
 
 // Tarea 2Ca:
 	//inicializar el fondo 1 con prioridad 0
-	bg1A = bgInit(1, BgType_Text8bpp, BgSize_T_256x256,0, 1);
+	bg1A = bgInit(1, BgType_Text8bpp, BgSize_T_256x256,0, 1);		//0 indica que el fondo empieza en dir + 0*2KB,
+																	//1 indica que contenido baldosas empieza en dir +0*16KB
 	bgSetPriority(bg1A,0);
 
 
@@ -162,8 +166,8 @@ void init_grafA()
 	// las baldosas para los fondos 1 y 2, cargar los colores de paleta
 	// correspondientes contenidos en la variable BaldosasPal[]
 
-	decompress(BaldosasTiles,bgGetGfxPtr(bg1A), LZ77Vram);
-	dmaCopy(BaldosasPal, BG_PALETTE, sizeof(BaldosasPal));
+	decompress(BaldosasTiles,bgGetGfxPtr(bg1A), LZ77Vram);		//Baldosas tiles var glob, cont baldosas, bgGet  dir inic baldos,
+	dmaCopy(BaldosasPal, BG_PALETTE, sizeof(BaldosasPal));		//paleta baldosas, BG_PAL dir ini paleta, tamaño paleta baldosas
 	
 // Tarea 2Da:
 	// inicializar el fondo 3 con prioridad 3
