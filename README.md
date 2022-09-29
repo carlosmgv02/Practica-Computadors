@@ -44,7 +44,7 @@ Se incluyen tanto los ficheros de la primera fase de la práctica, como los de l
   * *RSI_timer2.s*
   * *RSI_timer3.s*
   * *Sprites_sopo.s*
-# Authors
+## Authors
   * Jialiang Chen - [Prog1](https://github.com/carlosmgv02/Practica-Computadors/tree/prog1)
   * Ismael Ruiz - [Prog2](https://github.com/carlosmgv02/Practica-Computadors/tree/prog2)
   * Carlos Martínez - *[carlosmgv02](https://github.com/carlosmgv02)* - [Prog3](https://github.com/carlosmgv02/Practica-Computadors/tree/prog3)
